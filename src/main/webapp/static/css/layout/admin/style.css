@@ -34,6 +34,5 @@ html, body {
 }
 
 .content-container {
-    background-color: black;
     flex:1;
 }
