@@ -54,7 +54,7 @@ dependencies {
 }
 
 gretty {
-    servletContainer = 'tomcat9'
+    servletContainer = 'tomcat10'
     httpPort = 8080
     contextPath = '/'                     // http://localhost:8080/
     inplaceMode = 'soft'                  // JSP/정적리소스 핫리로드
