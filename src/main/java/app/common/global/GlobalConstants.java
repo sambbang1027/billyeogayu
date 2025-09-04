@@ -1,4 +1,4 @@
-package common.global;
+package app.common.global;
 
 public class GlobalConstants {
     /**

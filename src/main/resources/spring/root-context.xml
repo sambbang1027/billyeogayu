@@ -13,10 +13,14 @@
                            http://mybatis.org/schema/mybatis-spring
                            http://mybatis.org/schema/mybatis-spring.xsd">
 
-    <!-- Component Scan -->
-    <context:component-scan base-package="com.billyeogayu">
+    <!-- Component Scan - @Controller 제외 -->
+    <context:component-scan base-package="app.domains">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
+    <context:component-scan base-package="app.common">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
 
     <!-- Properties Configuration -->
     <context:property-placeholder location="classpath:application.properties" ignore-unresolvable="true"/>
@@ -39,12 +43,14 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+
+<!-- TODO: mapper 추가 후 주석 해제       -->
         <property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
-        <property name="typeAliasesPackage" value="com.billyeogayu.domain"/>
+        <property name="typeAliasesPackage" value="app.domains"/>
     </bean>
 
     <!-- MyBatis Mapper Scan -->
-    <mybatis-spring:scan base-package="com.billyeogayu.mapper"/>
+    <mybatis-spring:scan base-package="app.domains"/>
 
     <!-- Transaction Manager -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

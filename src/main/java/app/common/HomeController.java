@@ -1,3 +1,5 @@
+package app.common;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -5,12 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/")
 public class HomeController {
 
-    @GetMapping
+    @GetMapping("/home")
     public String home(Model model) {
         model.addAttribute("title", "Billyeogayu");
         model.addAttribute("message", "Spring Legacy + JSP + MyBatis 프로젝트에 오신 것을 환영합니다!");
@@ -19,6 +22,7 @@ public class HomeController {
     }
 
     @GetMapping("/health")
+    @ResponseBody
     public String health() {
         return "OK";
     }

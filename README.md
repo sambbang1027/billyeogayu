@@ -41,11 +41,11 @@ Spring Legacy + JSP + MyBatis 프로젝트
 ## 📁 프로젝트 구조
 
 ```
-billyeogayu/
+app/
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   └── com/billyeogayu/
+│   │   │   └── com/app/
 │   │   │       ├── domains/
 │   │   │       ├── common/
 │   │   ├── resources/
@@ -85,7 +85,7 @@ billyeogayu/
 ./gradlew test
 
 # 특정 테스트 클래스 실행
-./gradlew test --tests "com.billyeogayu.service.MemberServiceTest"
+./gradlew test --tests "com.app.service.MemberServiceTest"
 ```
 
 ## 📝 API 엔드포인트

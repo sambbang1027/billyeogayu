@@ -11,7 +11,8 @@
                            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <!-- Component Scan for Controllers -->
-    <context:component-scan base-package="com.billyeogayu"/>
+    <context:component-scan base-package="app.common"/>
+    <context:component-scan base-package="app.domains"/>
 
     <!-- MVC Annotation Driven -->
     <mvc:annotation-driven/>
