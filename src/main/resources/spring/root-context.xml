@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://mybatis.org/schema/mybatis-spring
+                           http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <!-- Component Scan -->
+    <context:component-scan base-package="com.billyeogayu">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- Properties Configuration -->
+    <context:property-placeholder location="classpath:application.properties" ignore-unresolvable="true"/>
+
+    <!-- DataSource Configuration -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="maximumPoolSize" value="${db.maximumPoolSize:10}"/>
+        <property name="minimumIdle" value="${db.minimumIdle:5}"/>
+        <property name="connectionTimeout" value="${db.connectionTimeout:30000}"/>
+        <property name="idleTimeout" value="${db.idleTimeout:600000}"/>
+        <property name="maxLifetime" value="${db.maxLifetime:1800000}"/>
+        <property name="leakDetectionThreshold" value="${db.leakDetectionThreshold:60000}"/>
+    </bean>
+
+    <!-- MyBatis SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
+        <property name="typeAliasesPackage" value="com.billyeogayu.domain"/>
+    </bean>
+
+    <!-- MyBatis Mapper Scan -->
+    <mybatis-spring:scan base-package="com.billyeogayu.mapper"/>
+
+    <!-- Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- Transaction Annotation -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>

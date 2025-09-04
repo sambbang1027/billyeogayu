@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!-- Settings -->
+    <settings>
+        <!-- Map underscore to camelCase -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- Enable lazy loading -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- Aggressive lazy loading disabled -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- Multiple result sets enabled -->
+        <setting name="multipleResultSetsEnabled" value="true"/>
+        <!-- Use column label instead of column name -->
+        <setting name="useColumnLabel" value="true"/>
+        <!-- Use generated keys -->
+        <setting name="useGeneratedKeys" value="true"/>
+        <!-- Auto mapping behavior -->
+        <setting name="autoMappingBehavior" value="PARTIAL"/>
+        <!-- Auto mapping unknown column behavior -->
+        <setting name="autoMappingUnknownColumnBehavior" value="WARNING"/>
+        <!-- Default executor type -->
+        <setting name="defaultExecutorType" value="SIMPLE"/>
+        <!-- Default statement timeout -->
+        <setting name="defaultStatementTimeout" value="25"/>
+        <!-- Default fetch size -->
+        <setting name="defaultFetchSize" value="100"/>
+        <!-- Safe row bounds enabled -->
+        <setting name="safeRowBoundsEnabled" value="false"/>
+        <!-- Safe result handler enabled -->
+        <setting name="safeResultHandlerEnabled" value="true"/>
+        <!-- Local cache scope -->
+        <setting name="localCacheScope" value="SESSION"/>
+        <!-- Jdbc type for null -->
+        <setting name="jdbcTypeForNull" value="OTHER"/>
+        <!-- Lazy load trigger methods -->
+        <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+    </settings>
+
+    <!-- Type Aliases -->
+    <typeAliases>
+        <package name="com.billyeogayu.domain"/>
+    </typeAliases>
+
+    <!-- Type Handlers -->
+    <typeHandlers>
+        <!-- Custom type handlers can be added here -->
+    </typeHandlers>
+
+    <!-- Object Factory -->
+    <objectFactory type="org.apache.ibatis.reflection.factory.DefaultObjectFactory">
+        <property name="constructorArgTypes" value=""/>
+        <property name="properties" value=""/>
+    </objectFactory>
+
+    <!-- Plugins -->
+    <plugins>
+        <!-- MyBatis plugins can be added here -->
+    </plugins>
+
+    <!-- Environments -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${db.driver}"/>
+                <property name="url" value="${db.url}"/>
+                <property name="username" value="${db.username}"/>
+                <property name="password" value="${db.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- Mappers -->
+    <mappers>
+        <!-- Mappers will be automatically scanned -->
+    </mappers>
+
+</configuration>
