@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -10,6 +10,10 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     </head>
     <body>
-        사이드바입니다.
+        <ul>
+            <li><a href="<c:url value='/admin/dashboard'/>">대시보드</a></li>
+            <li><a href="<c:url value='/admin/asset'/>">사용자 관리</a></li>
+            <li><a href="<c:url value='/admin/reservation'/>">통계</a></li>
+        </ul>
     </body>
 </html>
