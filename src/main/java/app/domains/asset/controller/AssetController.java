@@ -14,6 +14,7 @@ public class AssetController {
     public String asset(Model model) {
         model.addAttribute("pageTitle", "자산 관리");
         model.addAttribute("contentPage", "/WEB-INF/views/asset/assetList.jsp");
+        model.addAttribute("activePage", "asset");
         return "layout/admin/main";
     }
 }
