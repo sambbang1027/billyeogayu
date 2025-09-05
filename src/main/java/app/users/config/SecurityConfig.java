@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import app.users.auth.CustomUserDetailsService;
@@ -18,10 +19,12 @@ import app.users.auth.CustomUserDetailsService;
 @Configuration
 @EnableWebSecurity(debug=false)
 public class SecurityConfig {
-    
-    // 3. provider 등록
+
     @Autowired
     CustomUserDetailsService customUserDetailsService;
+    
+    @Autowired
+    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -37,13 +40,14 @@ public class SecurityConfig {
         return authenticationProvider;
     }
 
-    // 4. custom login, logout
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // 4-1
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests((authz) -> authz
+                // 관리자 전용 페이지
                 .requestMatchers(new AntPathRequestMatcher("/sub")).hasRole("ADMIN")
+                
+                // 공개 리소스 (정적 파일)
                 .requestMatchers(
                     new AntPathRequestMatcher("/"),
                     new AntPathRequestMatcher("/main"),
@@ -51,11 +55,29 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/js/**"),
                     new AntPathRequestMatcher("/images/**")
                 ).permitAll()
+                
+                // API 엔드포인트 (JWT 인증용)
+                .requestMatchers(
+                    new AntPathRequestMatcher("/api/login"),           // 로그인 API
+                    new AntPathRequestMatcher("/api/register"),        // 회원가입 API
+                    new AntPathRequestMatcher("/api/check-loginId"),   // ID 중복확인 API
+                    new AntPathRequestMatcher("/api/check-email")      // 이메일 중복확인 API
+                ).permitAll()
+                
+                // 폼 로그인 페이지
+                .requestMatchers(
+                    new AntPathRequestMatcher("/login"),
+                    new AntPathRequestMatcher("/register")             // 회원가입 페이지
+                ).permitAll()
+                
+                // 나머지는 인증 필요
                 .anyRequest().authenticated()
             );
 
-        // 4-2
-        // 로그인폼
+        // JWT 필터 추가 (UsernamePasswordAuthenticationFilter 앞에)
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // 폼 로그인 설정
         http.formLogin((form) -> form
             .loginPage("/login")
             .permitAll()
@@ -63,10 +85,10 @@ public class SecurityConfig {
             .failureUrl("/login")
             .usernameParameter("userid")
             .passwordParameter("password")
-            .failureHandler(customAuthenticationFailureHandler) // 5
+            .failureHandler(customAuthenticationFailureHandler)
         );
 
-        // 로그아웃
+        // 로그아웃 설정
         http.logout((logout) -> logout
             .logoutUrl("/logout")
             .logoutSuccessUrl("/")
@@ -78,7 +100,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 5. 사용자화 메시지
     @Autowired
     AuthenticationFailureHandler customAuthenticationFailureHandler;
 }

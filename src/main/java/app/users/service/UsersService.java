@@ -22,9 +22,19 @@ public interface UsersService {
     Users selectUserByEmail(String email);
     
     /**
-     * 사용자 등록
+     * 회원가입
      */
-    void insertUser(Users user);
+    void registerUser(Users user) throws IllegalArgumentException;
+    
+    /**
+     * 로그인 ID 중복 확인
+     */
+    boolean isLoginIdExists(String loginId);
+    
+    /**
+     * 이메일 중복 확인
+     */
+    boolean isEmailExists(String email);
     
     /**
      * 사용자 정보 수정
