@@ -20,6 +20,9 @@
     <!-- Static Resources -->
     <mvc:resources mapping="/static/**" location="/static/"/>
 
+    <!-- Image Resources -->
+    <mvc:resources mapping="/assets/**" location="classpath:/assets/" />
+
     <!-- View Resolver -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/views/"/>
