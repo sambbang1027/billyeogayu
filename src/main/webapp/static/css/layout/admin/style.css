@@ -1,0 +1,36 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display:flex;
+}
+
+.sidebar-container {
+    width: 13vw;
+    height: 100%;
+}
+
+.right-container {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    flex:1;
+}
+
+.header-container {
+    height: 8vh;
+}
+
+.content-container {
+    flex:1;
+}
