@@ -1,0 +1,241 @@
+.maintenance-container {
+  max-width: 97%;              
+  margin: 0 auto;
+  padding: 1rem;               /* 기본 여백 */
+  font-family: "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.page-title {
+  font-size: 1.5rem;           /* 약 24px */
+  font-weight: 600;
+  margin-bottom: 1rem;
+  align-self: flex-start;
+}
+
+/* -------------검색바 ---------------- */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  
+}
+
+.search-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.search-dropdown select {
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: #444;
+  cursor: pointer;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+  min-width: 250px;
+}
+
+.search-input:focus {
+  border-color: #587570;
+  box-shadow: 0 0 3px rgba(88,117,112,0.4);
+}
+
+.search-btn {
+  border: none;
+  color: white;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.search-btn .icon {
+  font-size: 1rem;
+}
+
+
+
+/* ---------------- 필터 영역 ---------------- */
+.filter-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+
+  width: 100%;            
+  box-sizing: border-box;   
+}
+
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-item select,
+.filter-item input {
+  padding: 0.4rem 0.6rem;
+  height: 2rem;
+  font-size: 0.9rem;
+  max-width: 12rem;           /* 최대 192px */
+  flex: 1;
+}
+
+/* 버튼 */
+.btn-reset, .btn-download {
+  padding: 0.5rem 1rem;
+  border: 1px solid #587570;
+  border-radius: 0.4rem;
+  background: #f9f9f9;
+  cursor: pointer;
+  white-space: nowrap;        /* 줄바꿈 방지 */
+  font-size: 0.9rem;
+}
+
+/* ---------------- 적용된 필터 ---------------- */
+.active-filters {
+  margin: 0.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  background: #deefec;
+  border: 1px solid #587570;
+  border-radius: 1rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* ---------------- 테이블 ---------------- */
+.maintenance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.maintenance-table th,
+.maintenance-table td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 0.75rem;
+}
+
+.status-complete {
+  color: #33805a;
+  background: #e4ffea;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+}
+.status-progress {
+  color: #e2474b;
+  background: #fbeee5;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+}
+.status-pending {
+  color: #888;
+  background: #f0f0f0;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+}
+
+/* ---------------- 페이지네이션 ---------------- */
+.pagination {
+  margin-top: 1rem;
+  text-align: center;
+}
+.pagination a {
+  margin: 0 0.4rem;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.3rem;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.9rem;
+}
+.pagination a.active {
+  background: #587570;
+  color: #fff;
+}
+
+/* ---------------- 반응형 ---------------- */
+
+/* 태블릿 (768px 이하) */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-item select,
+  .filter-item input {
+    width: 100%;
+    max-width: none;
+  }
+
+  .btn-reset, .btn-download {
+    width: 100%;
+    text-align: center;
+  }
+
+  .maintenance-table th, 
+  .maintenance-table td {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+}
+
+/* 모바일 (480px 이하) */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .filter-bar {
+    gap: 0.5rem;
+  }
+
+  .active-filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pagination a {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+}

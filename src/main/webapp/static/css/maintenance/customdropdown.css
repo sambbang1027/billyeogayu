@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  font-size: 1rem;
+  color: #7B7B7B;
+  padding: 0.4rem 1rem 0.4rem 0;
+  cursor: pointer;
+}
+
+.dropdown-toggle::after {
+  content: url('/assets/maintenance/arrow-down.png');
+  font-size: 0.8rem;
+  color: #587570;
+  margin-left: 0.5rem;
+}
+
+.dropdown-menu {
+  display: none; /* 기본적으로 숨김 */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin-top: 5px;
+  list-style: none;
+  padding: 0;
+  min-width: 97px;
+  z-index: 100;
+  text-align:center;
+}
+
+.dropdown-menu li {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.dropdown-menu li:hover {
+  background: #deefec;
+}
+
+.dropdown-menu li.active {
+  background: #deefec;
+  font-weight: bold;
+}
