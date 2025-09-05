@@ -10,6 +10,6 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     </head>
     <body>
-        헤더입니다.
+        예약 페이지입니다.
     </body>
 </html>
