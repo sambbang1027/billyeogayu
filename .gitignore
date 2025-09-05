@@ -25,6 +25,8 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+.metadata/
+.smarttomcat/
 
 # NetBeans
 /nbproject/private/
@@ -127,7 +129,5 @@ public
 tmp/
 temp/
 
-# Application specific
-application-local.properties
-application-dev.properties
-application-prod.properties
+# 민감정보 들어간 실제 설정 파일
+src/main/resources/application.properties
