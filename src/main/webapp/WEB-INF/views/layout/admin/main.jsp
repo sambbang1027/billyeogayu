@@ -6,7 +6,10 @@
 <html lang="ko">
     <head>
         <title><c:out value="${pageTitle}" /></title>
-          <link rel="stylesheet" href="<c:url value='/static/css/layout/admin/style.css'/>">
+        <link rel="stylesheet" href="<c:url value='/static/css/layout/admin/style.css'/>">
+        <c:if test="${activePage eq 'asset'}">
+            <link rel="stylesheet" href="<c:url value='/static/css/asset/assetlist/style.css'/>">
+        </c:if>
     </head>
     <body>
         <div class="container">
