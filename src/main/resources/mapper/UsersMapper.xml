@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.users.dao.UsersRepository">
+
+    <!-- User 결과 매핑 -->
+    <resultMap id="usersResultMap" type="app.users.model.Users">
+        <id property="userId" column="USER_ID"/>
+        <result property="loginId" column="LOGIN_ID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="name" column="NAME"/>
+        <result property="phoneNumber" column="PHONE_NUMBER"/>
+        <result property="birth" column="BIRTH"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="role" column="ROLE"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="deletedAt" column="DELETED_AT"/>
+        <result property="isDeleted" column="IS_DELETED"/>
+    </resultMap>
+
+    <!-- 로그인 ID로 사용자 조회 -->
+    <select id="selectUserByLoginId" parameterType="String" resultMap="usersResultMap">
+        SELECT USER_ID, LOGIN_ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER,
+               BIRTH, ADDRESS, ROLE, CREATED_AT, DELETED_AT, IS_DELETED
+        FROM USERS
+        WHERE LOGIN_ID = #{loginId}
+          AND IS_DELETED = 'N'
+    </select>
+
+    <!-- 사용자 ID로 조회 -->
+    <select id="selectUserById" parameterType="Long" resultMap="usersResultMap">
+        SELECT USER_ID, LOGIN_ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER,
+               BIRTH, ADDRESS, ROLE, CREATED_AT, DELETED_AT, IS_DELETED
+        FROM USERS
+        WHERE USER_ID = #{userId}
+          AND IS_DELETED = 'N'
+    </select>
+
+    <!-- 이메일로 사용자 조회 -->
+    <select id="selectUserByEmail" parameterType="String" resultMap="usersResultMap">
+        SELECT USER_ID, LOGIN_ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER,
+               BIRTH, ADDRESS, ROLE, CREATED_AT, DELETED_AT, IS_DELETED
+        FROM USERS
+        WHERE EMAIL = #{email}
+          AND IS_DELETED = 'N'
+    </select>
+
+    <!-- 사용자 등록 -->
+    <insert id="insertUser" parameterType="app.users.model.Users">
+        <selectKey keyProperty="userId" resultType="Long" order="BEFORE">
+            SELECT USER_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO USERS (
+            USER_ID, LOGIN_ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER,
+            BIRTH, ADDRESS, ROLE, CREATED_AT, IS_DELETED
+        ) VALUES (
+            #{userId}, #{loginId}, #{email}, #{password}, #{name}, #{phoneNumber},
+            #{birth}, #{address}, #{role}, SYSDATE, 'N'
+        )
+    </insert>
+
+    <!-- 사용자 정보 수정 -->
+    <update id="updateUser" parameterType="app.users.model.Users">
+        UPDATE USERS SET
+            EMAIL = #{email},
+            PASSWORD = #{password},
+            NAME = #{name},
+            PHONE_NUMBER = #{phoneNumber},
+            BIRTH = #{birth},
+            ADDRESS = #{address},
+            ROLE = #{role}
+        WHERE USER_ID = #{userId}
+          AND IS_DELETED = 'N'
+    </update>
+
+    <!-- 사용자 논리 삭제 -->
+    <update id="softDeleteUser" parameterType="Long">
+        UPDATE USERS SET
+            IS_DELETED = 'Y',
+            DELETED_AT = SYSDATE
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <!-- 전체 사용자 수 조회 -->
+    <select id="getUserCount" resultType="int">
+        SELECT COUNT(*)
+        FROM USERS
+        WHERE IS_DELETED = 'N'
+    </select>
+
+    <!-- 역할별 사용자 조회 -->
+    <select id="selectUsersByRole" parameterType="String" resultMap="usersResultMap">
+        SELECT USER_ID, LOGIN_ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER,
+               BIRTH, ADDRESS, ROLE, CREATED_AT, DELETED_AT, IS_DELETED
+        FROM USERS
+        <where>
+            IS_DELETED = 'N'
+            <if test="role != null and role != ''">
+                AND ROLE = #{role}
+            </if>
+        </where>
+        ORDER BY CREATED_AT DESC
+    </select>
+
+</mapper>

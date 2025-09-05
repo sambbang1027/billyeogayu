@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/context
-                           http://www.springframework.org/schema/context/spring-context.xsd
-                           http://www.springframework.org/schema/tx
-                           http://www.springframework.org/schema/tx/spring-tx.xsd
-                           http://mybatis.org/schema/mybatis-spring
-                           http://mybatis.org/schema/mybatis-spring.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://mybatis.org/schema/mybatis-spring
+        http://mybatis.org/schema/mybatis-spring.xsd">
 
     <!-- Component Scan - @Controller 제외 -->
     <context:component-scan base-package="app.domains">
@@ -20,7 +20,11 @@
     <context:component-scan base-package="app.common">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
-
+    
+    <!-- USERS -->
+    <context:component-scan base-package="app.users">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <!-- Properties Configuration -->
     <context:property-placeholder location="classpath:application.properties" ignore-unresolvable="true"/>
@@ -43,15 +47,17 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
-
-<!-- TODO: mapper 추가 후 주석 해제       -->
         <property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
-        <property name="typeAliasesPackage" value="app.domains"/>
+        <!--  USERS -->
+        <property name="typeAliasesPackage" value="app.domains,app.users.model"/>
     </bean>
 
     <!-- MyBatis Mapper Scan -->
     <mybatis-spring:scan base-package="app.domains"/> 
 
+
+	<!-- USERS -->
+    <mybatis-spring:scan base-package="app.users.dao"/>
 
     <!-- Transaction Manager -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
