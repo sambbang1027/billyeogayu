@@ -5,7 +5,7 @@
 <header class="u-header">
   <div class="u-header__inner">
     <!-- 로고 -->
-    <a class="u-logo" href="<c:url value='/'/>">
+    <a href="<c:url value='/resource/list'/>" class="u-logo">
       <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유 로고">
     </a>
 
