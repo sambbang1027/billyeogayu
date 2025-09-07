@@ -1,4 +1,4 @@
-package app.domains.asset.dao;
+package app.domains.list.dao;
 
-public interface AssetRepository {
+public interface ListRepository {
 }

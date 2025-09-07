@@ -1,4 +1,4 @@
-package app.domains.asset.service;
+package app.domains.list.service;
 
-public class AssetServiceImpl {
+public class ListServiceImpl {
 }
