@@ -24,12 +24,8 @@ public class AdminController {
 
     @GetMapping("/maintenance")
     public String maintenance(Model model) {
-        model.addAttribute("pageTitle", "점검 관리");
-        model.addAttribute("contentPage", "/WEB-INF/views/maintenance.jsp");
-        model.addAttribute("activePage", "maintenance");
-        return "layout/admin/main";
+    	return "forward:/maintenance/list";
     }
-
     @GetMapping("/reservation")
     public String reservation(Model model) {
         model.addAttribute("pageTitle", "예약 관리");

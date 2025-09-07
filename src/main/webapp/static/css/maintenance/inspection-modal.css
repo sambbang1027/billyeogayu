@@ -1,0 +1,131 @@
+@charset "UTF-8";
+/* 모달 전체 */
+.inspection-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;     /* 뷰포트 기준 */
+  height: 100vh;    /* 뷰포트 기준 */
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+
+.inspection-modal.hidden {
+  display: none;
+}
+
+/* 모달 박스 */
+.inspection-modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border-radius: 10px;
+  width: 600px;
+  padding: 20px 30px;
+    display: flex;
+  flex-direction: column;
+}
+
+
+/* 헤더 */
+.inspection-modal-header {
+  border-bottom: 1px solid #e6e6e6;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  text-align: center;
+  width: 100%;   /* 꽉 차도록 */
+}
+
+
+.inspection-modal-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c2c2c;
+}
+
+/* 바디 */
+.inspection-modal-body {
+  font-size: 16px;
+  color: #000;
+
+  flex: 1; /* 남은 공간 다 차지 */
+
+}
+
+.inspection-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 100px 1fr; /* label, value, label, value */
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.inspection-label {
+  font-weight: 600;
+  color: #4f7670;
+  text-align: right; /* 레이블은 오른쪽 정렬 */
+}
+
+.inspection-value {
+  color: #000;
+}
+
+.inspection-tags {
+  display: inline-block;
+}
+
+.inspection-tags .tag {
+  display: inline-block;
+  background: #deefec;
+  color: #587570;
+  border: 0.5px solid #587570;
+  border-radius: 10px;
+  font-size: 14px;
+  padding: 3px 8px;
+  margin-right: 5px;
+}
+
+/* 텍스트 입력 */
+.inspection-textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid #cfcfcf;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 15px;
+  resize: none;
+}
+
+/* 푸터 버튼 */
+.inspection-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  gap: 10px;
+}
+
+.inspection-btn-complete {
+  background: #587570;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.inspection-btn-cancel {
+  background: #ffffff;
+  color: #587570;
+  border: 1px solid #587570;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
