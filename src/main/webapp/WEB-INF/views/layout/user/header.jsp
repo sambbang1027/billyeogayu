@@ -15,8 +15,8 @@
       <!-- 검색 -->
       <form class="u-search" action="${listUrl}" method="get">
         <input type="text" name="q" value="${param.q}" placeholder="농기계를 검색하세요." aria-label="검색">
-        <button type="submit" aria-label="검색 실행">
-          <i class="u-ic u-ic--search" aria-hidden="true"></i>
+        <button type="submit" class="u-search__btn" aria-label="검색 실행">
+          <span class="u-ic--search" aria-hidden="true"></span>
         </button>
       </form>
 
