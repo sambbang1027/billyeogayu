@@ -5,14 +5,15 @@
 <header class="u-header">
   <div class="u-header__inner">
     <!-- 로고 -->
-    <a class="u-logo" href="<c:url value='/'/>">
+    <c:url var="listUrl" value="/resource/list"/>
+    <a href="${listUrl}" class="u-logo">
       <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유 로고">
     </a>
 
     <!-- 검색 + 필터 -->
     <div class="u-tools">
       <!-- 검색 -->
-      <form class="u-search" action="<c:url value='/resource/list'/>" method="get">
+      <form class="u-search" action="${listUrl}" method="get">
         <input type="text" name="q" value="${param.q}" placeholder="농기계를 검색하세요." aria-label="검색">
         <button type="submit" aria-label="검색 실행">
           <i class="u-ic u-ic--search" aria-hidden="true"></i>
@@ -30,9 +31,17 @@
           </svg>
         </button>
 
+        <c:url var="allUrl" value="/resource/list">
+          <c:param name="q" value="${param.q}"/>
+        </c:url>
+        <c:url var="availUrl" value="/resource/list">
+          <c:param name="q" value="${param.q}"/>
+          <c:param name="filter" value="available"/>
+        </c:url>
+
         <div class="u-filter__menu" id="filterMenuHeader">
-          <a href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/></c:url>">전체</a>
-          <a href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='available'/></c:url>">임대가능만</a>
+          <a href="${allUrl}">전체</a>
+          <a href="${availUrl}">임대가능만</a>
         </div>
       </div>
     </div>
@@ -66,14 +75,11 @@
 (function(){
   const wrap = document.querySelector('header .u-filter');
   const btn  = document.getElementById('filterBtnHeader');
-
   function closeMenu(){ wrap?.classList.remove('is-open'); btn?.setAttribute('aria-expanded','false'); }
   function toggleMenu(){ wrap?.classList.toggle('is-open'); btn?.setAttribute('aria-expanded', String(wrap.classList.contains('is-open'))); }
-
   btn?.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
   document.addEventListener('click', (e)=>{ if(!e.target.closest('header .u-filter')) closeMenu(); });
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
-
   closeMenu();
 })();
 </script>

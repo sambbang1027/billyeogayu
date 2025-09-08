@@ -2,7 +2,12 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<link rel="stylesheet" href="<c:url value='/static/css/resource/list.css'/>">
+
+
+<link rel="stylesheet" href="<c:url value='/static/css/layout/resource/list.css'/>">
+<link rel="stylesheet" href="<c:url value='/static/css/layout/user/header/style.css'/>"/>
+
+<jsp:include page="/WEB-INF/views/layout/user/header.jsp"/>
 
 <section class="asset-wrap">
   <!-- ↑ 더 이상 우측 상단 01(롤링넘버) 안 씀 -->
@@ -18,12 +23,12 @@
               </div>
 
               <c:choose>
-                <c:when test="${empty it.imageUrl}">
+                <c:when test="${empty it.image}">
                   <div class="asset-card__img is-empty">이미지 준비중</div>
                 </c:when>
                 <c:otherwise>
                   <div class="asset-card__img">
-                    <img src="<c:url value='${it.imageUrl}'/>" alt="<c:out value='${it.name}'/>" loading="lazy">
+                    <img src="<c:url value='${it.image}'/>" alt="<c:out value='${it.name}'/>" loading="lazy">
                   </div>
                 </c:otherwise>
               </c:choose>
@@ -38,7 +43,7 @@
                 </div>
                 <div class="asset-card__line"></div>
 
-                <button class="asset-card__cta" data-id="${it.id}"
+                <button class="asset-card__cta" data-id="${it.assetId}"
                         <c:if test="${!it.rentable}">disabled="disabled" aria-disabled="true" title="현재 임대 불가"</c:if>>
                   <c:out value="${it.rentable ? '임대신청' : '임대불가'}"/>
                 </button>
@@ -55,9 +60,9 @@
     </c:choose>
   </section>
 
-  <!-- 페이지네이션: page 없을 때도 1 노출 -->
-  <c:set var="totalPages" value="${page != null ? page.totalPages : 1}" />
-  <c:set var="currentPage" value="${page != null ? page.number : 1}" />
+<!-- 페이지네이션: page 없을 때도 1 노출 -->
+<c:set var="totalPages" value="${totalPages != null ? totalPages : 1}" />
+<c:set var="currentPage" value="${page != null ? page : 1}" />
   <nav class="asset-paging" aria-label="페이지 이동">
     <c:forEach var="p" begin="1" end="${totalPages}">
       <a class="asset-paging__item ${p == currentPage ? 'is-active' : ''}"
