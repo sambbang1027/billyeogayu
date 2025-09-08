@@ -30,7 +30,7 @@
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
         <!-- 대시보드 전용 JS: 반드시 Chart.js 다음, defer 권장 -->
-        <script src="<c:url value='/static/js/dashboard.js'/>" defer></script>
+        <script src="<c:url value='/static/js/dashboard/dashboard.js'/>" defer></script>
     </c:if>
 
 </head>
