@@ -11,6 +11,24 @@ const COMMON_OPTIONS = {
     scales: { y: { beginAtZero: true } },
 };
 
+// 파이 차트용 공통 옵션
+const PIE_COMMON_OPTIONS = {
+    plugins: { 
+        legend: { 
+            display: true,
+            position: 'bottom',
+            labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                    size: 12
+                }
+            }
+        }
+    },
+    interaction: { mode: "index", intersect: false }
+};
+
 // 유틸: 엘리먼트가 있을 때만 생성
 function initChart(id, factory) {
     const el = document.getElementById(id);
@@ -127,6 +145,50 @@ document.addEventListener("DOMContentLoaded", () => {
                         y: { ...COMMON_OPTIONS.scales.y, max: 100, ticks: { stepSize: 25, callback: (v) => v + "%" } },
                     },
                 },
+            })
+    );
+
+    // 파이 차트 (자원 분포 현황)
+    initChart(
+        "distributionChart",
+        (ctx) =>
+            new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: ["트랙터", "운반차", "논두렁 조성기", "이앙기", "기타"],
+                    datasets: [
+                        {
+                            data: [35, 25, 20, 15, 5],
+                            backgroundColor: [
+                                "#4CAF50",
+                                "#2196F3", 
+                                "#FF9800",
+                                "#9C27B0",
+                                "#607D8B"
+                            ],
+                            borderWidth: 2,
+                            borderColor: "#fff",
+                            hoverOffset: 4
+                        }
+                    ]
+                },
+                options: {
+                    ...PIE_COMMON_OPTIONS,
+                    plugins: {
+                        ...PIE_COMMON_OPTIONS.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value}개 (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
             })
     );
 

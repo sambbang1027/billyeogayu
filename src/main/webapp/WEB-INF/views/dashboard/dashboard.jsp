@@ -31,20 +31,31 @@
             </div>
         </div>
 
-        <!-- 중간 막대 차트 섹션 -->
+        <!-- 중간 차트 섹션 -->
         <div class="first-chart-section">
-            <h2 class="section-title">자원 종류별 현황</h2>
-            <div class="chart-container">
-                <canvas id="resourceTypeChart"></canvas>
-            </div>
-            <div class="chart-legend">
-                <div class="legend-item">
-                    <div class="legend-color legend-color-green"></div>
-                    <span class="legend-text">총 자원수</span>
+            <!-- 막대 차트 -->
+            <div class="chart-wrapper">
+                <h3 class="section-title">자원 종류별 현황</h3>
+                <div class="chart-container">
+                    <canvas id="resourceTypeChart"></canvas>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color legend-color-red"></div>
-                    <span class="legend-text">점검 필요</span>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-color-green"></div>
+                        <span class="legend-text">총 자원수</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-color-red"></div>
+                        <span class="legend-text">점검 필요</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 파이 차트 -->
+            <div class="chart-wrapper">
+                <h3 class="section-title">자원 분포 현황</h3>
+                <div class="chart-container">
+                    <canvas id="distributionChart"></canvas>
                 </div>
             </div>
         </div>

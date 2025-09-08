@@ -46,19 +46,45 @@
 
 /* 상단 차트 섹션 */
 .first-chart-section {
-    background: #fff;
+    display: flex; /* 가로 플렉스 */
+    flex-direction: row; /* ← 핵심: column에서 row로 */
+    gap: 32px; /* 카드 사이 간격 */
+    width: 100%;
+    align-items: stretch;
+    padding-left: 0;
+    padding-right: 0;
+    border-radius: 12px;
+    /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+    flex: 0 0 auto;
+    /*max-width: 1200px;*/
+}
+
+.chart-wrapper {
+    flex: 1 1 0; /* 동일 비율로 좌/우 분할 */
+    min-width: 0; /* 그래프 넘침 방지 */
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    flex: 0 0 auto;
-    width: min(100%, var(--first-chart-card-w));
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+}
+.chart-subtitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 12px 0;
+    text-align: center;
 }
 .first-chart-section .chart-container {
     position: relative;
     height: var(--first-chart-h);
+    max-height: var(--first-chart-h);
+    flex: 1;
 }
 .first-chart-section .chart-legend {
     gap: 12px;
     margin-top: 10px;
+    justify-content: center;
 }
 .first-chart-section .legend-color {
     width: 12px;
@@ -88,7 +114,6 @@
 .asset-usage, .asset-maintenance {
     flex: 1 1 0; /* 동일 비율로 좌/우 분할 */
     min-width: 0; /* 그래프 넘침 방지 */
-    background: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 16px 20px;
