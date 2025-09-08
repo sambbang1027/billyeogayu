@@ -6,6 +6,7 @@
   margin-right: 1rem; 
 }
 
+
 .dropdown-box {
   position: relative; /* 메뉴 위치 기준 */
 }
@@ -17,11 +18,11 @@
 
 .dropdown-toggle {
   background: #fff;
-  border: 1px solid #7b7b7b;
-  border-radius: 8px;
+  border: 1px solid #b4b4b4;
+  border-radius: 5px;
   font-size: 1rem;
   color: #7B7B7B;
-  padding: 0.4rem 1.5rem 0.4rem 0.8rem; /* 왼쪽·오른쪽 여백 */
+  padding: 0.4rem 1rem 0.4rem 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;

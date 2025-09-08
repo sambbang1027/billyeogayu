@@ -49,15 +49,19 @@ $(document).ready(function() {
 
     if (statusText === "점검중") {
 	console.log('상태는 점검중 -> 모달 열림 ')
-      $("#inspectionModal").show();
+      $("#inspectionModal").removeClass("hidden").show();
     } else if (statusText === "점검완료") {
-      $("#inspectionEditModal").show();
+		console.log('상태는 점검완료 -> 모달 열림 ')
+      $("#inspectionEditModal").removeClass("hidden").show();
     }
   });
 
   // 닫기 버튼 누르면 해당 모달만 닫기
   $(document).on("click", ".close-btn", function() {
-    $(this).closest(".inspection-modal").hide();
+    console.log('닫힙니다 모달이');
+    const $modal = $(this).closest(".inspection-modal");
+    if ($modal.length) {
+      $modal.removeAttr("style").addClass("hidden").hide();
+    }
   });
 });
-

@@ -107,6 +107,7 @@
 		     </div>
 	    </div>
 	
+		<button class="maintenance-apply" >등록</button>
 	
 	     <button class="btn-download">
 	     			<img alt="download-list" src="<c:url value='/assets/asset/download.svg'/>">
@@ -230,11 +231,12 @@
 
 <!-- 모달 include (하드코딩된 UI만) -->
 <jsp:include page="/WEB-INF/views/maintenance/inspectionModal.jsp" />
-<%-- <jsp:include page="/WEB-INF/views/maintenance/inspectionEditModal.jsp" /> --%>
+ <jsp:include page="/WEB-INF/views/maintenance/inspectionEditModal.jsp" />
+ <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" /> 
 
 <!-- 모달은 기본 숨김 -->
 <style>
-  #inspectionModal, #inspectionEditModal { display: none; }
+  #inspectionModal, #inspectionEditModal, #inspectionApplyModal { display: none; }
 </style>
 
 
