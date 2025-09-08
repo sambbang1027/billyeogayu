@@ -1,0 +1,63 @@
+html { font-size: 16px; }
+
+/* 페이지 래퍼: 세로 배치 + 화면 높이 채우기 */
+.asset-wrap{
+  max-width:75rem;
+  margin:2rem auto 1.25rem;      /* 필요하면 3rem/2rem로 조정 가능 */
+  padding:0 1rem;
+  display:flex;
+  flex-direction:column;
+  min-height:calc(100vh - 120px); /* 헤더 높이에 맞춰 숫자만 조정 */
+}
+
+/* 카드 그리드: flex 주지 말 것!! */
+.asset-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1rem;                       /* 1.25rem 써도 OK */
+  align-content:start;            /* ★ 행 늘어남 방지(기본 stretch 막기) */
+}
+
+.asset-card{
+  position:relative;
+  border:0.0625rem solid #d9d9d9; border-radius:0.625rem; background:#fff; overflow:hidden;
+  display:flex; flex-direction:column;
+  transition: box-shadow .15s ease;
+}
+.asset-card:hover{ box-shadow:0 0.5rem 1.125rem rgba(0,0,0,.06); }
+
+.asset-card__badge{
+  position:absolute; left:0.625rem; top:0.625rem;
+  padding:0.25rem 0.5rem; border-radius:0.25rem; font-size:0.75rem;
+}
+.asset-card__badge.is-ok{ background:#CEE6FF; color:#111; }
+.asset-card__badge.is-no{ background:#ff4d4f; color:#fff; }
+
+.asset-card__img{ position:relative; height:10.5rem; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.asset-card__img img{ max-width:80%; max-height:80%; object-fit:contain; }
+.asset-card__img.is-empty{ color:#888; background:#f6f6f6; font-size:.875rem; }
+
+.asset-card__body{ padding:0.75rem; display:flex; flex-direction:column; gap:0.5rem; }
+.asset-card__title{ font-size:1rem; font-weight:600; margin:0; color:#111; }
+.asset-card__meta{ display:flex; gap:0.5rem; color:#6f6f6f; font-size:0.75rem; }
+.asset-card__stock{ margin-left:auto; }
+.asset-card__line{ height:0.0625rem; background:#d1d1d1; margin-top:0.25rem; }
+
+.asset-card__cta{
+  align-self:flex-end; height:2rem; padding:0 0.75rem; border-radius:0.25rem; border:0; cursor:pointer;
+  background:#659f7c; color:#fff; font-size:0.875rem;
+}
+.asset-card__cta[disabled]{ background:#b8b8b8; cursor:not-allowed; }
+
+/* 페이지네이션: 항상 하단 고정 */
+.asset-paging{
+  display:flex; gap:0.375rem; justify-content:center;
+  margin-top:auto;                /* ★ 남는 공간을 먹고 아래로 밀림 */
+  margin-bottom:0.5rem;
+}
+.asset-paging__item{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:1.75rem; height:1.75rem; padding:0 0.5rem; border-radius:0.25rem;
+  text-decoration:none; color:#1e1e1e; font-size:0.875rem;
+}
+.asset-paging__item.is-active{ background:#659f7c; color:#fff; }
