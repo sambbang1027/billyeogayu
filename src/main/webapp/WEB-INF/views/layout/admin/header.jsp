@@ -9,6 +9,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
          <link rel="stylesheet" href="<c:url value='/static/css/layout/admin/header/style.css'/>">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+        <!-- 알람 모달 전용 CSS/JS -->
+        <link rel="stylesheet" href="<c:url value='/static/css/layout/admin/alarm/style.css'/>">
+        <script src="<c:url value='/static/js/alarm/alarm.js'/>" defer></script>
+
     </head>
     <body>
         <div class="header-container">
@@ -18,6 +23,8 @@
                          src="<c:url value='/assets/layout/admin/alarm.svg'/>"
                          alt="알람" />
                 </div>
+                
+                <!-- TODO: 최근 알람 개수 조회 및 출력 혹은 아예 숫자는 보여주지 말기? -->
                 <div class="alarm-text-box">
                     23
                 </div>
@@ -38,5 +45,9 @@
                      alt="로그아웃" />
             </div>
         </div>
+
+        <!-- 🔔 알람 모달 전역 include -->
+        <jsp:include page="/WEB-INF/views/layout/admin/alarm.jsp"/>
+
     </body>
 </html>

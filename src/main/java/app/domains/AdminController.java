@@ -11,10 +11,7 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("pageTitle", "대시보드");
-        model.addAttribute("contentPage", "/WEB-INF/views/dashboard.jsp");
-        model.addAttribute("activePage", "dashboard");
-        return "layout/admin/main";   // 공통 레이아웃
+        return "forward:/dashboard";
     }
 
     @GetMapping("/asset")
