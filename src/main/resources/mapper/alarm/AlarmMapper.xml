@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.domains.alarm.dao.AlarmRepository">
+
+    <resultMap id="alarmResultMap" type="app.domains.alarm.model.Alarm">
+        <id property="id" column="alarm_id"/>
+        <result property="assetId" column="asset_id"/>
+        <result property="type" column="type"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+        <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="app.domains.alarm.model.Alarm">
+        INSERT INTO alarm (asset_id, type, description, created_at, updated_at, is_deleted)
+        VALUES (#{assetId}, #{type}, #{description}, #{createdAt}, #{updatedAt}, #{isDeleted})
+    </insert>
+
+    <select id="findById" parameterType="long" resultMap="alarmResultMap">
+        SELECT alarm_id, asset_id, type, description, created_at, updated_at, deleted_at, is_deleted
+        FROM alarm 
+        WHERE alarm_id = #{id} AND is_deleted = 'N'
+    </select>
+
+    <select id="findAll" resultMap="alarmResultMap">
+        SELECT alarm_id, asset_id, type, description, created_at, updated_at, deleted_at, is_deleted
+        FROM alarm 
+        WHERE is_deleted = 'N'
+        ORDER BY created_at DESC
+    </select>
+
+</mapper>
