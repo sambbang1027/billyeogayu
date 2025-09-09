@@ -89,7 +89,7 @@ function renderActiveFilters(){
             $container.append(`
                 <div class="filter-tag" data-type="${key}">
                     <span class="filter-name">${displayValue}</span>
-                    <img alt="cancel-filter" src="/billyeogayu/assets/asset/xbtn.svg" class="filter-cancel">
+                    <img alt="cancel-filter" src="/assets/asset/xbtn.svg" class="filter-cancel">
                 </div>
             `);
         }
