@@ -50,7 +50,8 @@
     </bean>
 
 <!-- Mapper 스캔 -->
-<mybatis-spring:scan base-package="app.domains.list.dao"/>
+<mybatis-spring:scan base-package="app.domains.*.dao"/>
+
 
     <!-- list용: Repository에서 SqlSessionTemplate 직접 사용 -->
     <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">

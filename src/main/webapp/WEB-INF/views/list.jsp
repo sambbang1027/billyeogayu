@@ -5,6 +5,12 @@
 <link rel="stylesheet" href="<c:url value='/static/css/layout/user/resource/list.css'/>">
 <link rel="stylesheet" href="<c:url value='/static/css/layout/user/header/style.css'/>"/>
 
+<c:if test="${not empty successMessage}">
+    <div class="success-message" style="background: #d4edda; color: #155724; padding: 15px; margin: 20px; border-radius: 5px; border: 1px solid #c3e6cb;">
+        ${successMessage}
+    </div>
+</c:if>
+
 <jsp:include page="/WEB-INF/views/layout/user/header.jsp"/>
 
 <section class="asset-wrap">
@@ -152,21 +158,24 @@
   </c:if>
 </section>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- jQuery 버전: 임대신청 버튼 -->
 <script>
-  // 임대신청 버튼 클릭
-  document.querySelectorAll('.asset-card__cta').forEach(function(b){
-    b.addEventListener('click', function(){
-      const loggedIn = !!(${not empty sessionScope.loginUser});
+  $(function(){
+    $('.asset-card__cta').on('click', function(){
+      var loggedIn = !!(${not empty sessionScope.loginUser});
       if(!loggedIn){
         if(confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')){
-          location.href = '<c:url value="/login"/>';
+          window.location.href = '<c:url value="/login"/>';
         }
         return;
       }
-      if (this.hasAttribute('disabled')) return;
-      const id = this.getAttribute('data-id');
-      location.href = '<c:url value="/rent/apply"/>' + '?resourceId=' + encodeURIComponent(id);
+      if ($(this).is(':disabled')) return;
+
+      var id = $(this).data('id'); // data-id
+      window.location.href = '<c:url value="/rent/apply"/>' + '?resourceId=' + encodeURIComponent(id);
     });
   });
 </script>
- 
