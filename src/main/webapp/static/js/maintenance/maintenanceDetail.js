@@ -45,7 +45,39 @@ function openModal(modal, requestId){
 		type : "GET",
 		success : function(res) {
 			console.log(res);
+
+			// 점검 유형 
+			let type;
+			if(res.type === "EMERGENCY"){
+				type = "긴급점검";
+			}else if(res.type === "REGULAR"){
+				type = "정기점검"; 
+			}
+			$(".inspection-value.type").text(type);
+			
+			// 자원종류 (category)
+			$(".inspection-value.assetType").text(res.assetKind);
+			
+			// 자원명 (모델명 )
+			$(".inspection-value.assetName").text(res.assetName);
+			
+			// 점검자 
+			$(".inspection-value.inspector").text(res.resolverName)
+			
+			// 부품 목록 
+			let tags = "";
+			if(res.parts){
+				res.parts.split(",").forEach(function(part){
+					tags += `<span class="tag">${part.trim()}</span>`;
+				})
+			}
+			$(".inspection-tags").html(tags);
+			
+			// 조치내역 / 비고는 초기화만 (작성용)
+			$(".inspection-textarea.action").val("");
+			$(".inspection-textarea.note").val("");
 		}
 	})
-	
 }
+
+

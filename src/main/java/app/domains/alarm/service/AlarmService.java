@@ -1,0 +1,8 @@
+package app.domains.alarm.service;
+
+import app.domains.alarm.dto.AlarmResponseDto;
+import java.util.List;
+
+public interface AlarmService {
+    List<AlarmResponseDto> findAll();
+}

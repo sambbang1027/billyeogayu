@@ -22,7 +22,7 @@
 					    a.name AS asset_name,
 					    LISTAGG(p.name, ', ') WITHIN GROUP (ORDER BY p.name) AS parts,
 					    MAX(m.type)        AS type,
-					    MAX(u.name)        AS resolver_name,
+					    MAX(m.resolver_name)        AS resolver_name,
 					    MAX(a.category)    AS asset_kind,
 					    MAX(m.resolve_description) AS resolve_description,
 					    MAX(m.note)        AS note

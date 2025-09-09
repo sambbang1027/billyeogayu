@@ -67,14 +67,14 @@ function renderTable(list){
 		if(row.maintStatus === "COMPLETED"){
 			statusHtml = `
 				<div class ="status-complete">
-						<img class = "complete-img" src="/billyeogayu/assets/asset/canuse.svg">
+						<img class = "complete-img" src="/assets/asset/canuse.svg">
 						<span>점검완료</span>
 				</div>
 			`
 		}else if(row.maintStatus === "IN_PROGRESS"){
 			statusHtml = `
 				<div class ="status-progress">
-						<img class = "progress-img" src="/billyeogayu/assets/asset/using.svg">
+						<img class = "progress-img" src="/assets/asset/using.svg">
 						<span>점검중</span>
 				</div>
 			`
@@ -99,7 +99,7 @@ function renderTable(list){
 					<td>${row.adminName}</td>
 					<td>
 							<button class="edit-btn"  data-id="${row.requestId}">
-									<img src="/billyeogayu/assets/maintenance/edit-btn.svg" alt="수정">
+									<img src="/assets/maintenance/edit-btn.svg" alt="수정">
 							</button>
 					</td>
 			</tr>
@@ -116,7 +116,7 @@ function renderPagination(currentPage, totalPage){
 	  if (currentPage > 1) {
 	    $pagination.append(`
 	      <a href="#" class="arrow prev" data-page="${currentPage - 1}">
-	        <img src="/billyeogayu/assets/asset/left.svg" alt="이전">
+	        <img src="/assets/asset/left.svg" alt="이전">
 	      </a>
 	    `);
 	  }
@@ -132,7 +132,7 @@ function renderPagination(currentPage, totalPage){
 	  if (currentPage < totalPage) {
 	    $pagination.append(`
 	      <a href="#" class="arrow next" data-page="${currentPage + 1}">
-	        <img src="/billyeogayu/assets/asset/right.svg" alt="다음">
+	        <img src="/assets/asset/right.svg" alt="다음">
 	      </a>
 	    `);
 	  }
