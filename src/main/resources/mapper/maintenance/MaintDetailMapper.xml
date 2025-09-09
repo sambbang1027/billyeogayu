@@ -13,6 +13,7 @@
 				 <result property="resolverName" column="resolver_name"/>
 				 <result property="description" column="resolve_description"/>
 				 <result property="note" column="note" />
+				 <result property="resolvedAt"  column="resolved_at"/>
 		</resultMap>
 		
 	
@@ -25,13 +26,30 @@
 					    MAX(m.resolver_name)        AS resolver_name,
 					    MAX(a.category)    AS asset_kind,
 					    MAX(m.resolve_description) AS resolve_description,
-					    MAX(m.note)        AS note
+					    MAX(m.note)        AS note,
+						TO_CHAR(MAX(m.resolved_at), 'YYYY.MM.DD HH24:MI') AS resolved_at
 					
 					FROM maintenance m
 					JOIN asset a ON a.asset_id = m.asset_id
 					JOIN part p ON p.part_id = m.part_id
-					JOIN users u ON u.user_id = m.admin_id
 					WHERE m.request_id = #{requestId}
 					GROUP BY m.request_id, a.name
 		</select>
+		
+		<update id="completeMaintenance" parameterType="app.domains.maintenance.model.MaintenanceComplete">
+					UPDATE maintenance 
+					SET resolve_description = #{description}
+					    , note = #{note}
+					    , status = 'COMPLETED'
+					    , resolved_at = sysdate
+					WHERE request_id = #{requestId}
+		</update>
+		
+		<update id="updateRecord" parameterType="app.domains.maintenance.model.MaintenanceEdit"> 
+				UPDATE maintenance
+				SET note = #{note}
+					, updated_at = sysdate
+				WHERE request_id = #{requestId}
+		</update>
+		
 </mapper>

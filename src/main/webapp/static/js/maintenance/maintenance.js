@@ -4,19 +4,8 @@
 
 $(function () {
 	//console.log('페이지 로드 시작 ');
-	getFilterList();
   loadList(1); // 처음 로드될 때 1페이지 데이터 호출
 });
-
-function getFilterList(){
-	$.ajax({
-		url: "/maintenance/filter",
-		type : "GET",
-		success : function(res){
-			console.log(res);
-		}
-	})
-}
 
 
 // 필터 + 검색 값 수집

@@ -8,24 +8,22 @@ $(document).ready(function() {
     const $tr = $(this).closest("tr");
     const statusText = $tr.find(".status-complete span, .status-progress span").text().trim();
 	const requestId = $(this).data("id");
-	console.log("request ID -----", requestId);
+	//console.log("request ID -----", requestId);
 
     if (statusText === "점검중") {
 		
-	console.log('상태는 점검중 -> 모달 열림 ')
-	openModal("#inspectionModal", requestId);
+	//console.log('상태는 점검중 -> 모달 열림 ')
+	openModal("#inspectionModal", requestId, "create");
 	
-     // $("#inspectionModal").removeClass("hidden").show();
     } else if (statusText === "점검완료") {
-		console.log('상태는 점검완료 -> 모달 열림 ')
-		openModal("#inspectionEditModal", requestId);
-      //$("#inspectionEditModal").removeClass("hidden").show();
+	//	console.log('상태는 점검완료 -> 모달 열림 ')
+		openModal("#inspectionEditModal", requestId, "edit");
     }
   });
 
   // 닫기 버튼 누르면 해당 모달만 닫기
   $(document).on("click", ".close-btn", function() {
-    console.log('닫힙니다 모달이');
+    // console.log('닫힙니다 모달이');
     const $modal = $(this).closest(".inspection-modal");
     if ($modal.length) {
       $modal.removeAttr("style").addClass("hidden").hide();
@@ -35,9 +33,10 @@ $(document).ready(function() {
 
 
 
-function openModal(modal, requestId){
-	// 모달 열기 
-	$(modal).removeClass("hidden").show();
+function openModal(modal, requestId, mode){
+	// 모달 열기  -> requestId 를 모달에 숨겨두기 
+	$(modal).data("request-id", requestId).removeClass("hidden").show();
+
 	
 	//Ajax
 	$.ajax({
@@ -45,39 +44,103 @@ function openModal(modal, requestId){
 		type : "GET",
 		success : function(res) {
 			console.log(res);
+			if(mode === "create"){
+				// 조치내역 / 비고는 초기화만 (작성용)
+				$(".inspection-textarea.action").val("");
+				$(".inspection-textarea.note").val("");
 
+			}else if(mode === "edit"){
+				$(".inspection-record-textarea").text(res.description ? res.description : "");
+				$(".inspection-textarea.note").val(res.note ? res.note : "");
+				// 점검일 
+				$(".inspection-value.date").text(res.resolvedAt);
+			}
 			// 점검 유형 
-			let type;
-			if(res.type === "EMERGENCY"){
-				type = "긴급점검";
-			}else if(res.type === "REGULAR"){
-				type = "정기점검"; 
-			}
-			$(".inspection-value.type").text(type);
-			
-			// 자원종류 (category)
-			$(".inspection-value.assetType").text(res.assetKind);
-			
-			// 자원명 (모델명 )
-			$(".inspection-value.assetName").text(res.assetName);
-			
-			// 점검자 
-			$(".inspection-value.inspector").text(res.resolverName)
-			
-			// 부품 목록 
-			let tags = "";
-			if(res.parts){
-				res.parts.split(",").forEach(function(part){
-					tags += `<span class="tag">${part.trim()}</span>`;
-				})
-			}
-			$(".inspection-tags").html(tags);
-			
-			// 조치내역 / 비고는 초기화만 (작성용)
-			$(".inspection-textarea.action").val("");
-			$(".inspection-textarea.note").val("");
+				let type;
+				if(res.type === "EMERGENCY"){
+					type = "긴급점검";
+				}else if(res.type === "REGULAR"){
+					type = "정기점검"; 
+				}
+				$(".inspection-value.type").text(type);
+				
+				// 자원종류 (category)
+				$(".inspection-value.assetType").text(res.assetKind);
+				
+				// 자원명 (모델명 )
+				$(".inspection-value.assetName").text(res.assetName);
+				
+				// 점검자 
+				$(".inspection-value.inspector").text(res.resolverName)
+				
+				// 부품 목록 
+				let tags = "";
+				if(res.parts){
+					res.parts.split(",").forEach(function(part){
+						tags += `<span class="tag">${part.trim()}</span>`;
+					})
+				}
+				$(".inspection-tags").html(tags);
 		}
-	})
+	});
 }
 
 
+$(document).on("click", ".inspection-btn-complete.create", function() {
+	const requestId = $("#inspectionModal").data("request-id")
+	const description = $(".inspection-textarea.action").val().trim();
+	const note = $(".inspection-textarea.note").val().trim();
+	
+	$.ajax({
+		url : "/maintenance/complete",
+		type : "POST",
+		contentType: "application/json; charset=UTF-8",
+       data: JSON.stringify({
+           requestId: requestId,
+           description: description,
+           note: note
+       }),
+	   success : function(res){
+			if(res.code === "SUCCESS"){
+				alert("점검 완료처리 되었습니다.");
+				 $("#inspectionModal").hide();
+				location.reload(); // 새로 고침 
+
+			}
+	   },
+	   error : function(xhr, status, error){
+		console.error(error);
+		alert("등록 중 오류가 발생하였습니다");
+	   }
+	});
+})
+
+
+$(document).on("click", ".inspection-btn-complete.edit", function(){
+	const requestId = $("#inspectionEditModal").data("request-id");
+	const note = $("#inspectionEditModal .inspection-textarea.note").val().trim();
+	
+	//console.log("수정된 비고 -->" + note);
+	
+	$.ajax({
+		url : "/maintenance/edit",
+		type : "POST",
+		contentType: "application/json; charset=UTF-8",
+		data: JSON.stringify({
+			note : note,
+			requestId : requestId
+		}),
+		success : function(res){
+			 if(res.code === "SUCCESS"){
+				alert("기록이 수정되었습니다");
+				$("#inspectionEditModal").hide();
+				location.reload();
+			 }
+		},
+		error : function(xhr, status, error){
+			console.error(error);
+			alert("기록 수정에 실패하였습니다 ");
+		}
+		
+	});
+})

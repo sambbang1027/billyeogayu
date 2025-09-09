@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
+import app.domains.maintenance.model.MaintenanceComplete;
+import app.domains.maintenance.model.MaintenanceEdit;
 import app.domains.maintenance.service.MaintenanceService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -83,7 +87,7 @@ public class MaintenanceController {
     	return response;
     }
 	
-    // 점검중 상세 모달
+    // 점검 상세 모달 (점검중 + 점검완료) 
     @GetMapping("/detail/{requestId}")
     @ResponseBody
     public MaintDetail  getInspectionDetail(@PathVariable("requestId") int requestId) {
@@ -94,14 +98,36 @@ public class MaintenanceController {
         return detail;
     }
 
-	
-    
-
-    // 점검완료 수정 모달
-    @GetMapping("/maintenance/edit/{id}")
-    public String getInspectionEdit(@PathVariable Long id, Model model) {
-     //   model.addAttribute("maintenance", maintenanceService.findById(id));
-        return "maintenance/inspectionEditModal";
+    // 점검 완료 처리 
+    @PostMapping("/complete")
+    @ResponseBody
+    public Map<String, Object> completeMaintenance(@RequestBody  MaintenanceComplete maintenanceComplete){
+    	
+    	maintenanceService.completeMaintenance(maintenanceComplete);
+    	
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	response.put("code", "SUCCESS");
+    	response.put("message", "점검 기록이 등록되었습니다");
+    	
+    	return response;
     }
+	
+   
+    // 점검 기록  수정
+    @PostMapping("/edit")
+    @ResponseBody
+    public Map<String, Object> updateRecord(@RequestBody MaintenanceEdit maintenanceEdit ){
+    
+    	maintenanceService.updateRecord(maintenanceEdit);
+    	
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	response.put("code", "SUCCESS");
+    	response.put("message", "점검 기록이 수정되었습니다");
+    	
+    	return response;
+    }
+	
 
 }

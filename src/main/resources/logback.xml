@@ -63,7 +63,7 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </logger>
-
+    
     <!-- HikariCP Logger -->
     <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>

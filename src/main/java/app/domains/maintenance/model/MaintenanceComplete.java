@@ -6,21 +6,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Getter  @Setter
-public class MaintDetail {
-
+public class MaintenanceComplete {
 	private int requestId;
-	private String resolverName;
-	private String assetKind;
-	private String assetName;
-	private String type;
-	private String parts;
 	private String description;
 	private String note;
-	private String resolvedAt;
-	
 }

@@ -7,6 +7,9 @@ import org.apache.ibatis.annotations.Param;
 import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
+import app.domains.maintenance.model.MaintenanceComplete;
+import app.domains.maintenance.model.MaintenanceEdit;
+import oracle.net.aso.m;
 
 @Mapper
 public interface MaintenanceRepository {
@@ -21,8 +24,13 @@ public interface MaintenanceRepository {
 		List<String> getCompanyList();
 		
 		
-		// 점검 완료 처리를 위한 상세 내용 출력 
+		// 점검 기록 상세 내용 출력 
 		MaintDetail getMaintDetail (int requestId);
 		
+		// 점검 완료 처리 (기록등록 description + note)
+		int completeMaintenance(MaintenanceComplete maintenanceComplete);
+		
+		// 기록 수정
+		int updateRecord( MaintenanceEdit maintenanceEdit);
 		
 }

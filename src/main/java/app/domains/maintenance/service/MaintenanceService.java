@@ -5,6 +5,8 @@ import java.util.List;
 import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
+import app.domains.maintenance.model.MaintenanceComplete;
+import app.domains.maintenance.model.MaintenanceEdit;
 
 public interface MaintenanceService {
 
@@ -18,9 +20,12 @@ public interface MaintenanceService {
 	 List<String>getCompanyList();
 	 
 	 
-	 //점검 완료 처리를 위한 점검 기록 상세 
+	 // 점검 기록 상세 
 	 MaintDetail getMaintDetail(int requestId);
-	 
+	// 점검 완료 처리 
+	void completeMaintenance(MaintenanceComplete maintenanceComplete);
 	
+	// 기록 수정 
+	void updateRecord (MaintenanceEdit maintenanceEdit);
 	
 }

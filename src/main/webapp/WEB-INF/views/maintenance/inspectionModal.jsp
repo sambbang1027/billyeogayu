@@ -54,7 +54,7 @@
     </div>
 
     <div class="inspection-modal-footer">
-      <button class="inspection-btn-complete">점검 완료</button>
+      <button class="inspection-btn-complete create">점검 완료</button>
       <button class="inspection-btn-cancel close-btn">취소</button>
     </div>
   </div>
