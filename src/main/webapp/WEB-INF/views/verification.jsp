@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>빌려가유 - 회원가입</title>
-    <link rel="stylesheet" href="<c:url value='/static/css/layout/user/register/style.css'/>">
+    <link rel="stylesheet" href="<c:url value='/static/css/layout/user/verification/style.css'/>">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
@@ -63,15 +63,17 @@
                     <div class="register-title">본인 확인</div>
                     
                     <!-- 안내 박스 -->
-                    <div class="info-box">
-                        <div class="info-list">
-                            <div class="info-item">
-                                <div class="info-text">아이디를 잊으신 경우 휴대폰인증 또는 이메일 인증을 통해 아이디를 찾을 수 있습니다.
-                                입력하신 정보는 본인확인을 위해 사용되며, 본인확인 용도 외에 사용되거나 저장되지 않습니다.
-                                개인정보는 본인 동의 없이 공개되지 않으며 개인정보보호정책에 의해 보호받고 있습니다.</div>
-                            </div>
-                        </div>
-                    </div>
+					<div class="info-box">
+					    <div class="info-list">
+					        <div class="info-item">
+					            <div class="info-text">
+					                아이디를 잊으신 경우 휴대폰인증 또는 이메일 인증을 통해 아이디를 찾을 수 있습니다.<br>
+					                입력하신 정보는 본인확인을 위해 사용되며, 본인확인 용도 외에 사용되거나 저장되지 않습니다.<br>
+					                개인정보는 본인 동의 없이 공개되지 않으며 개인정보보호정책에 의해 보호받고 있습니다.
+					            </div>
+					        </div>
+					    </div>
+					</div>
 
                     <!-- 인증 방법 선택 -->
                     <div class="auth-methods">
