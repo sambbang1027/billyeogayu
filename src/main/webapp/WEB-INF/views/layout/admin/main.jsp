@@ -26,10 +26,9 @@
 		 		<link rel="stylesheet" href="<c:url value='/static/css/maintenance/inspection-apply.css'/>">
 				<script src="<c:url value='/static/js/maintenance/customDropdown.js'/>"></script>
 				<script src="<c:url value='/static/js/maintenance/searchDropdown.js'/>"></script>
-				<script src="<c:url value='/static/js/maintenance/pagination.js'/>"></script>
-				<script src="<c:url value='/static/js/maintenance/maintenanceDetail.js'/>"></script>
-				<script src="<c:url value='/static/js/maintenance/maintenanceApply.js'/>"></script>
-
+				<script src="<c:url value='/static/js/maintenance/maintenanceDetail.js'/>"></script>				
+				<script src="<c:url value='/static/js/maintenance/maintenanceApply.js'/>"></script>				
+				<script src="<c:url value='/static/js/maintenance/maintenance.js'/>"></script>
         </c:if>
         <c:if test="${activePage eq 'dashboard'}">
             <link rel="stylesheet" href="<c:url value='/static/css/dashboard/style.css'/>">
