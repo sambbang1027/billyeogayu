@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import app.domains.maintenance.dao.MaintenanceRepository;
+import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
 
@@ -18,6 +19,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 
 	@Autowired
 	private MaintenanceRepository maintenanceRepository;
+	
 	
 
 	@Override
@@ -42,4 +44,11 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 		return maintenanceRepository.getCompanyList();
 	}
 
+	@Override
+	public  MaintDetail getMaintDetail(int requestId) {
+		
+		return maintenanceRepository.getMaintDetail(requestId);
+	}
+
+	
 }

@@ -18,7 +18,7 @@
         <h3 class="apply-section-title">신청 정보</h3>
 
         <div class="apply-info">
-          <div class="apply-row">
+ <%--          <div class="apply-row">
             <label class="apply-label">신청일자</label>
 	            <div class="apply-input-wrapper">
 			          <input type="text" id="inspectionDate" class="date-input" placeholder="날짜 선택">
@@ -26,7 +26,7 @@
 					    <img src="<c:url value='/assets/maintenance/calendar.svg'/>" alt="달력">
 					  </span>
 	            </div>
-          </div>
+          </div> --%>
 
           <div class="apply-row">
             <label class="apply-label">점검자</label>

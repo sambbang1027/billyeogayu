@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
 import app.domains.maintenance.service.MaintenanceService;
@@ -82,16 +83,19 @@ public class MaintenanceController {
     	return response;
     }
 	
-	
-	
+    // 점검중 상세 모달
+    @GetMapping("/detail/{requestId}")
+    @ResponseBody
+    public MaintDetail  getInspectionDetail(@PathVariable("requestId") int requestId) {
+     
+    	MaintDetail detail = maintenanceService.getMaintDetail(requestId);
+    	log.info("상세 정보 ----------> "+detail);
+  	
+        return detail;
+    }
+
 	
     
- // 점검중 상세 모달
-    @GetMapping("/maintenance/detail/{id}")
-    public String getInspectionDetail(@PathVariable Long id, Model model) {
-       // model.addAttribute("maintenance", maintenanceService.findById(id));
-        return "maintenance/inspectionModal";
-    }
 
     // 점검완료 수정 모달
     @GetMapping("/maintenance/edit/{id}")

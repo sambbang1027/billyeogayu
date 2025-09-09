@@ -10,7 +10,7 @@ $(function () {
 
 function getFilterList(){
 	$.ajax({
-		url: "/billyeogayu/maintenance/filter",
+		url: "/maintenance/filter",
 		type : "GET",
 		success : function(res){
 			console.log(res);
@@ -36,7 +36,7 @@ function loadList(page = 1){
 	const filters = getFilterValues();
 	console.log('서버에 필터링 보내는 중 ' , filters);
 	$.ajax({
-		url : "/billyeogayu/maintenance/search",
+		url : "/maintenance/search",
 		type : "GET",
 		data : {...filters, page : page}, //DTO 매핑
 		success : function(res){
@@ -98,7 +98,7 @@ function renderTable(list){
 					<td>${statusHtml}</td>
 					<td>${row.adminName}</td>
 					<td>
-							<button class="edit-btn">
+							<button class="edit-btn"  data-id="${row.requestId}">
 									<img src="/billyeogayu/assets/maintenance/edit-btn.svg" alt="수정">
 							</button>
 					</td>

@@ -1,0 +1,37 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="app.domains.maintenance.dao.MaintenanceRepository">
+
+			<resultMap type="app.domains.maintenance.model.MaintDetail" id="DetailMap">
+				 <result property="requestId" column="request_id" />
+				 <result property="assetName" column="asset_name" />
+				 <result property="assetKind" column="asset_kind" />
+				 <result property="parts" column="parts"/>	
+				 <result property="type" column="type"/>
+				 <result property="resolverName" column="resolver_name"/>
+				 <result property="description" column="resolve_description"/>
+				 <result property="note" column="note" />
+		</resultMap>
+		
+	
+		<select  id="getMaintDetail"  resultMap="DetailMap" parameterType="int">
+					SELECT 
+					    m.request_id,
+					    a.name AS asset_name,
+					    LISTAGG(p.name, ', ') WITHIN GROUP (ORDER BY p.name) AS parts,
+					    MAX(m.type)        AS type,
+					    MAX(u.name)        AS resolver_name,
+					    MAX(a.category)    AS asset_kind,
+					    MAX(m.resolve_description) AS resolve_description,
+					    MAX(m.note)        AS note
+					
+					FROM maintenance m
+					JOIN asset a ON a.asset_id = m.asset_id
+					JOIN part p ON p.part_id = m.part_id
+					JOIN users u ON u.user_id = m.admin_id
+					WHERE m.request_id = #{requestId}
+					GROUP BY m.request_id, a.name
+		</select>
+</mapper>
