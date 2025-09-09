@@ -47,6 +47,8 @@
     list-style: none;
     padding: 0;
     margin: 20px 0 0 0;
+    max-height: 400px;
+    overflow-y: auto;
 }
 .alarm-item {
     display: flex;
