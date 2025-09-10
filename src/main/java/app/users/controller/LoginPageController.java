@@ -32,7 +32,9 @@ public class LoginPageController {
             @RequestParam(value = "logout", required = false) String logout,
             @RequestParam(value = "expired", required = false) String expired,
             @RequestParam(value = "userid", required = false) String userid,
+            @RequestParam(value = "returnUrl", required = false) String returnUrl,
             HttpServletRequest request,
+            HttpSession session,
             Model model) {
         
         log.info("=== 로그인 페이지 요청 ===");
@@ -41,7 +43,21 @@ public class LoginPageController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
             log.info("이미 로그인된 사용자 - 메인 페이지로 리다이렉트: {}", auth.getName());
+            
+            // 돌아갈 URL이 있으면 해당 페이지로, 없으면 메인으로
+            String redirectUrl = (String) session.getAttribute("returnUrl");
+            if (redirectUrl != null && !redirectUrl.trim().isEmpty()) {
+                session.removeAttribute("returnUrl"); // 사용 후 제거
+                log.info("저장된 returnUrl로 리다이렉트: {}", redirectUrl);
+                return "redirect:" + redirectUrl;
+            }
             return "redirect:/";
+        }
+        
+        // returnUrl이 파라미터로 전달된 경우 세션에 저장
+        if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+            session.setAttribute("returnUrl", returnUrl);
+            log.info("returnUrl 세션에 저장: {}", returnUrl);
         }
         
         // 에러 메시지 설정
@@ -144,6 +160,7 @@ public class LoginPageController {
     }
 
 
+
     /**
      * 회원가입 - 회원정보 입력 페이지 (인증 완료 후)
      */
@@ -166,7 +183,6 @@ public class LoginPageController {
         
         return "/register-info";
     }
-
 
 
     /**
@@ -206,7 +222,7 @@ public class LoginPageController {
      * 메인 페이지 (로그인 후)
      */
     @GetMapping("/")
-    public String home(Model model, HttpServletRequest request) {
+    public String home(Model model, HttpServletRequest request, HttpSession session) {
         log.info("=== 메인 페이지 요청 ===");
         
         try {
@@ -221,6 +237,14 @@ public class LoginPageController {
                     model.addAttribute("loginUser", user);
                     model.addAttribute("isLoggedIn", true);
                     log.info("로그인된 사용자 정보 설정: {} ({})", user.getName(), user.getLoginId());
+                    
+                    // 저장된 returnUrl이 있으면 해당 페이지로 리다이렉트
+                    String returnUrl = (String) session.getAttribute("returnUrl");
+                    if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+                        session.removeAttribute("returnUrl"); // 사용 후 제거
+                        log.info("저장된 returnUrl로 리다이렉트: {}", returnUrl);
+                        return "redirect:" + returnUrl;
+                    }
                 } else {
                     log.warn("인증된 사용자지만 사용자 정보를 찾을 수 없음: {}", loginId);
                     model.addAttribute("isLoggedIn", false);

@@ -52,14 +52,14 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .sessionFixation().changeSessionId() // 세션 고정 공격 방지
+                .sessionFixation().changeSessionId() 
                 .invalidSessionUrl("/login?expired=true")
                 .maximumSessions(1) // 동시 세션 1개로 제한
                 .maxSessionsPreventsLogin(false) // 새 로그인 시 기존 세션 만료
             )
             .authorizeHttpRequests((authz) -> authz
                 // 관리자 전용 페이지 (ROLE_ 접두사 자동 추가됨)
-                .requestMatchers(new AntPathRequestMatcher("/sub")).hasRole("ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/admin")).hasRole("ADMIN")
                 
                 // 공개 리소스 (정적 파일)
                 .requestMatchers(
