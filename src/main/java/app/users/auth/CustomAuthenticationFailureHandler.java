@@ -1,10 +1,10 @@
 package app.users.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,15 +14,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-    
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -30,14 +32,14 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
                                       AuthenticationException e) throws IOException, ServletException {
 
         String message = getErrorMessage(e);
-        
+
         log.info("인증 실패: {}, 메시지: {}", e.toString(), message);
 
         // API 요청인지 확인 (Content-Type이 JSON이거나 Accept 헤더에 JSON이 포함된 경우)
         String contentType = request.getContentType();
         String acceptHeader = request.getHeader("Accept");
         String requestURI = request.getRequestURI();
-        
+
         boolean isApiRequest = (contentType != null && contentType.contains("application/json")) ||
                               (acceptHeader != null && acceptHeader.contains("application/json")) ||
                               (requestURI != null && requestURI.startsWith("/api/"));
@@ -52,7 +54,7 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
     /**
      * API 요청 실패 처리 (JSON 응답)
      */
-    private void handleApiAuthenticationFailure(HttpServletResponse response, String message, 
+    private void handleApiAuthenticationFailure(HttpServletResponse response, String message,
                                               AuthenticationException exception) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -71,7 +73,7 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
      * 폼 로그인 실패 처리 (리다이렉트)
      */
     private void handleFormAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                               AuthenticationException exception, String message) 
+                                               AuthenticationException exception, String message)
                                                throws IOException, ServletException {
         try {
             String encodedMessage = URLEncoder.encode(message, "UTF-8");

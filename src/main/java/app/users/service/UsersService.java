@@ -65,12 +65,12 @@ public interface UsersService {
      * 사용자 인증 확인 (세션 기반용)
      */
     boolean authenticateUser(String loginId, String password);
-    
-    
+
+
     /**
      * 휴대폰 번호로 사용자 조회
      */
     Users getUserByPhone(String phoneNumber);
-    
+
 
 }

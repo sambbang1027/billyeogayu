@@ -24,14 +24,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
         // 데이터베이스에서 사용자 정보 조회
         Users user = userRepository.selectUserByLoginId(loginId);
-        
+
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + loginId);
         }
 
         // 사용자 권한 설정
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        
+
         // ROLE_ 접두사가 없으면 추가 (Spring Security 규칙)
         String role = user.getRole();
         if (role != null && !role.startsWith("ROLE_")) {

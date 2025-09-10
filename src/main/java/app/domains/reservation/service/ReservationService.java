@@ -1,10 +1,10 @@
 package app.domains.reservation.service;
 
-import app.domains.asset.model.Asset;
-import app.domains.reservation.model.BlockedRange;
-
 import java.util.Date;
 import java.util.List;
+
+import app.domains.asset.model.Asset;
+import app.domains.reservation.model.BlockedRange;
 
 public interface ReservationService {
 
