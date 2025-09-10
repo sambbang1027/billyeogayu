@@ -76,7 +76,6 @@
 <!--        <location>/WEB-INF/views/error/500.jsp</location>-->
 <!--    </error-page>-->
 
-
     <!-- Welcome Files -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
