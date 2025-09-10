@@ -1,8 +1,9 @@
 package app.domains.reservation.dao;
 
-import app.domains.asset.model.Asset;
 import app.domains.reservation.model.BlockedRange;
 import app.domains.reservation.model.Reservation;
+import app.domains.resource.model.Resource;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Mapper
 public interface ReservationRepository {
 
-    Asset findAssetById(@Param("assetId") Long assetId);
+    Resource findAssetById(@Param("assetId") Long assetId);
 
     List<BlockedRange> findBlockedRanges(@Param("assetId") Long assetId,
                                          @Param("from") Date from,

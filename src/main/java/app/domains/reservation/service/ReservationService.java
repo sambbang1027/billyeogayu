@@ -1,14 +1,14 @@
 package app.domains.reservation.service;
 
-import app.domains.asset.model.Asset;
 import app.domains.reservation.model.BlockedRange;
+import app.domains.resource.model.Resource;
 
 import java.util.Date;
 import java.util.List;
 
 public interface ReservationService {
 
-    Asset getAsset(Long assetId);
+    Resource getAsset(Long assetId);
 
     List<BlockedRange> getBlockedRanges(Long assetId, Date from, Date to);
 

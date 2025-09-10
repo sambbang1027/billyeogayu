@@ -4,7 +4,7 @@
 <mapper namespace="app.domains.reservation.dao.ReservationRepository">
 
     <!-- Asset 매핑 (팀원 필드명에 맞춤) -->
-    <resultMap id="assetMap" type="app.domains.asset.model.Asset">
+    <resultMap id="assetMap" type="app.domains.resource.model.Resource">
         <id property="assetId" column="ASSET_ID" />
         <result property="modelName" column="NAME" />
         <result property="category" column="CATEGORY" />

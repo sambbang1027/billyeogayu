@@ -193,6 +193,6 @@ public class LoginPageController {
             model.addAttribute("isLoggedIn", false);
         }
         
-        return "home";
+        return "redirect:/resource/list";
     }
 }

@@ -6,10 +6,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import app.domains.asset.model.Asset;
 import app.domains.reservation.dao.ReservationRepository;
 import app.domains.reservation.model.BlockedRange;
 import app.domains.reservation.model.Reservation;
+import app.domains.resource.model.Resource;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,7 +19,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository repo;
 
     @Override
-    public Asset getAsset(Long assetId) {
+    public Resource getAsset(Long assetId) {
         return repo.findAssetById(assetId);
     }
 

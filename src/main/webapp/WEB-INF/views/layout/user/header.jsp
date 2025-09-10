@@ -6,7 +6,7 @@
 <header class="u-header">
   <div class="u-header__inner">
     <!-- 로고 -->
-    <c:url var="listUrl" value="/asset/list" />
+    <c:url var="listUrl" value="/resource/list" />
     <a href="${listUrl}" class="u-logo">
       <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유 로고">
     </a>
@@ -32,10 +32,10 @@
           </svg>
         </button>
 
-        <c:url var="allUrl" value="/asset/list">
+        <c:url var="allUrl" value="/resource/list">
           <c:param name="q" value="${param.q}" />
         </c:url>
-        <c:url var="availUrl" value="/asset/list">
+        <c:url var="availUrl" value="/resource/list">
           <c:param name="q" value="${param.q}" />
           <c:param name="filter" value="available" />
         </c:url>
