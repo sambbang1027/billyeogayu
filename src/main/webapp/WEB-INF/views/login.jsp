@@ -38,7 +38,7 @@
                         </a>
                     </div>
                     <div class="menu-item">
-                        <a href="<c:url value='/register'/>" class="menu-link">
+                        <a href="<c:url value='/verification'/>" class="menu-link">
                             <div class="menu-text">회원가입</div>
                         </a>
                     </div>
@@ -115,7 +115,7 @@
                     
                     <!-- 링크 메뉴 -->
                     <div class="link-menu">
-                        <a href="<c:url value='/register'/>" class="link-item">회원가입</a>
+                        <a href="<c:url value='/verification'/>" class="link-item">회원가입</a>
                         <div class="vertical-divider"></div>
                         <a href="<c:url value='/find-id'/>" class="link-item">아이디 찾기</a>
                         <div class="vertical-divider"></div>

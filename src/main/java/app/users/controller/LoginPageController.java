@@ -70,15 +70,15 @@ public class LoginPageController {
     }
 
     /**
-     * 회원가입 페이지 (본인 확인 방법 선택)
+     * 본인 확인 페이지 (인증 방법 선택) - verification 페이지
      */
-    @GetMapping("/register")
-    public String registerPage(
+    @GetMapping("/verification")
+    public String verificationPage(
             @RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "success", required = false) String success,
             Model model) {
         
-        log.info("=== 회원가입 페이지 요청 ===");
+        log.info("=== 본인 확인 페이지 요청 ===");
         
         // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -90,7 +90,7 @@ public class LoginPageController {
         // 에러 메시지 설정
         if (error != null) {
             model.addAttribute("error", "true");
-            log.warn("회원가입 오류 발생");
+            log.warn("본인 확인 오류 발생");
         }
         
         // 성공 메시지 설정
@@ -99,69 +99,35 @@ public class LoginPageController {
             log.info("회원가입 완료");
         }
         
-        return "/register";
+        return "/verification";
     }
 
-    /**
-     * 회원가입 - 이메일 인증 페이지
-     */
-    @GetMapping("/register/email")
-    public String emailAuthPage(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "step", required = false, defaultValue = "1") String step,
-            Model model) {
-        
-        log.info("=== 회원가입 이메일 인증 페이지 요청 ===");
-        log.info("인증 단계: {}", step);
-        
-        // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            return "redirect:/";
-        }
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("step", step);
-        model.addAttribute("authType", "email");
-        model.addAttribute("purpose", "register");
-        
-        return "users/email-auth";
-    }
-
-    /**
-     * 회원가입 - 휴대폰 인증 페이지
-     */
-    @GetMapping("/register/phone")
-    public String phoneAuthPage(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "step", required = false, defaultValue = "1") String step,
-            Model model) {
-        
-        log.info("=== 회원가입 휴대폰 인증 페이지 요청 ===");
-        log.info("인증 단계: {}", step);
-        
-        // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            return "redirect:/";
-        }
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("step", step);
-        model.addAttribute("authType", "phone");
-        model.addAttribute("purpose", "register");
-        
-        return "users/phone-auth";
-    }
 
     /**
      * 회원가입 - 회원정보 입력 페이지 (인증 완료 후)
+     */
+    @GetMapping("/register/info")
+    public String registerInfoPage(
+            @RequestParam(value = "error", required = false) String error,
+            Model model) {
+        
+        log.info("=== 회원정보 입력 페이지 요청 ===");
+        
+        // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            return "redirect:/";
+        }
+        
+        if (error != null) {
+            model.addAttribute("error", "true");
+        }
+        
+        return "/register-info";
+    }
+
+    /**
+     * 회원가입 - 회원정보 입력 페이지 (레거시 - form 방식)
      */
     @GetMapping("/register/form")
     public String registerFormPage(
@@ -171,7 +137,7 @@ public class LoginPageController {
             Model model,
             RedirectAttributes redirectAttributes) {
         
-        log.info("=== 회원정보 입력 페이지 요청 ===");
+        log.info("=== 회원정보 입력 페이지 요청 (레거시) ===");
         log.info("인증 타입: {}, 인증 키: {}", authType, authKey);
         
         // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
@@ -180,9 +146,9 @@ public class LoginPageController {
             return "redirect:/";
         }
         
-        // 인증 정보가 없으면 회원가입 첫 페이지로 리다이렉트
+        // 인증 정보가 없으면 본인 확인 페이지로 리다이렉트
         if (authType == null || authKey == null) {
-            log.warn("인증 정보 없음 - 회원가입 페이지로 리다이렉트");
+            log.warn("인증 정보 없음 - 본인 확인 페이지로 리다이렉트");
             redirectAttributes.addAttribute("error", "true");
             return "redirect:/register";
         }
