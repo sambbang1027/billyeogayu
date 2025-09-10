@@ -39,7 +39,7 @@
 
     <!-- Type Aliases -->
     <typeAliases>
-        <package name="com.app.domain"/>
+        <package name="app.domains"/>
     </typeAliases>
 
     <!-- Plugins -->

@@ -42,8 +42,14 @@
             <param-name>contextConfigLocation</param-name>
             <param-value>classpath:spring/servlet-context.xml</param-value>
         </init-param>
+        <multipart-config>
+            <max-file-size>10485760</max-file-size>
+            <max-request-size>20971520</max-request-size>
+            <file-size-threshold>0</file-size-threshold>
+        </multipart-config>
         <load-on-startup>1</load-on-startup>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>appServlet</servlet-name>
         <url-pattern>/</url-pattern>
@@ -60,15 +66,15 @@
 	</session-config>
 
 
-    <!-- Error Pages -->
-<!--     <error-page>
-        <error-code>404</error-code>
-        <location>/WEB-INF/views/error/404.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>500</error-code>
-        <location>/WEB-INF/views/error/500.jsp</location>
-    </error-page> -->
+<!--    &lt;!&ndash; Error Pages &ndash;&gt;-->
+<!--    <error-page>-->
+<!--        <error-code>404</error-code>-->
+<!--        <location>/WEB-INF/views/error/404.jsp</location>-->
+<!--    </error-page>-->
+<!--    <error-page>-->
+<!--        <error-code>500</error-code>-->
+<!--        <location>/WEB-INF/views/error/500.jsp</location>-->
+<!--    </error-page>-->
 
     <!-- Welcome Files -->
     <welcome-file-list>
