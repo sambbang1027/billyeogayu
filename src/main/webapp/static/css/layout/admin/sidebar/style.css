@@ -1,4 +1,4 @@
-.logo-box {
+.sidebar-container .logo-box {
     max-width: 100%;
     height: auto;
     margin: 2rem 0 5rem 0;
@@ -11,10 +11,10 @@
     gap: 1rem;
 }
 
-.dashboard-container,
-.asset-container,
-.maintenance-container,
-.reservation-container {
+.sidebar-container .dashboard-container,
+.sidebar-container .asset-container,
+.sidebar-container .maintenance-container,
+.sidebar-container .reservation-container {
     display: flex;
     align-items: center;
     gap: 1.5rem;

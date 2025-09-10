@@ -1,0 +1,281 @@
+/* 점검 신청 모달 전용   */
+
+.inspection-apply-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.inspection-apply-modal.hidden { display: none; }
+
+.inspection-apply-modal-content {
+  background: #fff;
+  border-radius: 10px;
+  width: 600px;
+  max-width: 80vw;
+  min-width: 400px;
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.inspection-apply-modal-header {
+  border-bottom: 1px solid #e6e6e6;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.inspection-apply-modal-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c2c2c;
+}
+
+.inspection-apply-modal-body {
+  font-size: 16px;
+  color: #000;
+  flex: 1;
+}
+
+/* 섹션 */
+.apply-section {
+  margin-bottom: 20px;
+}
+
+.apply-section-title {
+  font-weight: 600;
+  font-size: 18px;
+  color: #333;
+}
+
+/* 점검신청 모달 안의 input, select, textarea 포커스 공통 스타일 */
+.inspection-apply-modal input:focus,
+.inspection-apply-modal select:focus,
+.inspection-apply-modal textarea:focus {
+  border-color: #587570;
+  outline: none; /* 기본 파란 아웃라인 제거 */
+  box-shadow: 0 0 0 1px #58757033; /* 선택 시 은은한 그림자 효과 (선택사항) */
+}
+
+/* 2열 배치 */
+.apply-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+  row-gap: 15px;
+}
+
+.apply-row,
+.custom-dropdown.apply {
+  display: flex;
+  flex-direction: column;
+  margin-top : 1rem;
+}
+
+.custom-dropdown.apply{
+	 align-items: normal;
+    margin-right: 0;
+}
+
+.dropdown-menu.apply{
+	width: 100%
+}
+
+.apply-label,
+.custom-dropdown-name {
+  color: #808080;
+  margin-bottom: 5px;
+}
+
+.apply-input,
+.apply-select,
+.dropdown-toggle.apply {
+  width: 100%;
+  border: 1px solid #cfcfcf;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 15px;
+  color: #333;
+}
+
+.apply-input-wrapper {
+  position: relative;
+}
+
+.apply-input-wrapper .input-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+}
+.date-input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 250px; /* input 폭 */
+}
+
+.date-input {
+  width: 100%;
+  padding: 10px 40px 10px 12px; /* 오른쪽에 아이콘 공간 확보 */
+  border: 1px solid #cfcfcf;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.calendar-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.calendar-icon img {
+  width: 24px;
+  height: 24px;
+  pointer-events: none; /* 클릭 영역은 span 전체 */
+}
+
+/* 드롭다운   */
+
+/* choices 컨테이너 보더 없애기 */
+.choices {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+ 
+}
+
+/* 드롭다운 열렸을 때 붙는 .is-open 상태도 초기화 */
+.choices.is-open {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 안쪽 input 감싸는 영역 (멀티 셀렉트용) */
+.choices__inner {
+  border: 1px solid #cfcfcf;   /* 원하는 보더만 다시 정의 */
+  border-radius: 5px;          /* 원하는 둥글기 */
+  box-shadow: none;
+  background-color: #ffffff;
+}
+
+
+
+/* placeholder 스타일 재정의 */
+.choices__placeholder {
+  font-size: 16px;  
+  color: #808080;    
+  opacity: 1;        /* 흐리게 보이지 않게 */
+  padding-left: 8px; /* 선택된 값이랑 간격 */
+  line-height: 2rem; /* 세로 가운데 정렬 느낌 */
+}
+
+/* 선택된 태그 */
+.choices__list--multiple .choices__item {
+  background-color: #deefec;
+  border: 1px solid #587570;
+  color: #587570;
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin: 3px;
+  font-size: 14px;
+}
+
+/* 삭제 버튼(X) */
+.choices__list--multiple .choices__item .choices__button {
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  width: 20px;   /* 버튼 크기 조정 */
+  height: 20px;
+  border: none;  /* 기본 보더 제거 */
+  color: transparent; /* 기본 X 글자 숨김 */
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+/* 드롭다운 기본 스타일 */
+.choices__list--dropdown .choices__item {
+  padding: 8px 12px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.choices__input{
+	background-color : transparent;
+}
+
+.choices__input:focus {
+  border: none !important; 
+  border-bottom: 1px solid #959595 !important; 
+  outline: none;
+  box-shadow: none !important; 
+  border-radius: 0 !important; 
+}
+
+
+
+/* 드롭다운 hover */
+.choices__list--dropdown .choices__item.is-highlighted {
+  background-color: #C5DEDA !important; /* hover 색 */
+}
+
+
+/* 드롭다운에서 선택된 값 */
+.choices__list--dropdown .choices__item.is-selected {
+  background-color: #fff;
+  color: #000;
+  font-weight: 500;
+  position: relative;
+}
+
+.choices__list--dropdown .choices__item.is-selected::before {
+  content: "✔";
+  color: #587570;
+  margin-right: 8px;
+}
+
+/* 푸터 버튼 */
+.inspection-apply-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.apply-btn-submit {
+  background: #587570;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.apply-btn-cancel {
+  background: #fff;
+  color: #587570;
+  border: 1px solid #587570;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}

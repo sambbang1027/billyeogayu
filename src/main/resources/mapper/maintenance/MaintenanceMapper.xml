@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="app.domains.maintenance.dao.MaintenanceRepository">
+
+		<resultMap type="app.domains.maintenance.model.Maintenance" id="MaintenanceMap">
+				 <result property="requestId" column="request_Id" />
+				 <result property="assetName" column="asset_name" />
+				 <result property="assetKind" column="asset_kind" />
+				 <result property="company" column="company"/>
+				 <result property="parts" column="parts"/>	
+				 <result property="maintType" column="type"/>
+				 <result property="maintStatus" column="status"/>
+				 <result property="maintDate" column="maint_date"/>
+				 <result property="adminName" column="admin_name"/>
+		</resultMap>
+		
+		<select id="searchMaintList" parameterType="app.domains.maintenance.model.MaintSearch"
+		 resultMap="MaintenanceMap">
+		
+			  SELECT * FROM (
+				    SELECT t.*, ROWNUM rnum
+				    FROM (
+						      SELECT 
+						        m.request_id,
+				       			a.name AS asset_name,
+				        		a.category AS asset_kind,
+						        LISTAGG(p.name, ', ') WITHIN GROUP (ORDER BY p.name) AS parts,
+						        m.type,
+						        m.status,
+						        TO_CHAR(m.resolved_at, 'YYYY.MM.DD') AS maint_date,
+						        u.name AS admin_name,
+						        a.company
+						      FROM maintenance m
+						      JOIN asset a ON a.asset_id = m.asset_id
+						      JOIN part p ON p.part_id = m.part_id
+						      JOIN users u ON u.user_id = m.admin_id
+						      <!-- 동적 where 절 있으면 적용되고 없으면 적용되지 않는 myBatis 동적 sql이다  -->
+						      <where>
+					      		
+						      		<if test="searchType == 'assetName' and keyword != null and keyword != ''">
+									    AND a.name LIKE '%' || #{keyword} || '%'
+									</if>
+									<if test="searchType == 'adminName' and keyword != null and keyword != ''">
+									    AND u.name LIKE '%' || #{keyword} || '%'
+									</if>
+						      		<if test="assetKind != null and assetKind != '' ">
+						      					AND a.category = #{assetKind}
+						      		</if>
+						      		<if test="maintStatus != null and maintStatus != '' ">
+						      					AND m.status = #{maintStatus}
+						      		</if>
+						      		<if test="company != null and company != '' ">
+						      					AND a.company = #{company}
+						      		</if>
+						      </where>		 
+						      GROUP BY m.request_id, a.name, a.category, m.type, m.status, m.resolved_at, u.name, a.company
+						      ORDER BY m.request_id DESC
+				    ) t
+				    WHERE ROWNUM &lt;= #{endRow}
+				  )
+				WHERE rnum &gt;= #{startRow}
+		</select>
+		
+		
+		<select id="getSearchCount" resultType="int">
+				SELECT COUNT(DISTINCT m.request_id)
+			    FROM maintenance m
+			    JOIN asset a ON a.asset_id = m.asset_id
+			    JOIN users u ON u.user_id = m.admin_id
+			      <where>
+				      				<if test="searchType == 'assetName' and keyword != null and keyword != ''">
+									    AND a.name LIKE '%' || #{keyword} || '%'
+									</if>
+									<if test="searchType == 'adminName' and keyword != null and keyword != ''">
+									    AND u.name LIKE '%' || #{keyword} || '%'
+									</if>
+						      		
+						      		<if test="assetKind != null and assetKind != '' ">
+						      					AND a.category = #{assetKind}
+						      		</if>
+						      		<if test="maintStatus != null and maintStatus != '' ">
+						      					AND m.status = #{maintStatus}
+						      		</if>
+						      		<if test="company != null and company != '' ">
+						      					AND a.company = #{company}
+						      		</if>
+				  </where>		 
+			    
+		</select>
+		
+		<select id="getAssetCategoryList" resultType="String">
+				SELECT DISTINCT category FROM asset
+		</select>
+		
+		<select id="getCompanyList" resultType="String">
+		SELECT DISTINCT company FROM asset
+		</select>
+		
+</mapper>

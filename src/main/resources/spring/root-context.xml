@@ -72,11 +72,15 @@
         <property name="typeAliasesPackage" value="app.domains,app.users.model"/>
     </bean>
 
-    <!-- MyBatis Mapper Scan -->
-    <mybatis-spring:scan base-package="app.domains"/> 
 
+    <!-- MyBatis Mapper Scan -->
     <!-- USERS -->
     <mybatis-spring:scan base-package="app.users.dao"/>
+
+	<!--     <mybatis-spring:scan base-package="app.domains"/> 
+	 -->
+	 <mybatis-spring:scan base-package="app.domains.*.dao"/>
+
 
     <!-- Transaction Manager -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
