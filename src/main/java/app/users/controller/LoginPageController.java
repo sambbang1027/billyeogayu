@@ -70,15 +70,16 @@ public class LoginPageController {
     }
 
     /**
-     * 본인 확인 페이지 (인증 방법 선택) - verification 페이지
+     * 통합 인증 페이지 (회원가입/아이디찾기/비밀번호재설정)
      */
     @GetMapping("/verification")
     public String verificationPage(
+            @RequestParam(value = "purpose", required = false, defaultValue = "register") String purpose,
             @RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "success", required = false) String success,
             Model model) {
         
-        log.info("=== 본인 확인 페이지 요청 ===");
+        log.info("=== 인증 페이지 요청 - purpose: {} ===", purpose);
         
         // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -99,7 +100,47 @@ public class LoginPageController {
             log.info("회원가입 완료");
         }
         
-        return "/verification";
+        // purpose에 따라 페이지 정보 설정
+        model.addAttribute("purpose", purpose);
+        
+        switch (purpose) {
+            case "find-id":
+                model.addAttribute("pageTitle", "아이디 찾기");
+                model.addAttribute("pageDescription", "본인 확인을 통해 아이디를 찾으실 수 있습니다.");
+                model.addAttribute("activePage", "find-id");
+                break;
+            case "reset-password":
+                model.addAttribute("pageTitle", "비밀번호 재설정");
+                model.addAttribute("pageDescription", "본인 확인을 통해 비밀번호를 재설정하실 수 있습니다.");
+                model.addAttribute("activePage", "reset-password");
+                break;
+            case "register":
+            default:
+                model.addAttribute("pageTitle", "회원가입");
+                model.addAttribute("pageDescription", "본인 확인을 진행해주세요.");
+                model.addAttribute("activePage", "register");
+                break;
+        }
+        
+        return "verification";
+    }
+
+    /**
+     * 아이디 찾기 페이지 (인증 방법 선택) - verification으로 리다이렉트
+     */
+    @GetMapping("/find-id")
+    public String findIdPage() {
+        log.info("=== 아이디 찾기 페이지 요청 - verification으로 리다이렉트 ===");
+        return "redirect:/verification?purpose=find-id";
+    }
+
+    /**
+     * 비밀번호 재설정 페이지 (인증 방법 선택) - verification으로 리다이렉트
+     */
+    @GetMapping("/reset-password")
+    public String resetPasswordPage() {
+        log.info("=== 비밀번호 재설정 페이지 요청 - verification으로 리다이렉트 ===");
+        return "redirect:/verification?purpose=reset-password";
     }
 
 
@@ -126,230 +167,7 @@ public class LoginPageController {
         return "/register-info";
     }
 
-    /**
-     * 회원가입 - 회원정보 입력 페이지 (레거시 - form 방식)
-     */
-    @GetMapping("/register/form")
-    public String registerFormPage(
-            @RequestParam(value = "authType", required = false) String authType,
-            @RequestParam(value = "authKey", required = false) String authKey,
-            @RequestParam(value = "error", required = false) String error,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-        
-        log.info("=== 회원정보 입력 페이지 요청 (레거시) ===");
-        log.info("인증 타입: {}, 인증 키: {}", authType, authKey);
-        
-        // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            return "redirect:/";
-        }
-        
-        // 인증 정보가 없으면 본인 확인 페이지로 리다이렉트
-        if (authType == null || authKey == null) {
-            log.warn("인증 정보 없음 - 본인 확인 페이지로 리다이렉트");
-            redirectAttributes.addAttribute("error", "true");
-            return "redirect:/register";
-        }
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("authType", authType);
-        model.addAttribute("authKey", authKey);
-        
-        return "users/register-form";
-    }
 
-    /**
-     * 아이디 찾기 페이지 (본인 확인 방법 선택)
-     */
-    @GetMapping("/find-id")
-    public String findIdPage(
-            @RequestParam(value = "error", required = false) String error,
-            Model model) {
-        
-        log.info("=== 아이디 찾기 페이지 요청 ===");
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        return "users/find-id";
-    }
-
-    /**
-     * 아이디 찾기 - 이메일 인증 페이지
-     */
-    @GetMapping("/find-id/email")
-    public String findIdEmailAuthPage(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "step", required = false, defaultValue = "1") String step,
-            Model model) {
-        
-        log.info("=== 아이디 찾기 이메일 인증 페이지 요청 ===");
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("step", step);
-        model.addAttribute("authType", "email");
-        model.addAttribute("purpose", "find-id");
-        
-        return "users/email-auth";
-    }
-
-    /**
-     * 아이디 찾기 - 휴대폰 인증 페이지
-     */
-    @GetMapping("/find-id/phone")
-    public String findIdPhoneAuthPage(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "step", required = false, defaultValue = "1") String step,
-            Model model) {
-        
-        log.info("=== 아이디 찾기 휴대폰 인증 페이지 요청 ===");
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("step", step);
-        model.addAttribute("authType", "phone");
-        model.addAttribute("purpose", "find-id");
-        
-        return "users/phone-auth";
-    }
-
-    /**
-     * 아이디 찾기 - 결과 페이지 (인증 완료 후)
-     */
-    @GetMapping("/find-id/result")
-    public String findIdResultPage(
-            @RequestParam(value = "authType", required = false) String authType,
-            @RequestParam(value = "authKey", required = false) String authKey,
-            @RequestParam(value = "foundId", required = false) String foundId,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-        
-        log.info("=== 아이디 찾기 결과 페이지 요청 ===");
-        log.info("인증 타입: {}, 찾은 아이디: {}", authType, foundId);
-        
-        // 인증 정보가 없으면 아이디 찾기 첫 페이지로 리다이렉트
-        if (authType == null || authKey == null) {
-            log.warn("인증 정보 없음 - 아이디 찾기 페이지로 리다이렉트");
-            redirectAttributes.addAttribute("error", "true");
-            return "redirect:/find-id";
-        }
-        
-        model.addAttribute("authType", authType);
-        model.addAttribute("authKey", authKey);
-        model.addAttribute("foundId", foundId);
-        
-        return "users/find-id-result";
-    }
-
-    /**
-     * 비밀번호 재설정 페이지 (본인 확인 방법 선택)
-     */
-    @GetMapping("/reset-password")
-    public String resetPasswordPage(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "success", required = false) String success,
-            Model model) {
-        
-        log.info("=== 비밀번호 재설정 페이지 요청 ===");
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        if (success != null) {
-            model.addAttribute("message", "비밀번호가 재설정되었습니다. 새 비밀번호로 로그인해주세요.");
-        }
-        
-        return "users/reset-password";
-    }
-
-    /**
-     * 비밀번호 재설정 - 이메일 인증 페이지
-     */
-    @GetMapping("/reset-password/email")
-    public String resetPasswordEmailAuthPage(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "step", required = false, defaultValue = "1") String step,
-            Model model) {
-        
-        log.info("=== 비밀번호 재설정 이메일 인증 페이지 요청 ===");
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("step", step);
-        model.addAttribute("authType", "email");
-        model.addAttribute("purpose", "reset-password");
-        
-        return "users/email-auth";
-    }
-
-    /**
-     * 비밀번호 재설정 - 휴대폰 인증 페이지
-     */
-    @GetMapping("/reset-password/phone")
-    public String resetPasswordPhoneAuthPage(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "step", required = false, defaultValue = "1") String step,
-            Model model) {
-        
-        log.info("=== 비밀번호 재설정 휴대폰 인증 페이지 요청 ===");
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("step", step);
-        model.addAttribute("authType", "phone");
-        model.addAttribute("purpose", "reset-password");
-        
-        return "users/phone-auth";
-    }
-
-    /**
-     * 비밀번호 재설정 - 새 비밀번호 입력 페이지 (인증 완료 후)
-     */
-    @GetMapping("/reset-password/form")
-    public String resetPasswordFormPage(
-            @RequestParam(value = "authType", required = false) String authType,
-            @RequestParam(value = "authKey", required = false) String authKey,
-            @RequestParam(value = "userId", required = false) String userId,
-            @RequestParam(value = "error", required = false) String error,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-        
-        log.info("=== 비밀번호 재설정 폼 페이지 요청 ===");
-        log.info("인증 타입: {}, 사용자 ID: {}", authType, userId);
-        
-        // 인증 정보가 없으면 비밀번호 재설정 첫 페이지로 리다이렉트
-        if (authType == null || authKey == null || userId == null) {
-            log.warn("인증 정보 없음 - 비밀번호 재설정 페이지로 리다이렉트");
-            redirectAttributes.addAttribute("error", "true");
-            return "redirect:/reset-password";
-        }
-        
-        if (error != null) {
-            model.addAttribute("error", "true");
-        }
-        
-        model.addAttribute("authType", authType);
-        model.addAttribute("authKey", authKey);
-        model.addAttribute("userId", userId);
-        
-        return "users/reset-password-form";
-    }
 
     /**
      * 로그아웃 처리 (페이지 기반)
