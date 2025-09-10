@@ -1,4 +1,4 @@
-package app.domains.list.controller;
+package app.domains.asset.controller;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import app.domains.asset.model.Asset;
-import app.domains.list.service.ListService;
+import app.domains.asset.service.AssetService;
 import app.users.model.Users;
 import app.users.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class ListController {
+public class AssetController {
 
-    private final ListService service;
+    private final AssetService service;
     private final UsersService usersService;
 
-    @GetMapping("/resource/list")
+    @GetMapping("/asset/list")
     public String listAssets(
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "filter", required = false) String filter,
@@ -120,7 +120,7 @@ public class ListController {
                 model.addAttribute("loginUser", loginUser);
             }
 
-            return "list"; // /WEB-INF/views/list.jsp
+            return "assetlist"; // /WEB-INF/views/list.jsp
 
         } catch (Exception e) {
             // 오류 정보를 모델에 추가
@@ -132,7 +132,7 @@ public class ListController {
             model.addAttribute("isLoggedIn", false);
             
             log.error("자원 목록 조회 중 오류 발생", e);
-            return "list"; // 오류가 있어도 일단 페이지는 보여줌
+            return "assetlist"; // 오류가 있어도 일단 페이지는 보여줌
         }
     }
 }

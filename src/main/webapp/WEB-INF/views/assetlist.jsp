@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
 <link rel="stylesheet"
-	href="<c:url value='/static/css/layout/user/resource/list.css'/>">
+	href="<c:url value='/static/css/layout/user/asset/list.css'/>">
 <link rel="stylesheet"
 	href="<c:url value='/static/css/layout/user/header/style.css'/>" />
 
@@ -67,9 +67,9 @@
 					조건에 맞는 자원이 없습니다.
 					<div style="margin-top: 16px;">
 						<a class="asset-paging__item"
-							href="<c:url value='/resource/list'/>">전체 보기</a> <a
+							href="<c:url value='/asset/list'/>">전체 보기</a> <a
 							class="asset-paging__item"
-							href="<c:url value='/resource/list'>
+							href="<c:url value='/asset/list'>
               <c:param name='q' value='${param.q}'/>
             </c:url>">필터
 							초기화</a>
@@ -87,7 +87,7 @@
 			<c:choose>
 				<c:when test="${page > 1}">
 					<a class="asset-paging__item"
-						href="<c:url value='/resource/list'>
+						href="<c:url value='/asset/list'>
                      <c:param name='q' value='${param.q}'/>
                      <c:param name='filter' value='${param.filter}'/>
                      <c:param name='page' value='1'/>
@@ -102,7 +102,7 @@
 			<c:choose>
 				<c:when test="${page > 1}">
 					<a class="asset-paging__item"
-						href="<c:url value='/resource/list'>
+						href="<c:url value='/asset/list'>
                      <c:param name='q' value='${param.q}'/>
                      <c:param name='filter' value='${param.filter}'/>
                      <c:param name='page' value='${prevPage}'/>
@@ -116,7 +116,7 @@
 			<!-- 이전 블록 -->
 			<c:if test="${hasPrevBlock}">
 				<a class="asset-paging__item"
-					href="<c:url value='/resource/list'>
+					href="<c:url value='/asset/list'>
                    <c:param name='q' value='${param.q}'/>
                    <c:param name='filter' value='${param.filter}'/>
                    <c:param name='page' value='${prevBlockPage}'/>
@@ -126,7 +126,7 @@
 			<!-- 현재 블록의 페이지들 -->
 			<c:forEach var="p" begin="${startPage}" end="${endPage}">
 				<a class="asset-paging__item ${p == page ? 'is-active' : ''}"
-					href="<c:url value='/resource/list'>
+					href="<c:url value='/asset/list'>
                    <c:param name='q' value='${param.q}'/>
                    <c:param name='filter' value='${param.filter}'/>
                    <c:param name='page' value='${p}'/>
@@ -136,7 +136,7 @@
 			<!-- 다음 블록 -->
 			<c:if test="${hasNextBlock}">
 				<a class="asset-paging__item"
-					href="<c:url value='/resource/list'>
+					href="<c:url value='/asset/list'>
                    <c:param name='q' value='${param.q}'/>
                    <c:param name='filter' value='${param.filter}'/>
                    <c:param name='page' value='${nextBlockPage}'/>
@@ -147,7 +147,7 @@
 			<c:choose>
 				<c:when test="${page < totalPages}">
 					<a class="asset-paging__item"
-						href="<c:url value='/resource/list'>
+						href="<c:url value='/asset/list'>
                      <c:param name='q' value='${param.q}'/>
                      <c:param name='filter' value='${param.filter}'/>
                      <c:param name='page' value='${nextPage}'/>
@@ -162,7 +162,7 @@
 			<c:choose>
 				<c:when test="${page < totalPages}">
 					<a class="asset-paging__item"
-						href="<c:url value='/resource/list'>
+						href="<c:url value='/asset/list'>
                      <c:param name='q' value='${param.q}'/>
                      <c:param name='filter' value='${param.filter}'/>
                      <c:param name='page' value='${totalPages}'/>

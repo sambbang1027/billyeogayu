@@ -1,4 +1,4 @@
-package app.domains.list.service;
+package app.domains.asset.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,14 +7,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import app.domains.asset.dao.AssetRepository;
 import app.domains.asset.model.Asset;
-import app.domains.list.dao.ListRepository;
 
 @Service
-public class ListServiceImpl implements ListService {
+public class AssetServiceImpl implements AssetService {
 
     @Autowired
-    private ListRepository repository;
+    private AssetRepository repository;
 
     @Override
     public List<Asset> getAssets(String q, String filter, int page, int pageSize) {

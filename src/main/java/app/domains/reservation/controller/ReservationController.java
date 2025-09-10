@@ -54,7 +54,7 @@ public class ReservationController {
             if ("true".equals(success)) {
                 redirectAttributes.addFlashAttribute("successMessage", 
                     "예약 신청이 정상적으로 등록되었습니다. 승인 결과는 신청내역에서 확인해주세요.(1-2일이 소요될 수 있습니다.)");
-                return "redirect:/resource/list";
+                return "redirect:/asset/list";
             }
             
             // resourceId가 있으면 assetId로 사용 (하위 호환성)
@@ -83,7 +83,7 @@ public class ReservationController {
             // assetId가 없으면 자원 목록으로 리다이렉트
             if (assetId == null) {
                 log.warn("자산 ID가 없음 - 자원 목록으로 리다이렉트");
-                return "redirect:/resource/list";
+                return "redirect:/asset/list";
             }
             
             // 3) 로그인된 사용자 정보 조회

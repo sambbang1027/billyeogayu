@@ -1,4 +1,4 @@
-package app.domains.list.dao;
+package app.domains.asset.dao;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import app.domains.asset.model.Asset;
 
 @Mapper
-public interface ListRepository {
+public interface AssetRepository {
     /**
      * 기존 메서드들
      */
