@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="app.domains.rental.dao.RentalRepository">
+<mapper namespace="app.domains.reservation.dao.ReservationRepository">
 
     <!-- Asset 매핑 (팀원 필드명에 맞춤) -->
     <resultMap id="assetMap" type="app.domains.asset.model.Asset">
@@ -22,7 +22,7 @@
     </resultMap>
 
     <!-- BlockedRange 매핑 -->
-    <resultMap id="blockedRangeMap" type="app.domains.rental.model.BlockedRange">
+    <resultMap id="blockedRangeMap" type="app.domains.reservation.model.BlockedRange">
         <result property="startAt" column="START_AT" />
         <result property="endAt" column="END_AT" />
     </resultMap>
@@ -72,8 +72,8 @@
         )
     </select>
 
-    <!-- 예약 생성 (실제 DB 구조에 맞춘) -->
-    <insert id="insertReservation" parameterType="app.domains.rental.model.Rental">
+    <!-- 예약 생성 (실제 DB 구조에 맞춤) -->
+    <insert id="insertReservation" parameterType="app.domains.reservation.model.Reservation">
         INSERT INTO RESERVATION (
             ASSET_ID,
             USER_ID,

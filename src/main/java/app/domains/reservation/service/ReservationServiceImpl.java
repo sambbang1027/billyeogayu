@@ -1,4 +1,4 @@
-package app.domains.rental.service;
+package app.domains.reservation.service;
 
 import java.util.Date;
 import java.util.List;
@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.domains.asset.model.Asset;
-import app.domains.rental.dao.RentalRepository;
-import app.domains.rental.model.BlockedRange;
-import app.domains.rental.model.Rental;
+import app.domains.reservation.dao.ReservationRepository;
+import app.domains.reservation.model.BlockedRange;
+import app.domains.reservation.model.Reservation;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class RentalServiceImpl implements RentalService {
+public class ReservationServiceImpl implements ReservationService {
 
-    private final RentalRepository repo;
+    private final ReservationRepository repo;
 
     @Override
     public Asset getAsset(Long assetId) {
@@ -58,7 +58,7 @@ public class RentalServiceImpl implements RentalService {
         String addressCity = parsed[1]; // 시/군/구(또는 시+구)
         String addressFull = buildFullAddress(useZipcode, useAddr1, useAddr2);
 
-        Rental r = Rental.builder()
+        Reservation r = Reservation.builder()
                 .assetId(assetId)
                 .userId(userId)
                 .startAt(startAt)

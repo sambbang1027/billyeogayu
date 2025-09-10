@@ -180,21 +180,31 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<!-- jQuery 버전: 임대신청 버튼 -->
+<!-- 세션 기반 로그인 체크로 수정된 스크립트 -->
 <script>
   $(function(){
     $('.asset-card__cta').on('click', function(){
-      var loggedIn = !!(${not empty sessionScope.loginUser});
+      if ($(this).is(':disabled')) return;
+
+      var id = $(this).data('id'); // data-id
+      
+      // 서버에서 전달받은 로그인 상태를 확인
+      var loggedIn = ${isLoggedIn ? 'true' : 'false'};
+      
+      
+      console.log('로그인 상태:', loggedIn); // 디버깅용
+      
       if(!loggedIn){
         if(confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')){
+          // 로그인 후 돌아올 페이지를 세션에 저장
+          sessionStorage.setItem('returnUrl', '<c:url value="/reservation/apply"/>?assetId=' + id);
           window.location.href = '<c:url value="/login"/>';
         }
         return;
       }
-      if ($(this).is(':disabled')) return;
-
-      var id = $(this).data('id'); // data-id
-      window.location.href = '<c:url value="/rent/apply"/>' + '?resourceId=' + encodeURIComponent(id);
+      
+      // 로그인된 상태면 바로 예약 신청 페이지로 이동
+      window.location.href = '<c:url value="/reservation/apply"/>' + '?assetId=' + encodeURIComponent(id);
     });
   });
 </script>

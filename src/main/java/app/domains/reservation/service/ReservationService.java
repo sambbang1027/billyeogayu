@@ -1,12 +1,12 @@
-package app.domains.rental.service;
+package app.domains.reservation.service;
 
 import app.domains.asset.model.Asset;
-import app.domains.rental.model.BlockedRange;
+import app.domains.reservation.model.BlockedRange;
 
 import java.util.Date;
 import java.util.List;
 
-public interface RentalService {
+public interface ReservationService {
 
     Asset getAsset(Long assetId);
 

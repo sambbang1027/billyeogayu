@@ -2,7 +2,10 @@ package app.domains.list.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,22 +13,62 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import app.domains.asset.model.Asset;
 import app.domains.list.service.ListService;
+import app.users.model.Users;
+import app.users.service.UsersService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@RequiredArgsConstructor
+@Slf4j
 public class ListController {
 
-    @Autowired
-    private ListService service;
+    private final ListService service;
+    private final UsersService usersService;
 
     @GetMapping("/resource/list")
     public String listAssets(
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "page", defaultValue = "1") int page,
+            HttpServletRequest request,
             Model model) {
 
         try {
-            // 1) 한 페이지 카드 개수(그리드 4x3 기준)
+            // 1) 세션에서 SecurityContext 수동 복원
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                Object storedContext = session.getAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+                if (storedContext instanceof SecurityContext) {
+                    SecurityContextHolder.setContext((SecurityContext) storedContext);
+                    log.info("세션에서 SecurityContext 복원 완료 - 세션ID: {}", session.getId());
+                }
+            }
+            
+            // 2) 로그인 사용자 정보 세션에서 가져오기
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isLoggedIn = false;
+            Users loginUser = null;
+            
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+                try {
+                    String loginId = auth.getName();
+                    loginUser = usersService.getUserByLoginId(loginId);
+                    if (loginUser != null) {
+                        isLoggedIn = true;
+                        log.info("로그인된 사용자: {} (ID: {})", loginUser.getName(), loginUser.getUserId());
+                    }
+                } catch (Exception e) {
+                    log.warn("사용자 정보 조회 실패: {}", e.getMessage());
+                }
+            } else {
+                log.info("비로그인 사용자 또는 익명 사용자");
+            }
+
+            // 3) 한 페이지 카드 개수(그리드 4x3 기준)
             final int pageSize = 12;
 
             // 파라미터 정리
@@ -33,28 +76,28 @@ public class ListController {
             if (filter != null && filter.trim().isEmpty()) filter = null;
             if (page < 1) page = 1;
 
-            // 2) 전체 개수 / 총 페이지
+            // 4) 전체 개수 / 총 페이지
             int total = service.getAssetCount(q, filter);
             int totalPages = Math.max(1, (int) Math.ceil((double) total / pageSize));
 
-            // 3) 현재 페이지 보정
+            // 5) 현재 페이지 보정
             page = Math.min(Math.max(page, 1), totalPages);
 
-            // 4) 목록 조회
+            // 6) 목록 조회
             List<Asset> items = service.getAssets(q, filter, page, pageSize);
 
-            // 5) 페이지 블록(버튼 20개 단위)
+            // 7) 페이지 블록(버튼 20개 단위)
             final int blockSize = 20;
             int startPage = ((page - 1) / blockSize) * blockSize + 1;
             int endPage = Math.min(startPage + blockSize - 1, totalPages);
             boolean hasPrevBlock = startPage > 1;
             boolean hasNextBlock = endPage < totalPages;
 
-            // 6) 화살표용 이전/다음 페이지
+            // 8) 화살표용 이전/다음 페이지
             int prevPage = Math.max(1, page - 1);
             int nextPage = Math.min(totalPages, page + 1);
 
-            // 7) 모델에 데이터 추가
+            // 9) 모델에 데이터 추가
             model.addAttribute("items", items);
             model.addAttribute("page", page);
             model.addAttribute("totalPages", totalPages);
@@ -70,6 +113,12 @@ public class ListController {
 
             model.addAttribute("prevPage", prevPage);
             model.addAttribute("nextPage", nextPage);
+            
+            // 10) 로그인 정보 추가
+            model.addAttribute("isLoggedIn", isLoggedIn);
+            if (loginUser != null) {
+                model.addAttribute("loginUser", loginUser);
+            }
 
             return "list"; // /WEB-INF/views/list.jsp
 
@@ -80,7 +129,9 @@ public class ListController {
             model.addAttribute("filter", filter);
             model.addAttribute("page", 1);
             model.addAttribute("totalPages", 1);
+            model.addAttribute("isLoggedIn", false);
             
+            log.error("자원 목록 조회 중 오류 발생", e);
             return "list"; // 오류가 있어도 일단 페이지는 보여줌
         }
     }

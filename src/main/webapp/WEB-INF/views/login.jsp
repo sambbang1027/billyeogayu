@@ -167,40 +167,56 @@
                 $buttonText.hide();
                 $loadingSpinner.show();
                 
-                // AJAX 로그인 요청
+             // AJAX 로그인 요청
                 $.ajax({
-                    url: '<c:url value="/api/login"/>',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        loginId: userid,
-                        password: password
-                    }),
-                    success: function(response) {
-                        if (response.success) {
-                            // 로그인 성공
-                            alert('로그인되었습니다.');
-                            window.location.href = '<c:url value="/"/>';
-                        } else {
-                            // 로그인 실패
-                            alert(response.message || '로그인에 실패했습니다.');
-                            resetLoginButton();
-                        }
-                    },
-                    error: function(xhr) {
-                        let errorMessage = '로그인 중 오류가 발생했습니다.';
-                        
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        } else if (xhr.status === 401) {
-                            errorMessage = '아이디 또는 비밀번호가 잘못되었습니다.';
-                        }
-                        
-                        alert(errorMessage);
-                        resetLoginButton();
-                    }
+                   url: '<c:url value="/api/login"/>',
+                   type: 'POST',
+                   contentType: 'application/json',
+                   data: JSON.stringify({
+                       loginId: userid,
+                       password: password
+                   }),
+                   success: function(response) {
+                       if (response.success) {
+                           // 로그인 성공
+                           console.log('로그인 성공:', response);
+                           
+                           // sessionStorage에서 returnUrl 확인
+                           const returnUrl = sessionStorage.getItem('returnUrl');
+                           
+                           if (returnUrl) {
+                               // 저장된 URL이 있으면 해당 페이지로 이동
+                               sessionStorage.removeItem('returnUrl'); // 사용 후 제거
+                               console.log('저장된 returnUrl로 이동:', returnUrl);
+                               window.location.href = returnUrl;
+                           } else if (response.data && response.data.returnUrl) {
+                               // 서버에서 returnUrl이 온 경우
+                               console.log('서버 returnUrl로 이동:', response.data.returnUrl);
+                               window.location.href = response.data.returnUrl;
+                           } else {
+                               // 기본적으로 자원 목록 페이지로 이동
+                               alert('로그인되었습니다.');
+                               window.location.href = '<c:url value="/resource/list"/>';
+                           }
+                       } else {
+                           // 로그인 실패
+                           alert(response.message || '로그인에 실패했습니다.');
+                           resetLoginButton();
+                       }
+                   },
+                   error: function(xhr) {
+                       let errorMessage = '로그인 중 오류가 발생했습니다.';
+
+                       if (xhr.responseJSON && xhr.responseJSON.message) {
+                           errorMessage = xhr.responseJSON.message;
+                       } else if (xhr.status === 401) {
+                           errorMessage = '아이디 또는 비밀번호가 잘못되었습니다.';
+                       }
+
+                       alert(errorMessage);
+                       resetLoginButton();
+                   }
                 });
-                
                 function resetLoginButton() {
                     $loginBtn.prop('disabled', false);
                     $buttonText.show();

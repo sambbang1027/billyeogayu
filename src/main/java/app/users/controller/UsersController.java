@@ -175,14 +175,20 @@ public class UsersController {
             // 사용자 정보 가져오기
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             
+            // 세션에 저장된 returnUrl 가져오기
+            String returnUrl = (String) session.getAttribute("returnUrl");
+            
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("sessionId", session.getId());
             responseData.put("username", userDetails.getUsername());
             responseData.put("authorities", userDetails.getAuthorities());
             responseData.put("maxInactiveInterval", session.getMaxInactiveInterval());
+            responseData.put("returnUrl", returnUrl);
+            
 
             log.info("=== 로그인 성공 ===");
             log.info("세션 ID: {}", session.getId());
+            log.info("returnUrl: {}", returnUrl);
 
             return ResponseEntity.ok(new ApiResponse(true, "로그인 성공", responseData));
 

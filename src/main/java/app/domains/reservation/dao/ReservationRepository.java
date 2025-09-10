@@ -1,8 +1,8 @@
-package app.domains.rental.dao;
+package app.domains.reservation.dao;
 
 import app.domains.asset.model.Asset;
-import app.domains.rental.model.BlockedRange;
-import app.domains.rental.model.Rental;
+import app.domains.reservation.model.BlockedRange;
+import app.domains.reservation.model.Reservation;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @Mapper
-public interface RentalRepository {
+public interface ReservationRepository {
 
     Asset findAssetById(@Param("assetId") Long assetId);
 
@@ -22,5 +22,5 @@ public interface RentalRepository {
                      @Param("startAt") Date startAt,
                      @Param("endAt") Date endAt);
 
-    int insertReservation(Rental rental);
+    int insertReservation(Reservation reservation);
 }

@@ -1,4 +1,4 @@
-package app.domains.rental.model;
+package app.domains.reservation.model;
 
 import lombok.*;
 import java.util.Date;

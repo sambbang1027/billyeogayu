@@ -1,10 +1,10 @@
-package app.domains.rental.model;
+package app.domains.reservation.model;
 
 import lombok.*;
 import java.util.Date;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Rental {
+public class Reservation {
     private Long reservationId;
     private Long assetId;
     private Long userId;
