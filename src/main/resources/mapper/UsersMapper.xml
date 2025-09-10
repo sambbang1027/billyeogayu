@@ -103,5 +103,14 @@
         </where>
         ORDER BY CREATED_AT DESC
     </select>
+    
+        <!-- 휴대폰 번호로 사용자 조회 -->
+    <select id="selectUserByPhone" parameterType="String" resultMap="usersResultMap">
+        SELECT USER_ID, LOGIN_ID, EMAIL, PASSWORD, NAME, PHONE_NUMBER,
+               BIRTH, ADDRESS, ROLE, CREATED_AT, DELETED_AT, IS_DELETED
+        FROM USERS
+        WHERE PHONE_NUMBER = #{phoneNumber}
+          AND IS_DELETED = 'N'
+    </select>
 
 </mapper>

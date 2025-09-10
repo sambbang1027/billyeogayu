@@ -20,11 +20,15 @@ public class ResourceServiceImpl implements ResourceService {
     public List<Resource> getAssets(String q, String filter, int page, int pageSize) {
         try {
             // 파라미터 검증
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 12;
+            if (page < 1) {
+				page = 1;
+			}
+            if (pageSize < 1) {
+				pageSize = 12;
+			}
 
             Map<String, Object> params = new HashMap<>();
-            
+
             // 검색어와 필터는 null이거나 빈 문자열이면 넣지 않음
             if (q != null && !q.trim().isEmpty()) {
                 params.put("q", q.trim());
@@ -32,7 +36,7 @@ public class ResourceServiceImpl implements ResourceService {
             if (filter != null && !filter.trim().isEmpty()) {
                 params.put("filter", filter.trim());
             }
-            
+
             // 페이징 파라미터
             int offset = (page - 1) * pageSize;
             params.put("offset", offset);
@@ -42,7 +46,7 @@ public class ResourceServiceImpl implements ResourceService {
             List<Resource> assets = repository.findAssetsGrouped(params);
 
             return assets;
-            
+
         } catch (Exception e) {
             throw new RuntimeException("자산 목록 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
@@ -52,7 +56,7 @@ public class ResourceServiceImpl implements ResourceService {
     public int getAssetCount(String q, String filter) {
         try {
             Map<String, Object> params = new HashMap<>();
-            
+
             // 검색어와 필터는 null이거나 빈 문자열이면 넣지 않음
             if (q != null && !q.trim().isEmpty()) {
                 params.put("q", q.trim());
@@ -65,7 +69,7 @@ public class ResourceServiceImpl implements ResourceService {
             int count = repository.countAssetsGrouped(params);
 
             return count;
-            
+
         } catch (Exception e) {
             throw new RuntimeException("자산 개수 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
@@ -82,7 +86,7 @@ public class ResourceServiceImpl implements ResourceService {
             List<Resource> availableAssets = repository.getAvailableAssets(name, category, company);
             
             return availableAssets;
-            
+
         } catch (Exception e) {
             throw new RuntimeException("사용 가능한 자산 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
         }

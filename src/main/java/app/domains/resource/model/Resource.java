@@ -1,11 +1,11 @@
 package app.domains.resource.model;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * Asset 엔티티 클래스
@@ -39,7 +39,7 @@ public class Resource {
     private int availableStock = 0; // STATUS가 'AVAILABLE'인 자산 수량
     private int rentedStock = 0; // STATUS가 'AVAILABLE'이 아닌 자산 수량
 
-    /** 
+    /**
      * 편의 프로퍼티 (JSP에서 사용)
      * availableStock이 0보다 크고 삭제되지 않은 경우에만 임대가능
      */

@@ -1,8 +1,8 @@
-package app.users.service;
+package app.domains.users.service;
 
 import java.util.List;
 
-import app.users.model.Users;
+import app.domains.users.model.Users;
 
 public interface UsersService {
 
@@ -65,4 +65,12 @@ public interface UsersService {
      * 사용자 인증 확인 (세션 기반용)
      */
     boolean authenticateUser(String loginId, String password);
+
+
+    /**
+     * 휴대폰 번호로 사용자 조회
+     */
+    Users getUserByPhone(String phoneNumber);
+
+
 }

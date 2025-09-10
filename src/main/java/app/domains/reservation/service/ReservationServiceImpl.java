@@ -36,13 +36,22 @@ public class ReservationServiceImpl implements ReservationService {
                         String useZipcode, String useAddr1, String useAddr2) {
 
         // 기본 유효성
-        if (assetId == null || userId == null) return false;
-        if (startAt == null || endAt == null || !startAt.before(endAt)) return false;
-        if (purpose == null || purpose.trim().isEmpty()) return false;
-        if (useZipcode == null || useZipcode.trim().isEmpty()) return false;
-        if (useAddr1 == null || useAddr1.trim().isEmpty()) return false;
-        if (useAddr2 == null) useAddr2 = "";
-        
+        if (assetId == null || userId == null) {
+			return false;
+		}
+        if (startAt == null || endAt == null || !startAt.before(endAt)) {
+			return false;
+		}
+        if (purpose == null || purpose.trim().isEmpty() || useZipcode == null || useZipcode.trim().isEmpty()) {
+			return false;
+		}
+        if (useAddr1 == null || useAddr1.trim().isEmpty()) {
+			return false;
+		}
+        if (useAddr2 == null) {
+			useAddr2 = "";
+		}
+
         // PURPOSE 길이 체크 (DB는 100 BYTE 제한)
         if (purpose.trim().length() > 100) {
             return false;
@@ -50,7 +59,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         // 겹침 재검증(동일 트랜잭션)
         int overlap = repo.countOverlap(assetId, startAt, endAt);
-        if (overlap > 0) return false;
+        if (overlap > 0) {
+			return false;
+		}
 
         // === 주소 파생값 생성 ===
         String[] parsed = parseKoreanAddress(useAddr1);
@@ -87,10 +98,14 @@ public class ReservationServiceImpl implements ReservationService {
      */
     private static String[] parseKoreanAddress(String addr1) {
         String a = addr1 == null ? "" : addr1.trim();
-        if (a.isEmpty()) return new String[]{"기타", "기타"};
-        
+        if (a.isEmpty()) {
+			return new String[]{"기타", "기타"};
+		}
+
         String[] token = a.split("\\s+");
-        if (token.length == 0) return new String[]{"기타", "기타"};
+        if (token.length == 0) {
+			return new String[]{"기타", "기타"};
+		}
 
         // 시/도 정규화 및 판별
         String sido = normalizeSido(token[0]);
@@ -103,7 +118,7 @@ public class ReservationServiceImpl implements ReservationService {
         String sigungu = "기타";
         if (token.length >= 2) {
             sigungu = token[1];
-            
+
             // "성남시 분당구"처럼 시+구가 함께 나오는 경우 처리
             if (token.length >= 3) {
                 String thirdToken = token[2];
@@ -112,7 +127,7 @@ public class ReservationServiceImpl implements ReservationService {
                 }
             }
         }
-        
+
         return new String[]{sido, sigungu};
     }
 
@@ -123,9 +138,9 @@ public class ReservationServiceImpl implements ReservationService {
         if (input == null || input.trim().isEmpty()) {
             return "기타";
         }
-        
+
         String normalized = input.trim();
-        
+
         // 특별시/광역시 처리
         switch (normalized) {
             case "서울": case "서울시":
@@ -146,24 +161,42 @@ public class ReservationServiceImpl implements ReservationService {
                 return "세종특별자치시";
             default:
                 // 이미 완전한 형태인지 확인
-                if (normalized.endsWith("특별시") || 
-                    normalized.endsWith("광역시") || 
+                if (normalized.endsWith("특별시") ||
+                    normalized.endsWith("광역시") ||
                     normalized.endsWith("특별자치시") ||
                     normalized.endsWith("도")) {
                     return normalized;
                 }
-                
+
                 // 도 단위 처리
-                if (normalized.equals("경기")) return "경기도";
-                if (normalized.equals("강원")) return "강원도";
-                if (normalized.equals("충북") || normalized.equals("충청북도")) return "충청북도";
-                if (normalized.equals("충남") || normalized.equals("충청남도")) return "충청남도";
-                if (normalized.equals("전북") || normalized.equals("전라북도")) return "전라북도";
-                if (normalized.equals("전남") || normalized.equals("전라남도")) return "전라남도";
-                if (normalized.equals("경북") || normalized.equals("경상북도")) return "경상북도";
-                if (normalized.equals("경남") || normalized.equals("경상남도")) return "경상남도";
-                if (normalized.equals("제주")) return "제주특별자치도";
-                
+                if (normalized.equals("경기")) {
+					return "경기도";
+				}
+                if (normalized.equals("강원")) {
+					return "강원도";
+				}
+                if (normalized.equals("충북") || normalized.equals("충청북도")) {
+					return "충청북도";
+				}
+                if (normalized.equals("충남") || normalized.equals("충청남도")) {
+					return "충청남도";
+				}
+                if (normalized.equals("전북") || normalized.equals("전라북도")) {
+					return "전라북도";
+				}
+                if (normalized.equals("전남") || normalized.equals("전라남도")) {
+					return "전라남도";
+				}
+                if (normalized.equals("경북") || normalized.equals("경상북도")) {
+					return "경상북도";
+				}
+                if (normalized.equals("경남") || normalized.equals("경상남도")) {
+					return "경상남도";
+				}
+                if (normalized.equals("제주")) {
+					return "제주특별자치도";
+				}
+
                 return "기타";
         }
     }

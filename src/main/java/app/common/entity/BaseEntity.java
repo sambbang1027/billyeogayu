@@ -1,9 +1,11 @@
 package app.common.entity;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,7 +16,7 @@ public abstract class BaseEntity {
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
     private String isDeleted = "N";
-    
+
     /**
      * Soft delete 처리
      */
@@ -23,14 +25,14 @@ public abstract class BaseEntity {
         this.deletedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
-    
+
     /**
      * 삭제 상태 확인
      */
     public boolean isDeleted() {
         return "Y".equals(this.isDeleted);
     }
-    
+
     /**
      * 삭제 취소 (복구)
      */

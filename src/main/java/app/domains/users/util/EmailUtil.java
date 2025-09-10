@@ -1,6 +1,9 @@
-package app.users.util;
+package app.domains.users.util;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.UnsupportedEncodingException;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -8,9 +11,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
-
-import javax.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -51,22 +52,22 @@ public class EmailUtil {
                 helper.setFrom(fromAddress);
                 log.warn("발신자 이름 설정 실패, 이메일만 사용: {}", e.getMessage());
             }
-            
+
             // 수신자 설정
             helper.setTo(toEmail);
-            
+
             // 제목 설정
             helper.setSubject("[빌려가유] 이메일 인증번호");
-            
+
             // 내용 설정 (HTML)
             String htmlContent = buildVerificationEmailContent(verificationCode);
             helper.setText(htmlContent, true);
 
             // 이메일 발송
             mailSender.send(message);
-            
+
             log.info("이메일 발송 성공 - 수신자: {}", toEmail);
-            
+
         } catch (MessagingException e) {
             log.error("이메일 발송 실패 (MessagingException) - 수신자: {}, 오류: {}", toEmail, e.getMessage());
             throw new RuntimeException("이메일 발송에 실패했습니다: " + e.getMessage());
@@ -90,15 +91,15 @@ public class EmailUtil {
 //                helper.setFrom(fromAddress);
 //                log.warn("발신자 이름 설정 실패, 이메일만 사용: {}", e.getMessage());
 //            }
-//            
+//
 //            helper.setTo(toEmail);
 //            helper.setSubject(subject);
 //            helper.setText(content, true);
 //
 //            mailSender.send(message);
-//            
+//
 //            log.info("이메일 발송 성공 - 수신자: {}, 제목: {}", toEmail, subject);
-//            
+//
 //        } catch (MessagingException e) {
 //            log.error("이메일 발송 실패 (MessagingException) - 수신자: {}, 오류: {}", toEmail, e.getMessage());
 //            throw new RuntimeException("이메일 발송에 실패했습니다: " + e.getMessage());

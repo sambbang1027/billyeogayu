@@ -1,14 +1,19 @@
-package app.users.controller;
-
-import app.users.service.EmailService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+package app.domains.users.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import app.domains.users.service.EmailService;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/email")
@@ -24,7 +29,7 @@ public class EmailController {
     @PostMapping("/send")
     public ResponseEntity<Map<String, Object>> sendVerificationCode(@RequestParam("email") String email) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             log.info("이메일 인증번호 발송 요청 - 이메일: {}", email);
 
@@ -58,7 +63,7 @@ public class EmailController {
     public ResponseEntity<Map<String, Object>> verifyCode(@RequestParam("email") String email,
                                                         @RequestParam("code") String code) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             log.info("이메일 인증번호 확인 요청 - 이메일: {}, 코드: {}", email, code);
 
@@ -67,7 +72,7 @@ public class EmailController {
             response.put("success", isValid);
             response.put("email", email);
             response.put("verified", isValid);
-            
+
             if (isValid) {
                 response.put("message", "이메일 인증이 완료되었습니다.");
                 return ResponseEntity.ok(response);
@@ -96,7 +101,7 @@ public class EmailController {
     @PostMapping("/resend")
     public ResponseEntity<Map<String, Object>> resendVerificationCode(@RequestParam("email") String email) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             log.info("이메일 인증번호 재발송 요청 - 이메일: {}", email);
 
@@ -129,7 +134,7 @@ public class EmailController {
     @GetMapping("/remaining-time")
     public ResponseEntity<Map<String, Object>> getRemainingTime(@RequestParam("email") String email) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             long remainingTime = emailService.getRemainingTime(email);
 
