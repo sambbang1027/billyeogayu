@@ -1,4 +1,4 @@
-package app.domains.asset.service;
+package app.domains.resource.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,17 +7,17 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import app.domains.asset.dao.AssetRepository;
-import app.domains.asset.model.Asset;
+import app.domains.resource.dao.ResourceRepository;
+import app.domains.resource.model.Resource;
 
 @Service
-public class AssetServiceImpl implements AssetService {
+public class ResourceServiceImpl implements ResourceService {
 
     @Autowired
-    private AssetRepository repository;
+    private ResourceRepository repository;
 
     @Override
-    public List<Asset> getAssets(String q, String filter, int page, int pageSize) {
+    public List<Resource> getAssets(String q, String filter, int page, int pageSize) {
         try {
             // 파라미터 검증
             if (page < 1) {
@@ -43,7 +43,7 @@ public class AssetServiceImpl implements AssetService {
             params.put("pageSize", pageSize);
 
             // 그룹핑된 자산 목록 조회 (중복 제거)
-            List<Asset> assets = repository.findAssetsGrouped(params);
+            List<Resource> assets = repository.findAssetsGrouped(params);
 
             return assets;
 
@@ -76,15 +76,15 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    public List<Asset> getAvailableAssets(String name, String category, String company) {
+    public List<Resource> getAvailableAssets(String name, String category, String company) {
         try {
             // 파라미터 검증
             if (name == null || name.trim().isEmpty()) {
                 throw new IllegalArgumentException("자산 이름은 필수입니다.");
             }
 
-            List<Asset> availableAssets = repository.getAvailableAssets(name, category, company);
-
+            List<Resource> availableAssets = repository.getAvailableAssets(name, category, company);
+            
             return availableAssets;
 
         } catch (Exception e) {

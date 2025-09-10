@@ -1,4 +1,4 @@
-package app.domains.asset.model;
+package app.domains.resource.model;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Asset {
+public class Resource {
     private long assetId;
     private String modelName;
     private String assetStatus;

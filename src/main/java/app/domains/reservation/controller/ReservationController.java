@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import app.domains.asset.model.Asset;
 import app.domains.reservation.model.BlockedRange;
 import app.domains.reservation.service.ReservationService;
+import app.domains.resource.model.Resource;
 import app.domains.users.model.Users;
 import app.domains.users.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,7 +54,7 @@ public class ReservationController {
             if ("true".equals(success)) {
                 redirectAttributes.addFlashAttribute("successMessage",
                     "예약 신청이 정상적으로 등록되었습니다. 승인 결과는 신청내역에서 확인해주세요.(1-2일이 소요될 수 있습니다.)");
-                return "redirect:/asset/list";
+                return "redirect:/resource/list";
             }
 
             // resourceId가 있으면 assetId로 사용 (하위 호환성)
@@ -83,7 +83,7 @@ public class ReservationController {
             // assetId가 없으면 자원 목록으로 리다이렉트
             if (assetId == null) {
                 log.warn("자산 ID가 없음 - 자원 목록으로 리다이렉트");
-                return "redirect:/asset/list";
+                return "redirect:/resource/list";
             }
 
             // 3) 로그인된 사용자 정보 조회
@@ -98,7 +98,9 @@ public class ReservationController {
 
             log.info("예약 신청 페이지 접근 - 사용자: {}, 자산ID: {}", loginUser.getName(), assetId);
 
-            Asset asset = service.getAsset(assetId);
+            
+            Resource asset = service.getAsset(assetId);
+            
 
             if (asset == null || asset.getIsDeleted() == 1) {
                 model.addAttribute("error", "선택한 자원을 찾을 수 없습니다.");
@@ -244,7 +246,7 @@ public class ReservationController {
     private void restoreFormData(Long assetId, String zipcode, String addr1, String addr2,
                                 String purpose, Model model, Users loginUser) {
         // 자산 정보 재설정
-        Asset asset = service.getAsset(assetId);
+        Resource asset = service.getAsset(assetId);
         if (asset != null) {
             String assetModel = (asset.getCategory() != null && !asset.getCategory().trim().isEmpty())
                                ? asset.getCategory() : "정보 없음";

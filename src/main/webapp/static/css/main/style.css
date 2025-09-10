@@ -1,0 +1,352 @@
+/* ===== 메인 페이지 스타일 ===== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+}
+
+/* ===== 사용자 정보 영역 ===== */
+.user-info {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(255,255,255,0.95);
+    padding: 1rem 1.5rem;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 10;
+}
+
+.user-greeting {
+    color: #2c5530;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.logout-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+}
+
+/* ===== 헤더 영역 ===== */
+.header {
+    margin-bottom: 3rem;
+    margin-top: 2rem;
+}
+
+.logo-container {
+    margin-bottom: 2rem;
+}
+
+.logo-image {
+    max-width: 600px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.main-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #2c5530;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    display: none; /* 로고 이미지가 있으면 숨김 */
+}
+
+.main-title .highlight {
+    color: #659f7c;
+}
+
+.subtitle {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #659f7c;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.tractor-icon {
+    font-size: 2.5rem;
+}
+
+.description {
+    font-size: 1.2rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+}
+
+.description p {
+    margin-bottom: 0.5rem;
+}
+
+/* ===== 액션 버튼 영역 ===== */
+.action-buttons {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 1.2rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    min-width: 200px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #659f7c 0%, #4a7c59 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(101, 159, 124, 0.3);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #2c5530;
+    border: 2px solid #659f7c;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #659f7c 0%, #4a7c59 100%);
+    color: white;
+    text-decoration: none;
+}
+
+/* ===== 메인 비주얼 영역 ===== */
+.main-visual {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    padding: 2rem;
+}
+
+.visual-content {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+}
+
+.visual-fallback {
+    display: none;
+    padding: 4rem;
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.fallback-detail {
+    margin-top: 2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* ===== 특징 카드 영역 ===== */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 4rem;
+}
+
+.feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    border: 1px solid #f0f0f0;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #659f7c;
+}
+
+.feature-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c5530;
+    margin-bottom: 0.5rem;
+}
+
+.feature-desc {
+    color: #666;
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+/* ===== 반응형 디자인 ===== */
+@media (max-width: 1024px) {
+    .user-info {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-bottom: 2rem;
+        justify-content: center;
+        display: inline-flex;
+    }
+    
+    .header {
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0.5rem;
+    }
+    
+    .logo-image {
+        max-width: 90%;
+    }
+    
+    .main-title {
+        font-size: 2.5rem;
+    }
+
+    .subtitle {
+        font-size: 1.8rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .description {
+        font-size: 1.1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 300px;
+        min-width: auto;
+    }
+
+    .main-visual {
+        margin: 0 1rem;
+        padding: 1.5rem;
+    }
+
+    .features {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    .user-info {
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 20px;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .user-greeting {
+        font-size: 0.9rem;
+    }
+
+    .logout-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1.5rem;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+    }
+
+    .feature-title {
+        font-size: 1.2rem;
+    }
+}
