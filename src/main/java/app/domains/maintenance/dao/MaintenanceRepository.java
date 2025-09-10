@@ -2,26 +2,24 @@ package app.domains.maintenance.dao;
 
 import java.util.List;
 import java.util.Map;
-
 import org.apache.ibatis.annotations.Mapper;
 
 import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
-import app.domains.maintenance.model.MaintenanceApply;
 import app.domains.maintenance.model.MaintenanceComplete;
 import app.domains.maintenance.model.MaintenanceEdit;
 
 
 @Mapper
 public interface MaintenanceRepository {
-		
-		// list 조회 + 필터링 + 검색  
+
+		// list 조회 + 필터링 + 검색
 		List<Maintenance> searchMaintList(MaintSearch maintSearch);
 		int getSearchCount(MaintSearch search);
 
-		
-		// 필터링 항목들 
+
+		// 필터링 항목들
 		List<String> getAssetCategoryList ();
 		List<String> getCompanyList();
 		List<Map<String, Object>> getPartList(int assetId);
@@ -45,7 +43,6 @@ public interface MaintenanceRepository {
 		int getNextRequestId();
 		int applyMaintenance(Map<String, Object> param);
 		int updateAssetStatus(int assetId);
-	//	int updatePartStatus(MaintenanceApply maintenanceApply);
-		
+
 		
 }

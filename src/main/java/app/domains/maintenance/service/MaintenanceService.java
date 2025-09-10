@@ -12,8 +12,8 @@ import app.domains.maintenance.model.MaintenanceEdit;
 
 public interface MaintenanceService {
 
-	 
-	 // 점검 리스트 조회 + 필터링 + 검색  
+
+	 // 점검 리스트 조회 + 필터링 + 검색
 	 List<Maintenance> searchMaintList(MaintSearch maintSearch);
 	 int getSearchCount(MaintSearch maintSearch);
 	 
@@ -33,4 +33,6 @@ public interface MaintenanceService {
 	
 	// 점검 신청 
 	void applyMaintenance(MaintenanceApply maintenanceApply);
+
+
 }

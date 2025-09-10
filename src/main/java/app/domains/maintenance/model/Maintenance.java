@@ -1,7 +1,5 @@
 package app.domains.maintenance.model;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +12,7 @@ import lombok.ToString;
 @ToString  @Builder
 @Getter  @Setter
 public class Maintenance {
-	
+
 	private int requestId;
 	private String assetName;
 	private String assetKind;

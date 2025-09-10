@@ -1,0 +1,434 @@
+diff --git a/src/main/java/app/domains/asset/controller/AssetController.java b/src/main/java/app/domains/asset/controller/AssetController.java
+deleted file mode 100644
+index ba6e0d2..0000000
+--- a/src/main/java/app/domains/asset/controller/AssetController.java
++++ /dev/null
+@@ -1,20 +0,0 @@
+-package app.domains.asset.controller;
+-
+-import lombok.extern.slf4j.Slf4j;
+-import org.springframework.stereotype.Controller;
+-import org.springframework.ui.Model;
+-import org.springframework.web.bind.annotation.GetMapping;
+-import org.springframework.web.bind.annotation.RequestMapping;
+-
+-@Slf4j
+-@Controller
+-@RequestMapping("/asset")
+-public class AssetController {
+-    @GetMapping("/list")
+-    public String asset(Model model) {
+-        model.addAttribute("pageTitle", "자산 관리");
+-        model.addAttribute("contentPage", "/WEB-INF/views/asset/assetList.jsp");
+-        model.addAttribute("activePage", "asset");
+-        return "layout/admin/main";
+-    }
+-}
+diff --git a/src/main/java/app/domains/asset/model/Asset.java b/src/main/java/app/domains/asset/model/Asset.java
+index 3bc8d93..6e5082f 100644
+--- a/src/main/java/app/domains/asset/model/Asset.java
++++ b/src/main/java/app/domains/asset/model/Asset.java
+@@ -7,23 +7,43 @@ import lombok.NoArgsConstructor;
+ 
+ import java.time.LocalDateTime;
+ 
++/**
++ * Asset 엔티티 클래스
++ * 매핑 테이블: ASSET
++ */
+ @Data
+ @NoArgsConstructor
+ @AllArgsConstructor
+ @Builder
+ public class Asset {
+-    private long assetId;
+-    private String modelName;
+-    private String assetStatus;
+-    private String category;
+-    private String company;
+-    private long maintenanceCycle;
+-    private long usageTime;
+-    private LocalDateTime lastMaintenanceDate;
+-    private LocalDateTime expectedMaintenanceDate;
+-    private String imagePath;
+-    private LocalDateTime createAt;
+-    private LocalDateTime updatedAt;
+-    private LocalDateTime deletedAt;
+-    private int isDeleted;
++
++    private long assetId;                  // ASSET_ID (PK)
++    private String name;                   // NAME
++    private String category;               // CATEGORY
++    private String company;                // COMPANY
++    private String status;                 // STATUS (AVAILABLE / UNAVAILABLE 등)
++    private String image;                  // IMAGE (이미지 경로)
++
++    private long maintenanceCycle;         // MAINTENANCE_CYCLE
++    private long usageTime;                // USAGE_TIME
++
++    private LocalDateTime lastMaintenanceDate;     // LAST_MAINTENANCE_DATE
++    private LocalDateTime expectedMaintenanceDate; // EXPECTED_MAINTENANCE_DATE
++
++    private LocalDateTime createdAt;       // CREATED_AT
++    private LocalDateTime updatedAt;       // UPDATED_AT
++    private LocalDateTime deletedAt;       // DELETED_AT
++
++    private String isDeleted;              // IS_DELETED ('Y'/'N')
++
++
++    /** 편의 프로퍼티 (JSP에서 사용) */
++    public boolean isRentable() {
++        return "AVAILABLE".equalsIgnoreCase(status) && "N".equalsIgnoreCase(isDeleted);
++    }
++
++    public int getStock() {
++        // 보유 대수 대신 여기서는 항상 1대 (추후 확장 가능)
++        return 1;
++    }
+ }
+diff --git a/src/main/java/app/domains/list/controller/ListController.java b/src/main/java/app/domains/list/controller/ListController.java
+new file mode 100644
+index 0000000..51e68c3
+--- /dev/null
++++ b/src/main/java/app/domains/list/controller/ListController.java
+@@ -0,0 +1,41 @@
++package app.domains.list.controller;
++
++import java.util.List;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Controller;
++import org.springframework.ui.Model;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.RequestParam;
++
++import app.domains.asset.model.Asset;
++import app.domains.list.service.ListService;
++
++@Controller
++public class ListController {
++
++    @Autowired
++    private ListService service;
++
++    @GetMapping("/resource/list")
++    public String listAssets(
++            @RequestParam(value = "q", required = false) String q,
++            @RequestParam(value = "filter", required = false) String filter,
++            @RequestParam(value = "page", defaultValue = "1") int page,
++            Model model) {
++
++        int pageSize = 8; // 한 페이지 8개
++        int total = service.getAssetCount(q, filter);
++        int totalPages = (int) Math.ceil((double) total / pageSize);
++
++        List<Asset> items = service.getAssets(q, filter, page, pageSize);
++
++        model.addAttribute("items", items);
++        model.addAttribute("page", page);
++        model.addAttribute("totalPages", totalPages);
++        model.addAttribute("q", q);
++        model.addAttribute("filter", filter);
++
++        return "resource/list"; // JSP
++    }
++}
+diff --git a/src/main/java/app/domains/list/dao/ListRepository.java b/src/main/java/app/domains/list/dao/ListRepository.java
+index 895a9a2..7967332 100644
+--- a/src/main/java/app/domains/list/dao/ListRepository.java
++++ b/src/main/java/app/domains/list/dao/ListRepository.java
+@@ -1,4 +1,13 @@
+ package app.domains.list.dao;
+ 
++import java.util.List;
++import java.util.Map;
++
++import app.domains.asset.model.Asset;
++import org.apache.ibatis.annotations.Mapper;
++
++@Mapper
+ public interface ListRepository {
++    List<Asset> findAssets(Map<String, Object> params);
++    int countAssets(Map<String, Object> params);
+ }
+diff --git a/src/main/java/app/domains/list/service/ListService.java b/src/main/java/app/domains/list/service/ListService.java
+index 32b583c..7bb3aab 100644
+--- a/src/main/java/app/domains/list/service/ListService.java
++++ b/src/main/java/app/domains/list/service/ListService.java
+@@ -1,4 +1,10 @@
+ package app.domains.list.service;
+ 
++import java.util.List;
++
++import app.domains.asset.model.Asset;
++
+ public interface ListService {
++    List<Asset> getAssets(String q, String filter, int page, int pageSize);
++    int getAssetCount(String q, String filter);
+ }
+diff --git a/src/main/java/app/domains/list/service/ListServiceImpl.java b/src/main/java/app/domains/list/service/ListServiceImpl.java
+index a8d6af9..894832a 100644
+--- a/src/main/java/app/domains/list/service/ListServiceImpl.java
++++ b/src/main/java/app/domains/list/service/ListServiceImpl.java
+@@ -1,4 +1,36 @@
+ package app.domains.list.service;
+ 
+-public class ListServiceImpl {
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Service;
++
++import app.domains.asset.model.Asset;
++import app.domains.list.dao.ListRepository;
++
++@Service
++public class ListServiceImpl implements ListService {
++
++    @Autowired
++    private ListRepository repository;
++
++    @Override
++    public List<Asset> getAssets(String q, String filter, int page, int pageSize) {
++        Map<String, Object> params = new HashMap<>();
++        params.put("q", q);
++        params.put("filter", filter);
++        params.put("offset", (page - 1) * pageSize);
++        params.put("pageSize", pageSize);
++        return repository.findAssets(params);
++    }
++
++    @Override
++    public int getAssetCount(String q, String filter) {
++        Map<String, Object> params = new HashMap<>();
++        params.put("q", q);
++        params.put("filter", filter);
++        return repository.countAssets(params);
++    }
+ }
+diff --git a/src/main/resources/spring/root-context.xml b/src/main/resources/spring/root-context.xml
+index 0a6b1e8..825819e 100644
+--- a/src/main/resources/spring/root-context.xml
++++ b/src/main/resources/spring/root-context.xml
+@@ -49,9 +49,13 @@
+         <property name="typeAliasesPackage" value="app.domains"/>
+     </bean>
+ 
+-    <!-- MyBatis Mapper Scan -->
+-    <mybatis-spring:scan base-package="app.domains"/> 
++<!-- Mapper 스캔 -->
++<mybatis-spring:scan base-package="app.domains.list.dao"/>
+ 
++    <!-- list용: Repository에서 SqlSessionTemplate 직접 사용 -->
++    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
++        <constructor-arg index="0" ref="sqlSessionFactory"/>
++    </bean>
+ 
+     <!-- Transaction Manager -->
+     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+diff --git a/src/main/webapp/WEB-INF/views/asset/assetList.jsp b/src/main/webapp/WEB-INF/views/asset/assetList.jsp
+deleted file mode 100644
+index e2ab14a..0000000
+--- a/src/main/webapp/WEB-INF/views/asset/assetList.jsp
++++ /dev/null
+@@ -1,15 +0,0 @@
+-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+-
+-<!DOCTYPE html>
+-<html lang="ko">
+-    <head>
+-        <meta charset="UTF-8">
+-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+-    </head>
+-    <body>
+-        자산 관리 페이지입니다.
+-    </body>
+-</html>
+\ No newline at end of file
+diff --git a/src/main/webapp/WEB-INF/views/layout/user/header.jsp b/src/main/webapp/WEB-INF/views/layout/user/header.jsp
+index f677e2b..0c82fb1 100644
+--- a/src/main/webapp/WEB-INF/views/layout/user/header.jsp
++++ b/src/main/webapp/WEB-INF/views/layout/user/header.jsp
+@@ -5,14 +5,15 @@
+ <header class="u-header">
+   <div class="u-header__inner">
+     <!-- 로고 -->
+-    <a href="<c:url value='/resource/list'/>" class="u-logo">
++    <c:url var="listUrl" value="/resource/list"/>
++    <a href="${listUrl}" class="u-logo">
+       <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유 로고">
+     </a>
+ 
+     <!-- 검색 + 필터 -->
+     <div class="u-tools">
+       <!-- 검색 -->
+-      <form class="u-search" action="<c:url value='/resource/list'/>" method="get">
++      <form class="u-search" action="${listUrl}" method="get">
+         <input type="text" name="q" value="${param.q}" placeholder="농기계를 검색하세요." aria-label="검색">
+         <button type="submit" aria-label="검색 실행">
+           <i class="u-ic u-ic--search" aria-hidden="true"></i>
+@@ -30,9 +31,17 @@
+           </svg>
+         </button>
+ 
++        <c:url var="allUrl" value="/resource/list">
++          <c:param name="q" value="${param.q}"/>
++        </c:url>
++        <c:url var="availUrl" value="/resource/list">
++          <c:param name="q" value="${param.q}"/>
++          <c:param name="filter" value="available"/>
++        </c:url>
++
+         <div class="u-filter__menu" id="filterMenuHeader">
+-          <a href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/></c:url>">전체</a>
+-          <a href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='available'/></c:url>">임대가능만</a>
++          <a href="${allUrl}">전체</a>
++          <a href="${availUrl}">임대가능만</a>
+         </div>
+       </div>
+     </div>
+@@ -66,14 +75,11 @@
+ (function(){
+   const wrap = document.querySelector('header .u-filter');
+   const btn  = document.getElementById('filterBtnHeader');
+-
+   function closeMenu(){ wrap?.classList.remove('is-open'); btn?.setAttribute('aria-expanded','false'); }
+   function toggleMenu(){ wrap?.classList.toggle('is-open'); btn?.setAttribute('aria-expanded', String(wrap.classList.contains('is-open'))); }
+-
+   btn?.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
+   document.addEventListener('click', (e)=>{ if(!e.target.closest('header .u-filter')) closeMenu(); });
+   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
+-
+   closeMenu();
+ })();
+ </script>
+diff --git a/src/main/webapp/WEB-INF/views/resource/list.jsp b/src/main/webapp/WEB-INF/views/resource/list.jsp
+new file mode 100644
+index 0000000..6a27e7b
+--- /dev/null
++++ b/src/main/webapp/WEB-INF/views/resource/list.jsp
+@@ -0,0 +1,94 @@
++<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
++<%@ taglib prefix="c" uri="jakarta.tags.core" %>
++<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
++
++
++
++<link rel="stylesheet" href="<c:url value='/static/css/layout/resource/list.css'/>">
++<link rel="stylesheet" href="<c:url value='/static/css/layout/user/header/style.css'/>"/>
++
++<jsp:include page="/WEB-INF/views/layout/user/header.jsp"/>
++
++<section class="asset-wrap">
++  <!-- ↑ 더 이상 우측 상단 01(롤링넘버) 안 씀 -->
++
++  <section class="asset-grid">
++    <c:choose>
++      <c:when test="${not empty items}">
++        <c:forEach var="it" items="${items}">
++          <c:if test="${empty param.filter || param.filter ne 'available' || it.rentable}">
++            <article class="asset-card" data-available="${it.rentable}">
++              <div class="asset-card__badge ${it.rentable ? 'is-ok' : 'is-no'}">
++                <span>${it.rentable ? '임대가능' : '임대불가'}</span>
++              </div>
++
++              <c:choose>
++                <c:when test="${empty it.image}">
++                  <div class="asset-card__img is-empty">이미지 준비중</div>
++                </c:when>
++                <c:otherwise>
++                  <div class="asset-card__img">
++                    <img src="<c:url value='${it.image}'/>" alt="<c:out value='${it.name}'/>" loading="lazy">
++                  </div>
++                </c:otherwise>
++              </c:choose>
++
++              <div class="asset-card__body">
++                <h3 class="asset-card__title"><c:out value="${it.name}"/></h3>
++                <div class="asset-card__meta">
++                  <span class="asset-card__cat"><c:out value="${it.category}"/></span>
++                  <span class="asset-card__stock">보유대수 :
++                    <fmt:formatNumber value="${it.stock}" pattern="#"/>대
++                  </span>
++                </div>
++                <div class="asset-card__line"></div>
++
++                <button class="asset-card__cta" data-id="${it.assetId}"
++                        <c:if test="${!it.rentable}">disabled="disabled" aria-disabled="true" title="현재 임대 불가"</c:if>>
++                  <c:out value="${it.rentable ? '임대신청' : '임대불가'}"/>
++                </button>
++              </div>
++            </article>
++          </c:if>
++        </c:forEach>
++      </c:when>
++      <c:otherwise>
++        <div style="grid-column: 1 / -1; text-align:center; padding:40px 0; color:#666;">
++          조건에 맞는 자원이 없습니다.
++        </div>
++      </c:otherwise>
++    </c:choose>
++  </section>
++
++<!-- 페이지네이션: page 없을 때도 1 노출 -->
++<c:set var="totalPages" value="${totalPages != null ? totalPages : 1}" />
++<c:set var="currentPage" value="${page != null ? page : 1}" />
++  <nav class="asset-paging" aria-label="페이지 이동">
++    <c:forEach var="p" begin="1" end="${totalPages}">
++      <a class="asset-paging__item ${p == currentPage ? 'is-active' : ''}"
++         href="<c:url value='/resource/list'>
++                  <c:param name='q' value='${param.q}'/>
++                  <c:param name='filter' value='${param.filter}'/>
++                  <c:param name='page' value='${p}'/>
++               </c:url>">${p}</a>
++    </c:forEach>
++  </nav>
++</section>
++
++<script>
++  // 버튼 클릭 로직은 그대로
++  document.querySelectorAll('.asset-card__cta').forEach(function(b){
++    b.addEventListener('click', function(){
++      const loggedIn = !!(${not empty sessionScope.loginUser});
++      if(!loggedIn){
++        if(confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')){
++          location.href = '<c:url value="/login"/>';
++        }
++        return;
++      }
++      if (this.hasAttribute('disabled')) return;
++      const id = this.getAttribute('data-id');
++      location.href = '<c:url value="/rent/apply"/>' + '?resourceId=' + encodeURIComponent(id);
++    });
++  });
++</script>
+diff --git a/src/main/webapp/WEB-INF/web.xml b/src/main/webapp/WEB-INF/web.xml
+index 92d21ad..c0a6b18 100644
+--- a/src/main/webapp/WEB-INF/web.xml
++++ b/src/main/webapp/WEB-INF/web.xml
+@@ -55,14 +55,14 @@
+     </session-config>
+ 
+     <!-- Error Pages -->
+-    <error-page>
++  <!--    <error-page>
+         <error-code>404</error-code>
+         <location>/WEB-INF/views/error/404.jsp</location>
+     </error-page>
+     <error-page>
+         <error-code>500</error-code>
+         <location>/WEB-INF/views/error/500.jsp</location>
+-    </error-page>
++    </error-page>-->
+ 
+     <!-- Welcome Files -->
+     <welcome-file-list>
+diff --git a/src/main/webapp/static/css/rental/apply.css b/src/main/webapp/static/css/layout/rental/apply.css
+similarity index 100%
+rename from src/main/webapp/static/css/rental/apply.css
+rename to src/main/webapp/static/css/layout/rental/apply.css

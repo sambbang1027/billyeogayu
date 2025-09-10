@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.domains.asset.dao.AssetRepository">
+
+    <resultMap id="AssetResultMap" type="app.domains.asset.model.Asset">
+        <id property="assetId" column="ASSET_ID"/>
+        <result property="modelName" column="NAME"/>
+        <result property="assetStatus" column="STATUS"/>
+        <result property="category" column="CATEGORY"/>
+        <result property="company" column="COMPANY"/>
+        <result property="maintenanceCycle" column="MAINTENANCE_CYCLE"/>
+        <result property="usageTime" column="USAGE_TIME"/>
+        <result property="lastMaintenanceDate" column="LAST_MAINTENANCE_DATE"/>
+        <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE"/>
+        <result property="imagePath" column="IMAGE"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+        <result property="deletedAt" column="DELETED_AT"/>
+        <result property="isDeleted" column="IS_DELETED"/>
+    </resultMap>
+
+    <resultMap id="PartResultMap" type="app.domains.asset.model.Part">
+        <id     property="partId"                  column="PART_ID"/>
+        <result property="assetId"                 column="ASSET_ID"/>
+        <result property="partName"                column="NAME"/>
+        <result property="partStatus"              column="STATUS"/>
+        <result property="lastMaintenanceDate"     column="LAST_MAINTENANCE_DATE"/>
+        <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE"/>
+        <result property="usageTime"               column="USAGE_TIME"/>
+        <result property="maintenanceCycle"        column="MAINTENANCE_CYCLE"/>
+        <result property="createdAt"               column="CREATED_AT"/>
+        <result property="updatedAt"               column="UPDATED_AT"/>
+        <result property="deletedAt"               column="DELETED_AT"/>
+        <result property="isDeleted"               column="IS_DELETED"/>
+    </resultMap>
+
+    <sql id="AssetFilters">
+        WHERE IS_DELETED = 'N'
+        <if test="assetStatus != null and assetStatus != ''">
+            AND STATUS = #{assetStatus}
+        </if>
+        <if test="category != null and category != ''">
+            AND CATEGORY = #{category}
+        </if>
+        <if test="company != null and company != ''">
+            AND COMPANY = #{company}
+        </if>
+
+        <if test="keywordLike != null and keywordLike != ''">
+            <choose>
+                <when test="field == 'category'">
+                    AND UPPER(CATEGORY) LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                </when>
+                <when test="field == 'company'">
+                    AND UPPER(COMPANY)  LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                </when>
+                <when test="field == 'modelName'">
+                    AND UPPER(NAME)     LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                </when>
+                <when test="field == 'status'">
+                    AND UPPER(STATUS)   LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                </when>
+                <!-- location 컬럼은 없으므로 무시. 'all' 또는 그 외 -->
+                <otherwise>
+                    AND (
+                    UPPER(CATEGORY) LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                    OR UPPER(COMPANY)  LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                    OR UPPER(NAME)     LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                    OR UPPER(STATUS)   LIKE UPPER(#{keywordLike}) ESCAPE '\'
+                    )
+                </otherwise>
+            </choose>
+        </if>
+    </sql>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM ASSET
+        <include refid="AssetFilters"/>
+    </select>
+
+    <select id="findAllPaged" resultMap="AssetResultMap">
+        SELECT * FROM (
+        SELECT a.*,
+        ROW_NUMBER() OVER (ORDER BY a.CREATED_AT DESC) rn
+        FROM ASSET a
+        <include refid="AssetFilters"/>
+        )
+        WHERE rn BETWEEN #{startRow} AND #{endRow}
+        ORDER BY rn
+    </select>
+
+    <select id="findAll" resultMap="AssetResultMap">
+        SELECT *
+        FROM ASSET
+        WHERE IS_DELETED = 'N'
+        <if test="assetStatus != null and assetStatus != ''">
+            AND STATUS = #{assetStatus}
+        </if>
+        <if test="category != null and category != ''">
+            AND CATEGORY = #{category}
+        </if>
+        <if test="company != null and company != ''">
+            AND COMPANY = #{company}
+        </if>
+        ORDER BY CREATED_AT DESC
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="AssetResultMap">
+        SELECT
+        ASSET_ID,
+        NAME,
+        STATUS,
+        CATEGORY,
+        COMPANY,
+        MAINTENANCE_CYCLE,
+        USAGE_TIME,
+        LAST_MAINTENANCE_DATE,
+        EXPECTED_MAINTENANCE_DATE,
+        IMAGE,
+        CREATED_AT,
+        UPDATED_AT,
+        DELETED_AT,
+        IS_DELETED
+        FROM ASSET
+        WHERE IS_DELETED = 'N'
+        AND ASSET_ID = #{assetId}
+    </select>
+
+    <select id="findByAssetId" parameterType="long" resultMap="PartResultMap">
+        SELECT
+        PART_ID,
+        ASSET_ID,
+        NAME,
+        STATUS,
+        LAST_MAINTENANCE_DATE,
+        EXPECTED_MAINTENANCE_DATE,
+        USAGE_TIME,
+        MAINTENANCE_CYCLE,
+        IS_DELETED
+        FROM PART
+        WHERE IS_DELETED = 'N'
+        AND ASSET_ID = #{assetId}
+        ORDER BY CREATED_AT DESC
+    </select>
+
+    <insert id="insertAsset"
+            parameterType="app.domains.asset.model.Asset"
+            keyProperty="assetId"
+            keyColumn="ASSET_ID">
+        INSERT INTO ASSET
+        (NAME, STATUS, CATEGORY, COMPANY,
+        MAINTENANCE_CYCLE, USAGE_TIME,
+        LAST_MAINTENANCE_DATE, EXPECTED_MAINTENANCE_DATE,
+        IMAGE, UPDATED_AT)
+        VALUES
+        (#{modelName},
+        #{assetStatus},
+        #{category},
+        #{company},
+        #{maintenanceCycle,      jdbcType=NUMERIC},
+        #{usageTime,             jdbcType=NUMERIC},
+        #{lastMaintenanceDate,   jdbcType=TIMESTAMP},
+        #{expectedMaintenanceDate,jdbcType=TIMESTAMP},
+        #{imagePath},
+        #{updatedAt,             jdbcType=TIMESTAMP})
+    </insert>
+
+    <insert id="insertParts" parameterType="map" useGeneratedKeys="false">
+        INSERT ALL
+        <foreach collection="parts" item="p">
+            INTO PART (
+            ASSET_ID, NAME, STATUS, MAINTENANCE_CYCLE, EXPECTED_MAINTENANCE_DATE
+            ) VALUES (
+            #{p.assetId},
+            #{p.partName},
+            #{p.partStatus},
+            #{p.maintenanceCycle, jdbcType=NUMERIC},
+            #{p.expectedMaintenanceDate, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <update id="updateAsset">
+        UPDATE asset
+        SET maintenance_cycle = #{maintenanceCycle}
+        WHERE asset_id = #{assetId}
+    </update>
+
+    <update id="updateParts">
+        <foreach collection="parts" item="p" separator=";">
+            UPDATE part
+            SET maintenance_cycle = #{p.maintenanceCycle}
+            WHERE asset_id = #{assetId} AND part_id = #{p.partId}
+        </foreach>
+    </update>
+
+    <update id="deleteAsset">
+        UPDATE ASSET
+        SET IS_DELETED = 'Y',
+        STATUS = 'AVAILABLE',
+        DELETED_AT = SYSDATE
+        WHERE ASSET_ID = #{assetId}
+    </update>
+
+    <update id="deletePart">
+        UPDATE PART
+        SET IS_DELETED = 'Y',
+        STATUS = 'AVAILABLE',
+        DELETED_AT = SYSDATE
+        WHERE PART_ID = #{partId}
+    </update>
+
+    <select id="findCategories" resultType="string">
+        SELECT DISTINCT CATEGORY
+        FROM ASSET
+        WHERE NULLIF(TRIM(CATEGORY), '') IS NOT NULL
+        ORDER BY CATEGORY
+    </select>
+
+    <select id="findCompanies" resultType="string">
+        SELECT DISTINCT COMPANY
+        FROM ASSET
+        WHERE NULLIF(TRIM(COMPANY), '') IS NOT NULL
+        ORDER BY COMPANY
+    </select>
+
+    <select id="findLocations" resultType="string">
+        SELECT DISTINCT LOCATION
+        FROM ASSET
+        WHERE NULLIF(TRIM(LOCATION), '') IS NOT NULL
+        ORDER BY LOCATION
+    </select>
+</mapper>
