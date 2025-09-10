@@ -238,4 +238,72 @@ public class LoginPageController {
         
         return "home";
     }
+    
+
+
+    /**
+     * 아이디 찾기 결과 페이지
+     */
+    @GetMapping("/find-id/result")
+    public String findIdResultPage(
+            @RequestParam(value = "authType", required = false) String authType,
+            @RequestParam(value = "authKey", required = false) String authKey,
+            @RequestParam(value = "foundId", required = false) String foundId,
+            @RequestParam(value = "error", required = false) String error,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        
+        log.info("=== 아이디 찾기 결과 페이지 요청 ===");
+        log.info("인증 타입: {}, 찾은 아이디: {}", authType, foundId);
+        
+        // 인증 정보가 없으면 아이디 찾기 첫 페이지로 리다이렉트
+        if (authType == null || authKey == null || foundId == null) {
+            log.warn("인증 정보 없음 - 아이디 찾기 페이지로 리다이렉트");
+            redirectAttributes.addAttribute("error", "true");
+            return "redirect:/verification?purpose=find-id";
+        }
+        
+        if (error != null) {
+            model.addAttribute("error", "true");
+        }
+        
+        model.addAttribute("authType", authType);
+        model.addAttribute("authKey", authKey);
+        model.addAttribute("foundId", foundId);
+        
+        return "/find-id-result";
+    }
+
+    /**
+     * 비밀번호 재설정 폼 페이지
+     */
+    @GetMapping("/reset-password/form")
+    public String resetPasswordFormPage(
+            @RequestParam(value = "authType", required = false) String authType,
+            @RequestParam(value = "authKey", required = false) String authKey,
+            @RequestParam(value = "userId", required = false) String userId,
+            @RequestParam(value = "error", required = false) String error,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        
+        log.info("=== 비밀번호 재설정 폼 페이지 요청 ===");
+        log.info("인증 타입: {}, 사용자 ID: {}", authType, userId);
+        
+        // 인증 정보가 없으면 비밀번호 재설정 첫 페이지로 리다이렉트
+        if (authType == null || authKey == null || userId == null) {
+            log.warn("인증 정보 없음 - 비밀번호 재설정 페이지로 리다이렉트");
+            redirectAttributes.addAttribute("error", "true");
+            return "redirect:/verification?purpose=reset-password";
+        }
+        
+        if (error != null) {
+            model.addAttribute("error", "true");
+        }
+        
+        model.addAttribute("authType", authType);
+        model.addAttribute("authKey", authKey);
+        model.addAttribute("userId", userId);
+        
+        return "/reset-password-form";
+    }
 }

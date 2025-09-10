@@ -45,4 +45,9 @@ public interface UsersRepository {
      * 역할별 사용자 조회
      */
     List<Users> selectUsersByRole(String role);
+    
+    /**
+     * 휴대폰 번호로 사용자 조회
+     */
+    Users selectUserByPhone(String phoneNumber);
 }

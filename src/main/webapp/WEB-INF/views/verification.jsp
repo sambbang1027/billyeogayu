@@ -1,248 +1,255 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>빌려가유 - 회원가입</title>
-    <link rel="stylesheet" href="<c:url value='/static/css/layout/user/verification/style.css'/>">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>빌려가유 - 회원가입</title>
+<link rel="stylesheet"
+	href="<c:url value='/static/css/layout/user/verification/style.css'/>">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-    <div class="component">
-        <!-- 헤더 -->
-        <div class="header">
-            <div class="header-content">
-                <img class="logo" src="<c:url value='/static/images/logo.png'/>" alt="빌려가유 로고" />
-                <div class="header-links">
-                    <span class="header-link">회원가입</span>
-                    <span class="header-link">로그인</span>
-                    <span class="header-link">마이페이지</span>
-                    <span class="header-link">로그아웃</span>
-                </div>
-            </div>
-        </div>
+	<div class="component">
+		<!-- 헤더 -->
+		<div class="header">
+			<div class="header-content">
+				<img class="logo" src="<c:url value='/static/images/logo.png'/>"
+					alt="빌려가유 로고" />
+				<div class="header-links">
+					<span class="header-link">회원가입</span> <span class="header-link">로그인</span>
+					<span class="header-link">마이페이지</span> <span class="header-link">로그아웃</span>
+				</div>
+			</div>
+		</div>
 
-        <div class="frame">
-            <!-- 사이드바 -->
+		<div class="frame">
+			<!-- 사이드바 -->
 			<div class="sidebar">
-			    <div class="sidebar-heading">
-			        <div class="sidebar-title">회원</div>
-			    </div>
-			    <div class="sidebar-menu">
-			        <div class="menu-item">
-			            <a href="<c:url value='/login'/>" class="menu-link">
-			                <div class="menu-text">로그인</div>
-			            </a>
-			        </div>
-			        <div class="menu-item ${activePage == 'register' ? 'active' : ''}">
-			            <a href="<c:url value='/verification?purpose=register'/>" class="menu-link">
-			                <div class="menu-text">회원가입</div>
-			            </a>
-			        </div>
-			        <div class="menu-item ${activePage == 'find-id' ? 'active' : ''}">
-			            <a href="<c:url value='/verification?purpose=find-id'/>" class="menu-link">
-			                <div class="menu-text">아이디찾기</div>
-			            </a>
-			        </div>
-			        <div class="menu-item ${activePage == 'reset-password' ? 'active' : ''}">
-			            <a href="<c:url value='/verification?purpose=reset-password'/>" class="menu-link">
-			                <div class="menu-text">비밀번호 재설정</div>
-			            </a>
-			        </div>
-			    </div>
+				<div class="sidebar-heading">
+					<div class="sidebar-title">회원</div>
+				</div>
+				<div class="sidebar-menu">
+					<div class="menu-item">
+						<a href="<c:url value='/login'/>" class="menu-link">
+							<div class="menu-text">로그인</div>
+						</a>
+					</div>
+					<div class="menu-item ${activePage == 'register' ? 'active' : ''}">
+						<a href="<c:url value='/verification?purpose=register'/>"
+							class="menu-link">
+							<div class="menu-text">회원가입</div>
+						</a>
+					</div>
+					<div class="menu-item ${activePage == 'find-id' ? 'active' : ''}">
+						<a href="<c:url value='/verification?purpose=find-id'/>"
+							class="menu-link">
+							<div class="menu-text">아이디찾기</div>
+						</a>
+					</div>
+					<div
+						class="menu-item ${activePage == 'reset-password' ? 'active' : ''}">
+						<a href="<c:url value='/verification?purpose=reset-password'/>"
+							class="menu-link">
+							<div class="menu-text">비밀번호 재설정</div>
+						</a>
+					</div>
+				</div>
 			</div>
 
-            <!-- 메인 컨텐츠 -->
-            <div class="main-content">
-                <div class="page-title">${pageTitle}</div>
-                
-                <div class="register-container">
-                    <div class="register-title">본인 확인</div>
-                    
-                    <!-- 안내 박스 -->
-                    <div class="info-box">
-                        <div class="info-list">
-                            <div class="info-item">
-                                <div class="info-text">
-                                    ${pageDescription}<br>
-                                    입력하신 정보는 본인확인을 위해 사용되며, 본인확인 용도 외에 사용되거나 저장되지 않습니다.<br>
-                                    개인정보는 본인 동의 없이 공개되지 않으며 개인정보보호정책에 의해 보호받고 있습니다.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+			<!-- 메인 컨텐츠 -->
+			<div class="main-content">
+				<div class="page-title">${pageTitle}</div>
 
-                    <!-- 인증 방법 선택 -->
-                    <div class="auth-methods">
-                        <div class="auth-method">
-                            <div class="auth-title">이메일 인증</div>
-                            <div class="auth-description">이메일으로 본인인증을 진행합니다.</div>
-                            <button class="auth-button email-auth" type="button">
-                                이메일으로 인증하기
-                            </button>
-                        </div>
-                        
-                        <div class="auth-method">
-                            <div class="auth-title">휴대폰 인증</div>
-                            <div class="auth-description">본인명의 휴대폰으로 본인인증을 진행합니다.</div>
-                            <button class="auth-button phone-auth" type="button">
-                                휴대폰으로 인증하기
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<div class="register-container">
+					<div class="register-title">본인 확인</div>
 
-            <!-- 브레드크럼 -->
-            <div class="breadcrumb">
-                <span class="breadcrumb-item">홈</span>
-                <span class="breadcrumb-arrow">></span>
-                <span class="breadcrumb-item">회원</span>
-                <span class="breadcrumb-arrow">></span>
-                <span class="breadcrumb-item current">${pageTitle}</span>
-            </div>
-        </div>
-    </div>
+					<!-- 안내 박스 -->
+					<div class="info-box">
+						<div class="info-list">
+							<div class="info-item">
+								<div class="info-text">
+									${pageDescription}<br> 입력하신 정보는 본인확인을 위해 사용되며, 본인확인 용도 외에
+									사용되거나 저장되지 않습니다.<br> 개인정보는 본인 동의 없이 공개되지 않으며 개인정보보호정책에 의해
+									보호받고 있습니다.
+								</div>
+							</div>
+						</div>
+					</div>
 
-    <!-- 이메일 인증 모달 -->
-    <div id="emailModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>이메일 인증</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <!-- 정보 입력 단계 -->
-                <div id="inputStep" class="step-content">
-                    <p class="modal-description">본인확인을 위해 정보를 입력해주세요.</p>
-                    <form id="emailAuthForm">
-                        <div class="form-group">
-                            <label for="userName">이름</label>
-                            <input type="text" id="userName" name="userName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="birthDate">생년월일 (8자리)</label>
-                            <input type="text" id="birthDate" name="birthDate" placeholder="예: 19900101" maxlength="8" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">이메일</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <button type="submit" class="modal-button" id="sendCodeBtn">
-                            이메일 인증 요청
-                        </button>
-                    </form>
-                </div>
+					<!-- 인증 방법 선택 -->
+					<div class="auth-methods">
+						<div class="auth-method">
+							<div class="auth-title">이메일 인증</div>
+							<div class="auth-description">이메일으로 본인인증을 진행합니다.</div>
+							<button class="auth-button email-auth" type="button">
+								이메일으로 인증하기</button>
+						</div>
 
-                <!-- 인증번호 입력 단계 -->
-                <div id="verificationStep" class="step-content" style="display: none;">
-                    <p class="modal-description">입력하신 이메일로 인증번호를 발송했습니다.</p>
-                    <div class="email-info">
-                        <span>발송된 이메일: </span><strong id="sentEmail"></strong>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="verificationCode">인증번호 (6자리)</label>
-                        <input type="text" id="verificationCode" maxlength="6" placeholder="인증번호 입력">
-                    </div>
-                    
-                    <div class="timer-section">
-                        <div class="timer">
-                            남은시간: <span id="timer">03:00</span>
-                        </div>
-                        <button type="button" class="resend-btn" id="resendBtn">재전송</button>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button type="button" class="modal-button secondary" id="backBtn">이전</button>
-                        <button type="button" class="modal-button" id="verifyBtn">인증확인</button>
-                    </div>
-                </div>
+						<div class="auth-method">
+							<div class="auth-title">휴대폰 인증</div>
+							<div class="auth-description">본인명의 휴대폰으로 본인인증을 진행합니다.</div>
+							<button class="auth-button phone-auth" type="button">
+								휴대폰으로 인증하기</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                <!-- 인증 성공 단계 -->
-                <div id="successStep" class="step-content" style="display: none;">
-                    <div class="success-icon">✓</div>
-                    <p class="success-message">이메일 인증이 완료되었습니다!</p>
-                    <button type="button" class="modal-button" id="continueBtn">
-                        회원가입 계속하기
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+			<!-- 브레드크럼 -->
+			<div class="breadcrumb">
+				<span class="breadcrumb-item">홈</span> <span
+					class="breadcrumb-arrow">></span> <span class="breadcrumb-item">회원</span>
+				<span class="breadcrumb-arrow">></span> <span
+					class="breadcrumb-item current">${pageTitle}</span>
+			</div>
+		</div>
+	</div>
 
-    <!-- 휴대폰 인증 모달 -->
-    <div id="phoneModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>휴대폰 인증</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <!-- 정보 입력 단계 -->
-                <div id="phoneInputStep" class="step-content">
-                    <p class="modal-description">본인확인을 위해 정보를 입력해주세요.</p>
-                    <form id="phoneAuthForm">
-                        <div class="form-group">
-                            <label for="phoneUserName">이름</label>
-                            <input type="text" id="phoneUserName" name="phoneUserName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phoneBirthDate">생년월일 (8자리)</label>
-                            <input type="text" id="phoneBirthDate" name="phoneBirthDate" placeholder="예: 19900101" maxlength="8" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phoneNumber">휴대폰 번호</label>
-                            <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="01012345678" maxlength="11" required>
-                        </div>
-                        <button type="submit" class="modal-button" id="sendSmsBtn">
-                            휴대폰 인증 요청
-                        </button>
-                    </form>
-                </div>
+	<!-- 이메일 인증 모달 -->
+	<div id="emailModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>이메일 인증</h2>
+				<span class="close">&times;</span>
+			</div>
+			<div class="modal-body">
+				<!-- 정보 입력 단계 -->
+				<div id="inputStep" class="step-content">
+					<p class="modal-description">본인확인을 위해 정보를 입력해주세요.</p>
+					<form id="emailAuthForm">
+						<div class="form-group">
+							<label for="userName">이름</label> <input type="text" id="userName"
+								name="userName" required>
+						</div>
+						<div class="form-group">
+							<label for="birthDate">생년월일 (8자리)</label> <input type="text"
+								id="birthDate" name="birthDate" placeholder="예: 19900101"
+								maxlength="8" required>
+						</div>
+						<div class="form-group">
+							<label for="email">이메일</label> <input type="email" id="email"
+								name="email" required>
+						</div>
+						<button type="submit" class="modal-button" id="sendCodeBtn">
+							이메일 인증 요청</button>
+					</form>
+				</div>
 
-                <!-- 인증번호 입력 단계 -->
-                <div id="phoneVerificationStep" class="step-content" style="display: none;">
-                    <p class="modal-description">입력하신 휴대폰 번호로 인증번호를 발송했습니다.</p>
-                    <div class="phone-info">
-                        <span>발송된 번호: </span><strong id="sentPhoneNumber"></strong>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="phoneVerificationCode">인증번호 (6자리)</label>
-                        <input type="text" id="phoneVerificationCode" maxlength="6" placeholder="인증번호 입력">
-                    </div>
-                    
-                    <div class="timer-section">
-                        <div class="timer">
-                            남은시간: <span id="phoneTimer">03:00</span>
-                        </div>
-                        <button type="button" class="resend-btn" id="phoneResendBtn">재전송</button>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button type="button" class="modal-button secondary" id="phoneBackBtn">이전</button>
-                        <button type="button" class="modal-button" id="phoneVerifyBtn">인증확인</button>
-                    </div>
-                </div>
+				<!-- 인증번호 입력 단계 -->
+				<div id="verificationStep" class="step-content"
+					style="display: none;">
+					<p class="modal-description">입력하신 이메일로 인증번호를 발송했습니다.</p>
+					<div class="email-info">
+						<span>발송된 이메일: </span><strong id="sentEmail"></strong>
+					</div>
 
-                <!-- 인증 성공 단계 -->
-                <div id="phoneSuccessStep" class="step-content" style="display: none;">
-                    <div class="success-icon">✓</div>
-                    <p class="success-message">휴대폰 인증이 완료되었습니다!</p>
-                    <button type="button" class="modal-button" id="phoneContinueBtn">
-                        회원가입 계속하기
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+					<div class="form-group">
+						<label for="verificationCode">인증번호 (6자리)</label> <input
+							type="text" id="verificationCode" maxlength="6"
+							placeholder="인증번호 입력">
+					</div>
 
-    <!-- JavaScript -->
-    <script>
+					<div class="timer-section">
+						<div class="timer">
+							남은시간: <span id="timer">03:00</span>
+						</div>
+						<button type="button" class="resend-btn" id="resendBtn">재전송</button>
+					</div>
+
+					<div class="button-group">
+						<button type="button" class="modal-button secondary" id="backBtn">이전</button>
+						<button type="button" class="modal-button" id="verifyBtn">인증확인</button>
+					</div>
+				</div>
+
+				<!-- 인증 성공 단계 -->
+				<div id="successStep" class="step-content" style="display: none;">
+					<div class="success-icon">✓</div>
+					<p class="success-message">이메일 인증이 완료되었습니다!</p>
+					<button type="button" class="modal-button" id="continueBtn">
+						회원가입 계속하기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 휴대폰 인증 모달 -->
+	<div id="phoneModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>휴대폰 인증</h2>
+				<span class="close">&times;</span>
+			</div>
+			<div class="modal-body">
+				<!-- 정보 입력 단계 -->
+				<div id="phoneInputStep" class="step-content">
+					<p class="modal-description">본인확인을 위해 정보를 입력해주세요.</p>
+					<form id="phoneAuthForm">
+						<div class="form-group">
+							<label for="phoneUserName">이름</label> <input type="text"
+								id="phoneUserName" name="phoneUserName" required>
+						</div>
+						<div class="form-group">
+							<label for="phoneBirthDate">생년월일 (8자리)</label> <input type="text"
+								id="phoneBirthDate" name="phoneBirthDate"
+								placeholder="예: 19900101" maxlength="8" required>
+						</div>
+						<div class="form-group">
+							<label for="phoneNumber">휴대폰 번호</label> <input type="tel"
+								id="phoneNumber" name="phoneNumber" placeholder="01012345678"
+								maxlength="11" required>
+						</div>
+						<button type="submit" class="modal-button" id="sendSmsBtn">
+							휴대폰 인증 요청</button>
+					</form>
+				</div>
+
+				<!-- 인증번호 입력 단계 -->
+				<div id="phoneVerificationStep" class="step-content"
+					style="display: none;">
+					<p class="modal-description">입력하신 휴대폰 번호로 인증번호를 발송했습니다.</p>
+					<div class="phone-info">
+						<span>발송된 번호: </span><strong id="sentPhoneNumber"></strong>
+					</div>
+
+					<div class="form-group">
+						<label for="phoneVerificationCode">인증번호 (6자리)</label> <input
+							type="text" id="phoneVerificationCode" maxlength="6"
+							placeholder="인증번호 입력">
+					</div>
+
+					<div class="timer-section">
+						<div class="timer">
+							남은시간: <span id="phoneTimer">03:00</span>
+						</div>
+						<button type="button" class="resend-btn" id="phoneResendBtn">재전송</button>
+					</div>
+
+					<div class="button-group">
+						<button type="button" class="modal-button secondary"
+							id="phoneBackBtn">이전</button>
+						<button type="button" class="modal-button" id="phoneVerifyBtn">인증확인</button>
+					</div>
+				</div>
+
+				<!-- 인증 성공 단계 -->
+				<div id="phoneSuccessStep" class="step-content"
+					style="display: none;">
+					<div class="success-icon">✓</div>
+					<p class="success-message">휴대폰 인증이 완료되었습니다!</p>
+					<button type="button" class="modal-button" id="phoneContinueBtn">
+						회원가입 계속하기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- JavaScript -->
+	<script>
         $(document).ready(function() {
             let timerInterval;
             let phoneTimerInterval;
@@ -250,6 +257,11 @@
             let phoneRemainingTime = 180; // 3분
             let userInfo = {}; // 사용자 입력 정보 저장
             let phoneUserInfo = {}; // 휴대폰 사용자 입력 정보 저장
+
+            // JSP에서 전달받은 purpose 값
+            const PURPOSE = '${purpose}' || 'register';
+            
+            console.log('현재 purpose:', PURPOSE);
 
             // 이메일 인증 버튼 클릭
             $('.email-auth').on('click', function() {
@@ -315,11 +327,26 @@
                 clearEmailTimer();
             });
 
-            // 계속하기 버튼
+            // 계속하기 버튼 - purpose별 분기 처리
             $('#continueBtn').on('click', function() {
-                // 사용자 정보를 localStorage에 저장 후 정보입력 페이지로 이동
-                localStorage.setItem('registrationData', JSON.stringify(userInfo));
-                window.location.href = '<c:url value="/register/info"/>';
+                console.log('이메일 인증 완료 - purpose:', PURPOSE);
+                
+                if (PURPOSE === 'register') {
+                    // 기존 회원가입 로직
+                    localStorage.setItem('registrationData', JSON.stringify(userInfo));
+                    window.location.href = '<c:url value="/register/info"/>';
+                } else {
+                    // 아이디 찾기 또는 비밀번호 재설정
+                    const userData = {
+                        purpose: PURPOSE,
+                        authType: 'email',
+                        userName: userInfo.userName,
+                        birthDate: userInfo.birthDate,
+                        email: userInfo.email
+                    };
+                    
+                    handleAuthComplete(userData);
+                }
             });
 
             // ===== 휴대폰 인증 관련 =====
@@ -366,12 +393,141 @@
                 clearPhoneTimer();
             });
 
-            // 휴대폰 계속하기 버튼
+            // 휴대폰 계속하기 버튼 - purpose별 분기 처리
             $('#phoneContinueBtn').on('click', function() {
-                // 사용자 정보를 localStorage에 저장 후 정보입력 페이지로 이동
-                localStorage.setItem('registrationData', JSON.stringify(phoneUserInfo));
-                window.location.href = '<c:url value="/register/info"/>';
+                console.log('휴대폰 인증 완료 - purpose:', PURPOSE);
+                
+                if (PURPOSE === 'register') {
+                    // 기존 회원가입 로직
+                    localStorage.setItem('registrationData', JSON.stringify(phoneUserInfo));
+                    window.location.href = '<c:url value="/register/info"/>';
+                } else {
+                    // 아이디 찾기 또는 비밀번호 재설정
+                    const userData = {
+                        purpose: PURPOSE,
+                        authType: 'phone',
+                        userName: phoneUserInfo.userName,
+                        birthDate: phoneUserInfo.birthDate,
+                        phoneNumber: phoneUserInfo.phoneNumber
+                    };
+                    
+                    handleAuthComplete(userData);
+                }
             });
+
+            // 인증 완료 처리 함수
+
+			function handleAuthComplete(userData) {
+			    console.log('인증 완료 처리 시작:', userData);
+			    
+			    $.ajax({
+			        url: '<c:url value="/api/auth-complete"/>',
+			        method: 'POST',
+			        contentType: 'application/json',
+			        data: JSON.stringify(userData),
+			        success: function(response) {
+			            console.log('API 응답:', response);
+			            
+			            if (response.success) {
+			                const result = response.data;
+			                console.log('응답 데이터:', result);
+			                
+			                switch (userData.purpose) {
+			                    case 'find-id':
+			                        console.log('아이디 찾기 결과 페이지로 이동');
+			                        console.log('foundId:', result.foundId);
+			                        console.log('authType:', result.authType);
+			                        console.log('authKey:', result.authKey);
+			                        
+			                        // URL 생성 시 undefined 체크 (encodeURIComponent 제거)
+			                        const authType = result.authType || '';
+			                        const authKey = result.authKey || '';
+			                        const foundId = result.foundId || '';
+			                        
+			                        console.log('최종 URL 파라미터:', { authType, authKey, foundId });
+			                        
+			                        // 아이디 찾기 결과 페이지로 이동
+			                        const findIdUrl = '<c:url value="/find-id/result"/>' + 
+			                                        '?authType=' + authType + 
+			                                        '&authKey=' + authKey + 
+			                                        '&foundId=' + foundId;
+			                        
+			                        console.log('이동할 URL:', findIdUrl);
+			                        window.location.href = findIdUrl;
+			                        break;
+			                        
+			                    case 'reset-password':
+			                        console.log('비밀번호 재설정 폼 페이지로 이동');
+			                        console.log('userId:', result.userId);
+			                        console.log('authType:', result.authType);
+			                        console.log('authKey:', result.authKey);
+			                        
+			                        // URL 생성 시 undefined 체크 (encodeURIComponent 제거)
+			                        const pwAuthType = result.authType || '';
+			                        const pwAuthKey = result.authKey || '';
+			                        const userId = result.userId || '';
+			                        
+			                        console.log('최종 URL 파라미터:', { pwAuthType, pwAuthKey, userId });
+			                        
+			                        // 비밀번호 재설정 폼 페이지로 이동
+			                        const resetPasswordUrl = '<c:url value="/reset-password/form"/>' + 
+			                                               '?authType=' + pwAuthType + 
+			                                               '&authKey=' + pwAuthKey + 
+			                                               '&userId=' + userId;
+			                        
+			                        console.log('이동할 URL:', resetPasswordUrl);
+			                        window.location.href = resetPasswordUrl;
+			                        break;
+			                        
+			                    default:
+			                        console.log('알 수 없는 purpose:', userData.purpose);
+			                        alert('처리 중 오류가 발생했습니다.');
+			                        break;
+			                }
+			            } else {
+			                alert(response.message || '처리 중 오류가 발생했습니다.');
+			            }
+			        },
+			        error: function(xhr, status, error) {
+			            console.error('API 호출 오류:', xhr, status, error);
+			            console.error('응답 텍스트:', xhr.responseText);
+			            alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+			        }
+			    });
+			}
+
+            // 성공 메시지 동적 변경
+            function updateSuccessMessage() {
+                let message = '';
+                let buttonText = '';
+                
+                switch (PURPOSE) {
+                    case 'find-id':
+                        message = '인증이 완료되었습니다!';
+                        buttonText = '아이디 찾기 계속하기';
+                        break;
+                    case 'reset-password':
+                        message = '인증이 완료되었습니다!';
+                        buttonText = '비밀번호 재설정 계속하기';
+                        break;
+                    case 'register':
+                    default:
+                        message = '인증이 완료되었습니다!';
+                        buttonText = '회원가입 계속하기';
+                        break;
+                }
+                
+                // 이메일 성공 단계 메시지 업데이트
+                $('#successStep .success-message').text('이메일 ' + message);
+                $('#continueBtn').text(buttonText);
+                
+                // 휴대폰 성공 단계 메시지 업데이트
+                $('#phoneSuccessStep .success-message').text('휴대폰 ' + message);
+                $('#phoneContinueBtn').text(buttonText);
+            }
+
+            // 페이지 로드 시 성공 메시지 업데이트
+            updateSuccessMessage();
 
             // 생년월일 숫자만 입력
             $('#birthDate, #phoneBirthDate').on('input', function() {
@@ -779,6 +935,6 @@
                 return phoneNumber;
             }
         });
-    </script>
+	</script>
 </body>
 </html>

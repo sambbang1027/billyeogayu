@@ -218,4 +218,29 @@ public class UsersServiceImpl implements UsersService {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
     }
+    
+
+
+    // UsersServiceImpl.java 구현체에 추가
+    @Override
+    @Transactional(readOnly = true)
+    public Users getUserByPhone(String phoneNumber) {
+        log.debug("휴대폰 번호로 사용자 조회 - phoneNumber: {}", phoneNumber);
+        
+        try {
+            Users user = userRepository.selectUserByPhone(phoneNumber);
+            if (user != null) {
+                log.debug("휴대폰 번호로 사용자 조회 성공 - userId: {}, loginId: {}", 
+                         user.getUserId(), user.getLoginId());
+            } else {
+                log.debug("휴대폰 번호로 사용자를 찾을 수 없음 - phoneNumber: {}", phoneNumber);
+            }
+            return user;
+            
+        } catch (Exception e) {
+            log.error("휴대폰 번호로 사용자 조회 중 오류 발생 - phoneNumber: {}", phoneNumber, e);
+            return null;
+        }
+    }
+
 }
