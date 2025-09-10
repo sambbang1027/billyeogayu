@@ -3,37 +3,37 @@
 
 <mapper namespace="app.domains.list.dao.ListRepository">
 
-    <!-- 기본 매핑 (stock 필드 제외) -->
+    <!-- 기본 매핑 -->
     <resultMap id="assetMap" type="app.domains.asset.model.Asset">
         <id property="assetId" column="ASSET_ID"/>
-        <result property="name" column="NAME"/>
+        <result property="modelName" column="NAME"/>
         <result property="category" column="CATEGORY"/>
         <result property="company" column="COMPANY"/>
-        <result property="status" column="STATUS"/>
-        <result property="image" column="IMAGE"/>
+        <result property="assetStatus" column="STATUS"/>
+        <result property="imagePath" column="IMAGE"/>
         <result property="maintenanceCycle" column="MAINTENANCE_CYCLE"/>
         <result property="usageTime" column="USAGE_TIME"/>
         <result property="lastMaintenanceDate" column="LAST_MAINTENANCE_DATE"/>
         <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE"/>
-        <result property="createdAt" column="CREATED_AT"/>
+        <result property="createAt" column="CREATED_AT"/>
         <result property="updatedAt" column="UPDATED_AT"/>
         <result property="deletedAt" column="DELETED_AT"/>
         <result property="isDeleted" column="IS_DELETED"/>
     </resultMap>
 
-    <!-- 그룹핑용 매핑 (rentable 제거) -->
+    <!-- 그룹핑용 매핑 -->
     <resultMap id="assetGroupMap" type="app.domains.asset.model.Asset">
         <id property="assetId" column="ASSET_ID"/>
-        <result property="name" column="NAME"/>
+        <result property="modelName" column="NAME"/>
         <result property="category" column="CATEGORY"/>
         <result property="company" column="COMPANY"/>
-        <result property="status" column="STATUS"/>
-        <result property="image" column="IMAGE"/>
+        <result property="assetStatus" column="STATUS"/>
+        <result property="imagePath" column="IMAGE"/>
         <result property="maintenanceCycle" column="MAINTENANCE_CYCLE"/>
         <result property="usageTime" column="USAGE_TIME"/>
         <result property="lastMaintenanceDate" column="LAST_MAINTENANCE_DATE"/>
         <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE"/>
-        <result property="createdAt" column="CREATED_AT"/>
+        <result property="createAt" column="CREATED_AT"/>
         <result property="updatedAt" column="UPDATED_AT"/>
         <result property="deletedAt" column="DELETED_AT"/>
         <result property="isDeleted" column="IS_DELETED"/>
@@ -67,14 +67,18 @@
         </if>
     </select>
 
-    <!-- 그룹핑된 자산 목록 조회 (재고 정보만 계산) -->
+    <!-- 그룹핑된 자산 목록 조회 (STATUS 기준으로 단순화) -->
     <select id="findAssetsGrouped" parameterType="map" resultMap="assetGroupMap">
         SELECT 
             MIN(a.ASSET_ID) AS ASSET_ID,
             a.NAME,
             a.CATEGORY,
             a.COMPANY,
-            MIN(a.STATUS) AS STATUS,
+            <!-- AVAILABLE 상태가 하나라도 있으면 AVAILABLE, 아니면 첫 번째 상태 사용 -->
+            CASE 
+                WHEN SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) > 0 THEN 'AVAILABLE'
+                ELSE MIN(a.STATUS)
+            END AS STATUS,
             MIN(a.IMAGE) AS IMAGE,
             MIN(a.MAINTENANCE_CYCLE) AS MAINTENANCE_CYCLE,
             MIN(a.USAGE_TIME) AS USAGE_TIME,
@@ -83,30 +87,10 @@
             MIN(a.CREATED_AT) AS CREATED_AT,
             MIN(a.UPDATED_AT) AS UPDATED_AT,
             MIN(a.DELETED_AT) AS DELETED_AT,
-            MIN(a.IS_DELETED) AS IS_DELETED,
-            COUNT(*) AS STOCK,
-            COUNT(*) - COALESCE((
-                SELECT COUNT(DISTINCT r.ASSET_ID)
-                FROM ASSET a2
-                INNER JOIN RESERVATION r ON a2.ASSET_ID = r.ASSET_ID
-                WHERE a2.NAME = a.NAME 
-                AND a2.CATEGORY = a.CATEGORY 
-                AND a2.COMPANY = a.COMPANY
-                AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-                AND r.END_TIME > SYSDATE
-                AND a2.IS_DELETED = 'N'
-            ), 0) AS AVAILABLE_STOCK,
-            COALESCE((
-                SELECT COUNT(DISTINCT r.ASSET_ID)
-                FROM ASSET a2
-                INNER JOIN RESERVATION r ON a2.ASSET_ID = r.ASSET_ID
-                WHERE a2.NAME = a.NAME 
-                AND a2.CATEGORY = a.CATEGORY 
-                AND a2.COMPANY = a.COMPANY
-                AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-                AND r.END_TIME > SYSDATE
-                AND a2.IS_DELETED = 'N'
-            ), 0) AS RENTED_STOCK
+            MIN(CASE WHEN a.IS_DELETED = 'N' THEN 0 ELSE 1 END) AS IS_DELETED,
+            COUNT(a.ASSET_ID) AS STOCK,
+            SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) AS AVAILABLE_STOCK,
+            SUM(CASE WHEN a.STATUS IN ('USING', 'MAINTENANCE_REQUIRED', 'MAINTAINING') THEN 1 ELSE 0 END) AS RENTED_STOCK
         FROM ASSET a
         WHERE a.IS_DELETED = 'N'
         <if test="q != null and q != ''">
@@ -114,17 +98,7 @@
         </if>
         GROUP BY a.NAME, a.CATEGORY, a.COMPANY
         <if test="filter != null and filter == 'available'">
-            HAVING COUNT(*) - COALESCE((
-                SELECT COUNT(DISTINCT r.ASSET_ID)
-                FROM ASSET a2
-                INNER JOIN RESERVATION r ON a2.ASSET_ID = r.ASSET_ID
-                WHERE a2.NAME = a.NAME 
-                AND a2.CATEGORY = a.CATEGORY 
-                AND a2.COMPANY = a.COMPANY
-                AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-                AND r.END_TIME > SYSDATE
-                AND a2.IS_DELETED = 'N'
-            ), 0) > 0
+            HAVING SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) > 0
         </if>
         ORDER BY a.NAME, a.CATEGORY, a.COMPANY
         <if test="offset != null and pageSize != null">
@@ -132,7 +106,7 @@
         </if>
     </select>
 
-    <!-- 그룹핑된 자산의 총 개수 (단순화) -->
+    <!-- 그룹핑된 자산의 총 개수 (STATUS 기준으로 단순화) -->
     <select id="countAssetsGrouped" parameterType="map" resultType="int">
         SELECT COUNT(*) FROM (
             SELECT a.NAME, a.CATEGORY, a.COMPANY
@@ -143,24 +117,12 @@
             </if>
             GROUP BY a.NAME, a.CATEGORY, a.COMPANY
             <if test="filter != null and filter == 'available'">
-                HAVING EXISTS (
-                    SELECT 1 FROM ASSET a2 
-                    WHERE a2.NAME = a.NAME 
-                    AND a2.CATEGORY = a.CATEGORY 
-                    AND a2.COMPANY = a.COMPANY
-                    AND a2.IS_DELETED = 'N'
-                    AND NOT EXISTS (
-                        SELECT 1 FROM RESERVATION r 
-                        WHERE r.ASSET_ID = a2.ASSET_ID 
-                        AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-                        AND r.END_TIME > SYSDATE
-                    )
-                )
+                HAVING SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) > 0
             </if>
         )
     </select>
 
-    <!-- 보유대수 계산 (name, category, company가 같은 자산의 개수) -->
+    <!-- 보유대수 계산 (modelName, category, company가 같은 자산의 개수) -->
     <select id="countAssetStock" resultType="int">
         SELECT COUNT(*) FROM ASSET 
         WHERE IS_DELETED = 'N'
@@ -169,7 +131,7 @@
         AND (COMPANY = #{company} OR (COMPANY IS NULL AND #{company} IS NULL))
     </select>
 
-    <!-- 특정 그룹의 사용 가능한 자산들 조회 -->
+    <!-- 특정 그룹의 사용 가능한 자산들 조회 (STATUS = 'AVAILABLE'만) -->
     <select id="getAvailableAssets" resultMap="assetMap">
         SELECT a.* FROM ASSET a
         WHERE a.IS_DELETED = 'N'
@@ -177,12 +139,6 @@
         AND (a.CATEGORY = #{category} OR (a.CATEGORY IS NULL AND #{category} IS NULL))
         AND (a.COMPANY = #{company} OR (a.COMPANY IS NULL AND #{company} IS NULL))
         AND a.STATUS = 'AVAILABLE'
-        AND NOT EXISTS (
-            SELECT 1 FROM RESERVATION r 
-            WHERE r.ASSET_ID = a.ASSET_ID 
-            AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-            AND r.END_TIME > SYSDATE
-        )
         ORDER BY a.ASSET_ID
     </select>
 

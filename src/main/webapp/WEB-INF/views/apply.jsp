@@ -230,7 +230,7 @@
                     String(oneYearLater.getMonth() + 1).padStart(2, '0') + '-' + 
                     String(oneYearLater.getDate()).padStart(2, '0') + 'T23:59:59';
       
-      const baseUrl = window.location.origin + window.location.pathname.split('/').slice(0, 2).join('/');
+      const baseUrl = window.location.origin;
       const params = new URLSearchParams({ assetId, from: fromDate, to: toDate });
       const fullUrl = baseUrl + '/api/rental/blocked?' + params.toString();
       

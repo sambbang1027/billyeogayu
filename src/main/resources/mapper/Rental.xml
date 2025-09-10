@@ -3,87 +3,98 @@
 
 <mapper namespace="app.domains.rental.dao.RentalRepository">
 
-	<!-- Asset 매핑 -->
-	<resultMap id="assetMap" type="app.domains.asset.model.Asset">
-		<id property="assetId" column="ASSET_ID" />
-		<result property="name" column="NAME" />
-		<result property="category" column="CATEGORY" />
-		<result property="company" column="COMPANY" />
-		<result property="status" column="STATUS" />
-		<result property="image" column="IMAGE" />
-		<result property="maintenanceCycle" column="MAINTENANCE_CYCLE" />
-		<result property="usageTime" column="USAGE_TIME" />
-		<result property="lastMaintenanceDate"
-			column="LAST_MAINTENANCE_DATE" />
-		<result property="expectedMaintenanceDate"
-			column="EXPECTED_MAINTENANCE_DATE" />
-		<result property="createdAt" column="CREATED_AT" />
-		<result property="updatedAt" column="UPDATED_AT" />
-		<result property="deletedAt" column="DELETED_AT" />
-		<result property="isDeleted" column="IS_DELETED" />
-	</resultMap>
+    <!-- Asset 매핑 (팀원 필드명에 맞춤) -->
+    <resultMap id="assetMap" type="app.domains.asset.model.Asset">
+        <id property="assetId" column="ASSET_ID" />
+        <result property="modelName" column="NAME" />
+        <result property="category" column="CATEGORY" />
+        <result property="company" column="COMPANY" />
+        <result property="assetStatus" column="STATUS" />
+        <result property="imagePath" column="IMAGE" />
+        <result property="maintenanceCycle" column="MAINTENANCE_CYCLE" />
+        <result property="usageTime" column="USAGE_TIME" />
+        <result property="lastMaintenanceDate" column="LAST_MAINTENANCE_DATE" />
+        <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE" />
+        <result property="createAt" column="CREATED_AT" />
+        <result property="updatedAt" column="UPDATED_AT" />
+        <result property="deletedAt" column="DELETED_AT" />
+        <result property="isDeleted" column="IS_DELETED" />
+    </resultMap>
 
-	<!-- BlockedRange 매핑 -->
-	<resultMap id="blockedRangeMap"
-		type="app.domains.rental.model.BlockedRange">
-		<result property="startAt" column="START_AT" />
-		<result property="endAt" column="END_AT" />
-	</resultMap>
+    <!-- BlockedRange 매핑 -->
+    <resultMap id="blockedRangeMap" type="app.domains.rental.model.BlockedRange">
+        <result property="startAt" column="START_AT" />
+        <result property="endAt" column="END_AT" />
+    </resultMap>
 
-	<!-- 자산 조회 -->
-	<select id="findAssetById" resultMap="assetMap">
-		SELECT * FROM ASSET
-		WHERE ASSET_ID = #{assetId}
-		AND IS_DELETED = 'N'
-	</select>
+    <!-- 자산 조회 -->
+    <select id="findAssetById" resultMap="assetMap">
+        SELECT 
+            ASSET_ID,
+            NAME,
+            CATEGORY, 
+            COMPANY,
+            STATUS,
+            IMAGE,
+            MAINTENANCE_CYCLE,
+            USAGE_TIME,
+            LAST_MAINTENANCE_DATE,
+            EXPECTED_MAINTENANCE_DATE,
+            CREATED_AT,
+            UPDATED_AT,
+            DELETED_AT,
+            CASE WHEN IS_DELETED = 'N' THEN 0 ELSE 1 END AS IS_DELETED
+        FROM ASSET
+        WHERE ASSET_ID = #{assetId}
+        AND IS_DELETED = 'N'
+    </select>
 
-	<!-- 예약된 날짜 범위 조회 -->
-	<select id="findBlockedRanges" resultMap="blockedRangeMap">
-		SELECT START_TIME AS START_AT, END_TIME AS END_AT
-		FROM RESERVATION
-		WHERE ASSET_ID = #{assetId}
-		AND STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-		AND END_TIME &gt;= #{from}
-		AND START_TIME &lt;= #{to}
-		ORDER BY START_TIME
-	</select>
+    <!-- 예약된 날짜 범위 조회 -->
+    <select id="findBlockedRanges" resultMap="blockedRangeMap">
+        SELECT START_TIME AS START_AT, END_TIME AS END_AT
+        FROM RESERVATION
+        WHERE ASSET_ID = #{assetId}
+        AND STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
+        AND END_TIME &gt;= #{from}
+        AND START_TIME &lt;= #{to}
+        ORDER BY START_TIME
+    </select>
 
-	<!-- 겹치는 예약 개수 확인 -->
-	<select id="countOverlap" resultType="int">
-		SELECT COUNT(*) FROM RESERVATION
-		WHERE ASSET_ID = #{assetId}
-		AND STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-		AND (
-		(START_TIME &lt;= #{startAt} AND END_TIME &gt; #{startAt}) OR
-		(START_TIME &lt; #{endAt} AND END_TIME &gt;= #{endAt}) OR
-		(START_TIME &gt;= #{startAt} AND END_TIME &lt;= #{endAt})
-		)
-	</select>
+    <!-- 겹치는 예약 개수 확인 -->
+    <select id="countOverlap" resultType="int">
+        SELECT COUNT(*) FROM RESERVATION
+        WHERE ASSET_ID = #{assetId}
+        AND STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
+        AND (
+            (START_TIME &lt;= #{startAt} AND END_TIME &gt; #{startAt}) OR
+            (START_TIME &lt; #{endAt} AND END_TIME &gt;= #{endAt}) OR
+            (START_TIME &gt;= #{startAt} AND END_TIME &lt;= #{endAt})
+        )
+    </select>
 
-	<!-- 예약 생성 (실제 DB 구조에 맞춤) -->
-	<insert id="insertReservation"
-		parameterType="app.domains.rental.model.Rental">
-		INSERT INTO RESERVATION (
-		ASSET_ID,
-		USER_ID,
-		START_TIME,
-		END_TIME,
-		PURPOSE,
-		ADDRESS,
-		ADDRESS_STATE,
-		ADDRESS_CITY,
-		STATUS
-		) VALUES (
-		#{assetId},
-		#{userId},
-		#{startAt},
-		#{endAt},
-		#{purpose},
-		#{address},
-		#{addressState},
-		#{addressCity},
-		#{status}
-		)
-	</insert>
+    <!-- 예약 생성 (실제 DB 구조에 맞춘) -->
+    <insert id="insertReservation" parameterType="app.domains.rental.model.Rental">
+        INSERT INTO RESERVATION (
+            ASSET_ID,
+            USER_ID,
+            START_TIME,
+            END_TIME,
+            PURPOSE,
+            ADDRESS,
+            ADDRESS_STATE,
+            ADDRESS_CITY,
+            STATUS
+        ) VALUES (
+            #{assetId},
+            #{userId},
+            #{startAt},
+            #{endAt},
+            #{purpose},
+            #{address},
+            #{addressState},
+            #{addressCity},
+            #{status}
+        )
+    </insert>
 
 </mapper>

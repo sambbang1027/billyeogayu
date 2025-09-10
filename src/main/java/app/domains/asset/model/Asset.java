@@ -16,42 +16,37 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Asset {
+    private long assetId;
+    private String modelName;
+    private String assetStatus;
+    private String category;
+    private String company;
+    private long maintenanceCycle;
+    private long usageTime;
+    private LocalDateTime lastMaintenanceDate;
+    private LocalDateTime expectedMaintenanceDate;
+    private String imagePath;
+    private LocalDateTime createAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
+    private int isDeleted;
 
-    private long assetId; // ASSET_ID (PK)
-    private String name; // NAME
-    private String category; // CATEGORY
-    private String company; // COMPANY
-    private String status; // STATUS (AVAILABLE / UNAVAILABLE 등)
-    private String image; // IMAGE (이미지 경로)
-
-    private long maintenanceCycle; // MAINTENANCE_CYCLE
-    private long usageTime; // USAGE_TIME
-
-    private LocalDateTime lastMaintenanceDate; // LAST_MAINTENANCE_DATE
-    private LocalDateTime expectedMaintenanceDate; // EXPECTED_MAINTENANCE_DATE
-
-    private LocalDateTime createdAt; // CREATED_AT
-    private LocalDateTime updatedAt; // UPDATED_AT
-    private LocalDateTime deletedAt; // DELETED_AT
-
-    private String isDeleted; // IS_DELETED ('Y'/'N')
 
     // 기존 보유대수 필드 (DB에는 없고 계산해서 설정) - 하위호환성 유지
     private int stock = 1;
-    
-    // 새로운 재고 관련 필드들 (선택적 사용)
-    private int availableStock = 0;  // 실제 임대 가능한 수량
-    private int rentedStock = 0;     // 현재 대여중인 수량
 
-    /** 편의 프로퍼티 (JSP에서 사용) */
+    // 새로운 재고 관련 필드들 (선택적 사용)
+    private int availableStock = 0; // STATUS가 'AVAILABLE'인 자산 수량
+    private int rentedStock = 0; // STATUS가 'AVAILABLE'이 아닌 자산 수량
+
+    /** 
+     * 편의 프로퍼티 (JSP에서 사용)
+     * availableStock이 0보다 크고 삭제되지 않은 경우에만 임대가능
+     */
     public boolean isRentable() {
-        // availableStock이 설정되어 있으면 그것을 우선 사용
-        if (availableStock >= 0) {  // availableStock이 설정된 경우
-            return "AVAILABLE".equalsIgnoreCase(status) && "N".equalsIgnoreCase(isDeleted) && availableStock > 0;
-        } else {  // availableStock이 설정되지 않은 경우 (기존 로직)
-            return "AVAILABLE".equalsIgnoreCase(status) && "N".equalsIgnoreCase(isDeleted);
-        }
+        return isDeleted == 0 && availableStock > 0;
     }
+
     public int getStock() {
         return this.stock;
     }
@@ -59,7 +54,7 @@ public class Asset {
     public void setStock(int stock) {
         this.stock = stock;
     }
-    
+
     // 새로운 재고 관련 메서드들
     public int getAvailableStock() {
         return this.availableStock;
@@ -76,7 +71,7 @@ public class Asset {
     public void setRentedStock(int rentedStock) {
         this.rentedStock = rentedStock;
     }
-    
+
     // 전체 재고 수량 (기존 stock과 동일하지만 명확한 의미)
     public int getTotalStock() {
         return this.stock;
@@ -85,12 +80,12 @@ public class Asset {
     public void setTotalStock(int totalStock) {
         this.stock = totalStock;
     }
-    
+
     // 재고 상태 체크 편의 메서드
     public boolean hasAvailableStock() {
         return availableStock > 0;
     }
-    
+
     public boolean isOutOfStock() {
         return availableStock == 0;
     }

@@ -36,7 +36,7 @@ public class RentalController {
     private static final String HC_NAME       = "김철수";
     private static final String HC_BIRTH      = "90/01/01";
     private static final String HC_PHONE      = "010-1234-5678";
-    private static final Long   HC_ASSET_ID   = 52L;
+    private static final Long   HC_ASSET_ID   = 23L;
 
     /**
      * GET /rental/apply 접근 시 올바른 경로로 리다이렉트
@@ -71,56 +71,63 @@ public class RentalController {
     public String showApply(@RequestParam("resourceId") Long assetId,
                             HttpSession session,
                             Model model) {
-
-        Asset asset = service.getAsset(assetId);
-        if (asset == null || "Y".equalsIgnoreCase(asset.getIsDeleted())) {
-            model.addAttribute("error", "선택한 자원을 찾을 수 없습니다.");
-            return "error/404";
-        }
-
-        // 신청자 정보 설정
-        String name, birth, phone;
-        if (USE_HARDCODE) {
-            name = HC_NAME;
-            birth = HC_BIRTH;
-            phone = HC_PHONE;
-        } else {
-            // [LOGIN 연동 시 세션에서 가져오기]
-            name = (String) session.getAttribute("USER_NAME");
-            birth = (String) session.getAttribute("USER_BIRTH");
-            phone = (String) session.getAttribute("USER_PHONE");
-            
-            // 세션값이 없으면 기본값 설정
-            if (name == null) name = "";
-            if (birth == null) birth = "";
-            if (phone == null) phone = "";
-        }
-
-        // 자산 정보
-        String assetModel = (asset.getCategory() != null && !asset.getCategory().trim().isEmpty()) 
-                           ? asset.getCategory() : "정보 없음";
-
-        model.addAttribute("assetId", asset.getAssetId());
-        model.addAttribute("assetName", asset.getName());
-        model.addAttribute("assetModel", assetModel);
-        model.addAttribute("assetMaker", asset.getCompany());
-        model.addAttribute("assetImage", asset.getImage());
-
-        // 신청인 정보
-        Map<String, Object> applicant = new HashMap<>();
-        applicant.put("name", name);
-        applicant.put("birth", birth);
-        applicant.put("zipcode", "");
-        applicant.put("addr1", "");
-        applicant.put("addr2", "");
-        model.addAttribute("applicant", applicant);
-
-        String[] phoneArray = splitPhone(phone);
-        model.addAttribute("phone1", phoneArray[0]);
-        model.addAttribute("phone2", phoneArray[1]);
-        model.addAttribute("phone3", phoneArray[2]);
         
-        return "apply";
+        try {
+            Asset asset = service.getAsset(assetId);
+            
+            if (asset == null || asset.getIsDeleted() == 1) {
+                model.addAttribute("error", "선택한 자원을 찾을 수 없습니다.");
+                return "error/404";
+            }
+
+            // 신청자 정보 설정
+            String name, birth, phone;
+            if (USE_HARDCODE) {
+                name = HC_NAME;
+                birth = HC_BIRTH;
+                phone = HC_PHONE;
+            } else {
+                // [LOGIN 연동 시 세션에서 가져오기]
+                name = (String) session.getAttribute("USER_NAME");
+                birth = (String) session.getAttribute("USER_BIRTH");
+                phone = (String) session.getAttribute("USER_PHONE");
+                
+                // 세션값이 없으면 기본값 설정
+                if (name == null) name = "";
+                if (birth == null) birth = "";
+                if (phone == null) phone = "";
+            }
+
+            // 자산 정보
+            String assetModel = (asset.getCategory() != null && !asset.getCategory().trim().isEmpty()) 
+                               ? asset.getCategory() : "정보 없음";
+
+            model.addAttribute("assetId", asset.getAssetId());
+            model.addAttribute("assetName", asset.getModelName());
+            model.addAttribute("assetModel", assetModel);
+            model.addAttribute("assetMaker", asset.getCompany());
+            model.addAttribute("assetImage", asset.getImagePath());
+
+            // 신청인 정보
+            Map<String, Object> applicant = new HashMap<>();
+            applicant.put("name", name);
+            applicant.put("birth", birth);
+            applicant.put("zipcode", "");
+            applicant.put("addr1", "");
+            applicant.put("addr2", "");
+            model.addAttribute("applicant", applicant);
+
+            String[] phoneArray = splitPhone(phone);
+            model.addAttribute("phone1", phoneArray[0]);
+            model.addAttribute("phone2", phoneArray[1]);
+            model.addAttribute("phone3", phoneArray[2]);
+            
+            return "apply";
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "페이지 로딩 중 오류가 발생했습니다: " + e.getMessage());
+            return "error/500";
+        }
     }
 
     /**
@@ -202,10 +209,10 @@ public class RentalController {
                                ? asset.getCategory() : "정보 없음";
             
             model.addAttribute("assetId", asset.getAssetId());
-            model.addAttribute("assetName", asset.getName());
+            model.addAttribute("assetName", asset.getModelName());
             model.addAttribute("assetModel", assetModel);
             model.addAttribute("assetMaker", asset.getCompany());
-            model.addAttribute("assetImage", asset.getImage());
+            model.addAttribute("assetImage", asset.getImagePath());
         }
 
         // 신청인 정보 복원
