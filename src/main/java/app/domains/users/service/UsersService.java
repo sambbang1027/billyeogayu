@@ -1,8 +1,8 @@
-package app.users.service;
+package app.domains.users.service;
 
 import java.util.List;
 
-import app.users.model.Users;
+import app.domains.users.model.Users;
 
 public interface UsersService {
 

@@ -1,4 +1,4 @@
-package app.users.controller;
+package app.domains.users.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import app.users.service.SmsService;
+import app.domains.users.service.SmsService;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

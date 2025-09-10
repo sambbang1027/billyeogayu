@@ -1,4 +1,4 @@
-package app.users.util;
+package app.domains.users.util;
 
 
 import java.util.concurrent.TimeUnit;

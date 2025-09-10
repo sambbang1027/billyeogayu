@@ -1,4 +1,4 @@
-package app.users.controller;
+package app.domains.users.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import app.users.model.Users;
-import app.users.service.UsersService;
+import app.domains.users.model.Users;
+import app.domains.users.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;

@@ -1,4 +1,4 @@
-package app.users.service;
+package app.domains.users.service;
 
 
 import java.util.Random;
@@ -6,8 +6,8 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import app.users.util.RedisUtil;
-import app.users.util.SmsUtil;
+import app.domains.users.util.RedisUtil;
+import app.domains.users.util.SmsUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service

@@ -1,4 +1,4 @@
-package app.users.service;
+package app.domains.users.service;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import app.users.dao.UsersRepository;
-import app.users.model.Users;
+import app.domains.users.dao.UsersRepository;
+import app.domains.users.model.Users;
 import lombok.extern.slf4j.Slf4j;
 
 @Service

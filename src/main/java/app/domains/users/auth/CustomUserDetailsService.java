@@ -1,4 +1,4 @@
-package app.users.auth;
+package app.domains.users.auth;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import app.users.dao.UsersRepository;
-import app.users.model.Users;
+import app.domains.users.dao.UsersRepository;
+import app.domains.users.model.Users;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -40,7 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         authorities.add(new SimpleGrantedAuthority(role));
 
         // CustomUserDetails 객체 반환
-        return new app.users.auth.CustomUserDetails(
+        return new app.domains.users.auth.CustomUserDetails(
                 user.getLoginId(),
                 user.getPassword(),
                 user.getName(),

@@ -1,8 +1,8 @@
-package app.users.dao;
+package app.domains.users.dao;
 
 import java.util.List;
 
-import app.users.model.Users;
+import app.domains.users.model.Users;
 
 public interface UsersRepository {
 

@@ -1,4 +1,4 @@
-package app.users.auth;
+package app.domains.users.auth;
 
 import java.util.Collection;
 

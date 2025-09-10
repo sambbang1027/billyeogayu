@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import app.domains.asset.model.Asset;
 import app.domains.asset.service.AssetService;
-import app.users.model.Users;
-import app.users.service.UsersService;
+import app.domains.users.model.Users;
+import app.domains.users.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

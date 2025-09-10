@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import app.users.auth.CustomUserDetailsService;
+import app.domains.users.auth.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity(debug=false)

@@ -1,4 +1,4 @@
-package app.users.service;
+package app.domains.users.service;
 
 public interface EmailService {
 
