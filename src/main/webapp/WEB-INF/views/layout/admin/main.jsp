@@ -41,6 +41,16 @@
 
             <script src="<c:url value='/static/js/dashboard/dashboard.js'/>" defer></script>
         </c:if>
+        
+        <c:if test="${activePage eq 'reservation'}">
+        		<link rel="stylesheet" href="<c:url value='/static/css/admin-reservation/reservation.css'/>">
+        		<link rel="stylesheet" href="<c:url value='/static/css/maintenance/custom-dropdown.css'/>">
+        		<script src="<c:url value='/static/js/maintenance/customDropdown.js'/>"></script>
+        		 <script src="<c:url value='/static/js/admin-reservation/reservation.js'/>"></script>
+        		
+        		
+        		
+        </c:if>
     </head>
 
 <body>

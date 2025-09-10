@@ -39,14 +39,14 @@
           <div class="custom-dropdown apply">
 						<label class="custom-dropdown-name">점검유형</label>
 						<div class="dropdown-box apply">
-										<button class="dropdown-toggle apply">
-								    			<span class="dropdown-label apply" data-value="">선택</span>
-								    			<img src="<c:url value='/assets/maintenance/arrow-down.svg'/>">
-								  		</button>
-								  		<ul class="dropdown-menu apply">
-										    	<li data-value="REGULAR">정기점검</li>
-										    	<li data-value="EMERGENCY">긴급점검</li>
-								  		</ul>
+								<button class="dropdown-toggle apply">
+						    			<span class="dropdown-label apply" data-value="">선택</span>
+						    			<img src="<c:url value='/assets/maintenance/arrow-down.svg'/>">
+						  		</button>
+						  		<ul class="dropdown-menu apply">
+								    	<li data-value="REGULAR">정기점검</li>
+								    	<li data-value="EMERGENCY">긴급점검</li>
+						  		</ul>
 						</div>
 					</div>
         </div>
@@ -54,11 +54,6 @@
         <div class="apply-row column">
          <label for="inspectionItems">점검 항목</label>
 			<select id="inspectionItems" multiple>
-<!-- 			  <option value="타이어" selected>타이어</option>
-			  <option value="엔진" selected>엔진</option>
-			  <option value="브레이크" >브레이크</option>
-			  <option value="에어크리너">에어크리너</option>
-			  <option value="냉각수">냉각수</option> -->
 			</select>
         </div>
       </div>

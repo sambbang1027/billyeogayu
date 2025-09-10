@@ -50,9 +50,7 @@
     </bean>
 
     <!-- MyBatis Mapper Scan -->
-<!--     <mybatis-spring:scan base-package="app.domains"/> 
- -->
- <mybatis-spring:scan base-package="app.domains.*.dao"/>
+ 	<mybatis-spring:scan base-package="app.domains.*.dao"/>
 
     <!-- Transaction Manager -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
