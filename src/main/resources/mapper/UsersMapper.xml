@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="app.users.dao.UsersRepository">
+<mapper namespace="app.domains.users.dao.UsersRepository">
 
     <!-- User 결과 매핑 -->
-    <resultMap id="usersResultMap" type="app.users.model.Users">
+    <resultMap id="usersResultMap" type="app.domains.users.model.Users">
         <id property="userId" column="USER_ID"/>
         <result property="loginId" column="LOGIN_ID"/>
         <result property="email" column="EMAIL"/>
@@ -48,7 +48,7 @@
     </select>
 
     <!-- 사용자 등록 -->
-    <insert id="insertUser" parameterType="app.users.model.Users">
+    <insert id="insertUser" parameterType="app.domains.users.model.Users">
         <selectKey keyProperty="userId" resultType="Long" order="BEFORE">
             SELECT USER_SEQ.NEXTVAL FROM DUAL
         </selectKey>
@@ -62,7 +62,7 @@
     </insert>
 
     <!-- 사용자 정보 수정 -->
-    <update id="updateUser" parameterType="app.users.model.Users">
+    <update id="updateUser" parameterType="app.domains.users.model.Users">
         UPDATE USERS SET
             EMAIL = #{email},
             PASSWORD = #{password},
