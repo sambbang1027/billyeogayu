@@ -49,9 +49,16 @@
         <property name="typeAliasesPackage" value="app.domains"/>
     </bean>
 
+<<<<<<< HEAD
 <!-- Mapper 스캔 -->
 <mybatis-spring:scan base-package="app.domains.*.dao"/>
 
+=======
+    <!-- MyBatis Mapper Scan -->
+<!--     <mybatis-spring:scan base-package="app.domains"/> 
+ -->
+ <mybatis-spring:scan base-package="app.domains.*.dao"/>
+>>>>>>> 1d0a07221359bba71af3029759467442ef9cb42e
 
     <!-- list용: Repository에서 SqlSessionTemplate 직접 사용 -->
     <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">

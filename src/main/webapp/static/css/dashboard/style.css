@@ -1,0 +1,226 @@
+/* 공통 속성 */
+:root {
+    --card-font-size: 20px;
+    --card-gap: 1.25rem; /* 20px */
+    --card-w: 12.5rem;
+    --card-color: linear-gradient(135deg, #a8e6cf 0%, #88d8a3 100%);
+
+    --first-chart-card-w: 560px; /* 카드 최대 너비 */
+    --first-chart-h: 220px; /* 차트 영역 높이 */
+    --bottom-chart-h: 260px;  /* 필요시 220~300px로 조절 */
+}
+
+/* 전체 컨테이너 */
+.dashboard-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+}
+
+/* 섹션 공통 */
+.metrics-section,
+.first-chart-section,
+.second-chart-section {
+    width: 100%;
+    display: flex;
+    min-width: 0;
+    margin: 0;
+    gap: 12px;
+    padding: 0 20px;
+    flex-direction: column;
+    align-self: flex-start;
+}
+.section-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0 0 12px;
+}
+
+/* 상단 차트 섹션 */
+.first-chart-section {
+    display: flex; /* 가로 플렉스 */
+    flex-direction: row; /* ← 핵심: column에서 row로 */
+    gap: 32px; /* 카드 사이 간격 */
+    width: 100%;
+    align-items: stretch;
+    padding-left: 0;
+    padding-right: 0;
+    border-radius: 12px;
+    /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+    flex: 0 0 auto;
+    /*max-width: 1200px;*/
+}
+
+.chart-wrapper {
+    flex: 1 1 0; /* 동일 비율로 좌/우 분할 */
+    min-width: 0; /* 그래프 넘침 방지 */
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+}
+.chart-subtitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 12px 0;
+    text-align: center;
+}
+.first-chart-section .chart-container {
+    position: relative;
+    height: var(--first-chart-h);
+    max-height: var(--first-chart-h);
+    flex: 1;
+}
+.first-chart-section .chart-legend {
+    gap: 12px;
+    margin-top: 10px;
+    justify-content: center;
+}
+.first-chart-section .legend-color {
+    width: 12px;
+    height: 12px;
+}
+.first-chart-section .legend-text {
+    font-size: 12px;
+}
+
+/* 하단 차트 섹션 */
+.second-chart-section {
+    display: flex; /* 가로 플렉스 */
+    flex-direction: row; /* ← 핵심: column에서 row로 */
+    gap: 32px; /* 카드 사이 간격 */
+    width: 100%;
+    align-items: stretch;
+    padding-left: 0;
+    padding-right: 0;
+}
+.second-chart-section .chart-container {
+    position: relative;
+    height: var(--bottom-chart-h);
+    margin-bottom: 16px;
+    flex: 1;
+  }
+
+.asset-usage, .asset-maintenance {
+    flex: 1 1 0; /* 동일 비율로 좌/우 분할 */
+    min-width: 0; /* 그래프 넘침 방지 */
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 자원현황 관련 */
+.metrics-grid-first {
+    inline-size: calc((var(--card-w) * 5) + (var(--card-gap) * 4));
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: var(--card-gap);
+    margin-inline: auto;
+    overflow-x: auto;
+    align-items: stretch;
+}
+.metric-card {
+    flex: 0 0 var(--card-w);
+    background: var(--card-color);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+.metric-card:hover {
+    transform: translateY(-2px);
+}
+.metric-title {
+    font-size: 14px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+.metric-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1a252f;
+    white-space: nowrap;
+}
+
+/* 차트 관련 공통 */
+.chart-container {
+    position: relative;
+    height: 100px;
+    margin-bottom: 20px;
+    flex: 1;
+}
+canvas {
+    /*width: 50% !important;*/
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 차트 설명 항목(총 자원수, 점검 필요) */
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+.legend-color-green{
+    background-color: #92BEA9;
+}
+.legend-color-red{
+    background-color: #FF82AC;
+}
+.legend-text {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 차트 필터(드롭다운) */
+.chart-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+.filter-btn:hover {
+    background: #f8f9fa;
+    border-color: #007bff;
+}
+.filter-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}

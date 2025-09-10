@@ -11,10 +11,7 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("pageTitle", "대시보드");
-        model.addAttribute("contentPage", "/WEB-INF/views/dashboard.jsp");
-        model.addAttribute("activePage", "dashboard");
-        return "layout/admin/main";   // 공통 레이아웃
+        return "forward:/dashboard";
     }
 
     @GetMapping("/asset")
@@ -24,12 +21,8 @@ public class AdminController {
 
     @GetMapping("/maintenance")
     public String maintenance(Model model) {
-        model.addAttribute("pageTitle", "점검 관리");
-        model.addAttribute("contentPage", "/WEB-INF/views/maintenance.jsp");
-        model.addAttribute("activePage", "maintenance");
-        return "layout/admin/main";
+    	return "forward:/maintenance/list";
     }
-
     @GetMapping("/reservation")
     public String reservation(Model model) {
         model.addAttribute("pageTitle", "예약 관리");

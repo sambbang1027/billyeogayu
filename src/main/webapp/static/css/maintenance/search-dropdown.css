@@ -1,0 +1,66 @@
+@charset "UTF-8";
+
+.search-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.search-dropdown-toggle {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  font-size: 1rem;
+  color: #7B7B7B;
+  padding: 0.4rem 1rem 0.4rem 0;
+  cursor: pointer;
+}
+
+.search-dropdown-toggle::after {
+  font-size: 0.8rem;
+  color: #587570;
+  margin-left: 0.5rem;
+  display: inline-block;
+  vertical-align: middle; 
+}
+
+.search-dropdown-label {
+  margin-left: 0.5rem;         
+}
+
+.search-dropdown-menu {
+  display: none; /* 기본적으로 숨김 */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin-top: 5px;
+  list-style: none;
+  padding: 0;
+  min-width: 92px;
+  z-index: 100;
+  text-align:center;
+}
+
+.search-dropdown-menu li {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.search-dropdown-menu li:hover {
+  background: #deefec;
+}
+
+.search-dropdown-menu li.active {
+  background: #deefec;
+  font-weight: bold;
+}
+.search-dropdown-btn {
+	 margin-left: 0.5rem;
+     vertical-align: middle;
+    pointer-events: none; /* 클릭 이벤트 무시 (눌러도 안 사라짐) */
+  
+}
