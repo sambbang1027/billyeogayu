@@ -1,12 +1,13 @@
 package app.domains.test.controller;
 
+import java.sql.Connection;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
 
 @Controller
 public class TestController {
@@ -26,6 +27,6 @@ public class TestController {
         }
 
         model.addAttribute("dbMessage", message);
-        return "dbtest"; 
+        return "dbtest";
     }
 }

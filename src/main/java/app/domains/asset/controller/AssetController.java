@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import app.domains.asset.model.Asset;
 import app.domains.asset.service.AssetService;
-import app.users.model.Users;
-import app.users.service.UsersService;
+import app.domains.users.model.Users;
+import app.domains.users.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -47,12 +47,12 @@ public class AssetController {
                     log.info("세션에서 SecurityContext 복원 완료 - 세션ID: {}", session.getId());
                 }
             }
-            
+
             // 2) 로그인 사용자 정보 세션에서 가져오기
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             boolean isLoggedIn = false;
             Users loginUser = null;
-            
+
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
                 try {
                     String loginId = auth.getName();
@@ -72,9 +72,15 @@ public class AssetController {
             final int pageSize = 12;
 
             // 파라미터 정리
-            if (q != null && q.trim().isEmpty()) q = null;
-            if (filter != null && filter.trim().isEmpty()) filter = null;
-            if (page < 1) page = 1;
+            if (q != null && q.trim().isEmpty()) {
+				q = null;
+			}
+            if (filter != null && filter.trim().isEmpty()) {
+				filter = null;
+			}
+            if (page < 1) {
+				page = 1;
+			}
 
             // 4) 전체 개수 / 총 페이지
             int total = service.getAssetCount(q, filter);
@@ -113,7 +119,7 @@ public class AssetController {
 
             model.addAttribute("prevPage", prevPage);
             model.addAttribute("nextPage", nextPage);
-            
+
             // 10) 로그인 정보 추가
             model.addAttribute("isLoggedIn", isLoggedIn);
             if (loginUser != null) {
@@ -130,7 +136,7 @@ public class AssetController {
             model.addAttribute("page", 1);
             model.addAttribute("totalPages", 1);
             model.addAttribute("isLoggedIn", false);
-            
+
             log.error("자원 목록 조회 중 오류 발생", e);
             return "assetlist"; // 오류가 있어도 일단 페이지는 보여줌
         }

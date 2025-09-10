@@ -1,4 +1,4 @@
-package app.users.model;
+package app.domains.users.model;
 
 import java.util.Date;
 
@@ -27,21 +27,21 @@ public class Users {
     private String password;
     private String name;
     private String phoneNumber;
-    
+
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date birth;
-    
+
     private String address;
     private String role;
-    
+
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
-    
+
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date deletedAt;
-    
+
     private String isDeleted;
 }

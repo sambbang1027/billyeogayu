@@ -1,10 +1,10 @@
 package app.domains.alarm.dto;
 
+import java.time.format.DateTimeFormatter;
+
 import app.domains.alarm.model.Alarm;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.format.DateTimeFormatter;
 import lombok.ToString;
 
 @Getter
@@ -19,14 +19,14 @@ public class AlarmResponseDto {
     private String updatedAt;
     private String deletedAt;
     private String isDeleted;
-    
+
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    
+
     public static AlarmResponseDto from(Alarm alarm) {
         if (alarm == null) {
             return null;
         }
-        
+
         return AlarmResponseDto.builder()
                 .id(alarm.getId())
                 .assetId(alarm.getAssetId())

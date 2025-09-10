@@ -1,4 +1,4 @@
-package app.users.auth;
+package app.domains.users.auth;
 
 import java.util.Collection;
 
@@ -15,7 +15,7 @@ public class CustomUserDetails implements UserDetails {
     private boolean enabled;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(String loginId, String password, String name, String email, 
+    public CustomUserDetails(String loginId, String password, String name, String email,
                            String role, boolean enabled, Collection<? extends GrantedAuthority> authorities) {
         this.loginId = loginId;
         this.password = password;
