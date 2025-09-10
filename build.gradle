@@ -85,6 +85,8 @@ dependencies {
 	implementation 'org.eclipse.angus:jakarta.mail:2.0.1'
 	implementation 'jakarta.activation:jakarta.activation-api:2.1.0'
 
+    implementation 'commons-fileupload:commons-fileupload:1.5'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 
