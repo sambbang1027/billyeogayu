@@ -82,7 +82,7 @@ function renderTable(list){
 			<tr>
 					<td>${i + 1}</td>
 					<td>${row.assetName}</td>
-					<td>${row.maintDate}</td>
+					 <td>${row.maintDate && row.maintDate !== "null" ? row.maintDate : ""}</td>
 					<td>${typeHtml}</td>
 					<td>${statusHtml}</td>
 					<td>${row.adminName}</td>

@@ -18,16 +18,6 @@
         <h3 class="apply-section-title">신청 정보</h3>
 
         <div class="apply-info">
- <%--          <div class="apply-row">
-            <label class="apply-label">신청일자</label>
-	            <div class="apply-input-wrapper">
-			          <input type="text" id="inspectionDate" class="date-input" placeholder="날짜 선택">
-					  <span class="calendar-icon">
-					    <img src="<c:url value='/assets/maintenance/calendar.svg'/>" alt="달력">
-					  </span>
-	            </div>
-          </div> --%>
-
           <div class="apply-row">
             <label class="apply-label">점검자</label>
             <input type="text" class="apply-input" placeholder="점검자 이름 입력">
@@ -38,13 +28,11 @@
       <!-- 점검 정보 -->
       <div class="apply-section">
         <h3 class="apply-section-title">점검 정보</h3>
-
         <div class="apply-info">
           <div class="apply-row">
             <label class="apply-label">자원명</label>
             <div class="apply-input-wrapper">
-              <input type="text" class="apply-input" placeholder="자원명 검색">
-              <img alt="검색" class="input-icon" src="<c:url value='/assets/maintenance/non-back-search.svg'/>">
+	             <input type="text" class="apply-input asset" value="" readonly>
             </div>
           </div>
           
@@ -52,29 +40,25 @@
 						<label class="custom-dropdown-name">점검유형</label>
 						<div class="dropdown-box apply">
 										<button class="dropdown-toggle apply">
-								    			<span class="dropdown-label apply">전체</span>
+								    			<span class="dropdown-label apply" data-value="">선택</span>
 								    			<img src="<c:url value='/assets/maintenance/arrow-down.svg'/>">
 								  		</button>
 								  		<ul class="dropdown-menu apply">
-								  <!-- >>유형들  list로 불러와서 for문으로 뿌려야함 -->
-										    	<li class="active">전체</li>
-										    	<li>정기점검</li>
-										    	<li>긴급점검</li>
-								  </ul>
+										    	<li data-value="REGULAR">정기점검</li>
+										    	<li data-value="EMERGENCY">긴급점검</li>
+								  		</ul>
 						</div>
 					</div>
-          
-          
         </div>
 
         <div class="apply-row column">
          <label for="inspectionItems">점검 항목</label>
 			<select id="inspectionItems" multiple>
-			  <option value="타이어" selected>타이어</option>
+<!-- 			  <option value="타이어" selected>타이어</option>
 			  <option value="엔진" selected>엔진</option>
-			  <option value="브레이크" selected>브레이크</option>
+			  <option value="브레이크" >브레이크</option>
 			  <option value="에어크리너">에어크리너</option>
-			  <option value="냉각수">냉각수</option>
+			  <option value="냉각수">냉각수</option> -->
 			</select>
         </div>
       </div>

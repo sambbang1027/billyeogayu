@@ -41,15 +41,38 @@
 					SET resolve_description = #{description}
 					    , note = #{note}
 					    , status = 'COMPLETED'
-					    , resolved_at = sysdate
+					    , resolved_at = SYSDATE
 					WHERE request_id = #{requestId}
 		</update>
 		
 		<update id="updateRecord" parameterType="app.domains.maintenance.model.MaintenanceEdit"> 
 				UPDATE maintenance
 				SET note = #{note}
-					, updated_at = sysdate
+					, updated_at = SYSDATE
 				WHERE request_id = #{requestId}
+		</update>
+		
+		<select  id="findByAssetId" resultType ="hashmap">
+				SELECT asset_id, part_id
+				FROM maintenance
+				WHERE request_id = #{requestId}
+		</select>
+		
+		
+		<update id="updateAssetStatusAfterMaintenance" parameterType = "int">
+				UPDATE asset
+				SET last_maintenance_date = SYSDATE
+						, status = 'AVAILABLE'
+						, expected_maintenance_date = SYSDATE +NUMTODSINTERVAL(maintenance_cycle, 'HOUR')
+				WHERE asset_id = #{assetId}
+		</update>
+		
+		<update id="updatePartStatusAfterMaintenance" parameterType="int">
+				UPDATE part
+				SET last_maintenance_date = SYSDATE
+						, status = 'AVAILABLE'
+						, expected_maintenance_date = SYSDATE + NUMTODSINTERVAL(maintenance_cycle, 'HOUR')
+				WHERE part_id = #{partId}
 		</update>
 		
 </mapper>

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
+import app.domains.maintenance.model.MaintenanceApply;
 import app.domains.maintenance.model.MaintenanceComplete;
 import app.domains.maintenance.model.MaintenanceEdit;
 import app.domains.maintenance.service.MaintenanceService;
@@ -129,5 +130,24 @@ public class MaintenanceController {
     	return response;
     }
 	
+    @GetMapping("/part-list/{assetId}")
+    @ResponseBody
+    public List<Map<String, Object>> getPartList(@PathVariable("assetId") int assetId){
+    	return maintenanceService.getPartList(assetId);
+    }
+    
+    // 점검 신청
+    @PostMapping("/apply")
+    @ResponseBody
+    public Map<String, Object> applyMaintenance(@RequestBody MaintenanceApply maintenanceApply){
+    	maintenanceService.applyMaintenance(maintenanceApply);
+    	
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	response.put("code", "SUCCESS");
+    	response.put("message", "점검 신청이 등록되었습니다");
+    	
+    	return response;
+    }
 
 }

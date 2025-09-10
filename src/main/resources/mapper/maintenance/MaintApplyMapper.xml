@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="app.domains.maintenance.dao.MaintenanceRepository">
+  		
+  		<select id="getPartList" parameterType="int" resultType="hashmap">
+  				SELECT part_id, name
+  				FROM part
+  				WHERE asset_id = #{assetId}
+  		</select>
+  		
+  		
+  		<select id="getNextRequestId" resultType="int">
+		    SELECT SEQ_REQUEST_ID.NEXTVAL FROM dual
+		</select>
+
+		<!--  
+		<insert id="applyMaintenance"
+        parameterType="app.domains.maintenance.model.MaintenanceApply">
+		    <foreach collection="parts" item="part">
+		        INSERT INTO maintenance (
+		            asset_id, admin_id, part_id,
+		            type, item, resolver_name,  request_id
+		        )
+		        VALUES (
+		            #{assetId},#{adminId},#{part.partId},
+		            #{type}, #{part.partName},#{resolverName}, #{requestId}
+		        )
+		    </foreach>
+	</insert>-->
+	
+	
+			<insert id="applyMaintenance" parameterType="map">
+			    INSERT INTO maintenance (
+			        asset_id, admin_id, part_id, type, item, resolver_name, request_id
+			    )
+			    VALUES (
+			        #{assetId}, #{adminId}, #{partId}, #{type}, #{partName}, #{resolverName}, #{requestId}
+			    )
+			</insert>
+						
+		
+		<update id="updateAssetStatus"  parameterType="int">
+				UPDATE asset
+				       SET status = 'MAINTAINING'
+				 WHERE asset_id = #{assetId}
+		</update>
+		
+  </mapper>

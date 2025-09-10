@@ -25,7 +25,7 @@
 	    <div class="filter-bar">
 		    <div class="filter-list">
 		    		<!--  종류 드롭다운   -->
-					<div class="custom-dropdown">
+					<div class="custom-dropdown filter-dropdown">
 						<label class="custom-dropdown-name">종류</label>
 						<div class="dropdown-box">
 										<button class="dropdown-toggle">
@@ -42,7 +42,7 @@
 					</div>
 
 				<!-- 제조사 드롭다운 -->
-				<div class="custom-dropdown">
+				<div class="custom-dropdown filter-dropdown">
 					<label class="custom-dropdown-name">제조사</label>
 					<div class="dropdown-box">
 					  	<button class="dropdown-toggle">
@@ -58,7 +58,7 @@
 				</div>
 				
 		        		<!-- 상태 드롭다운 -->
-				<div class="custom-dropdown">
+				<div class="custom-dropdown filter-dropdown">
 					<label class="custom-dropdown-name">상태</label>
 					<div class="dropdown-box">
 						  <button class="dropdown-toggle">
