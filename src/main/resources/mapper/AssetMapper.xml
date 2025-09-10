@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="app.domains.assets.dao.AssetRepository">
+<mapper namespace="app.domains.asset.dao.AssetRepository">
 
-    <resultMap id="AssetResultMap" type="app.domains.assets.model.Asset">
+    <resultMap id="AssetResultMap" type="app.domains.asset.model.Asset">
         <id property="assetId" column="ASSET_ID"/>
         <result property="modelName" column="NAME"/>
         <result property="assetStatus" column="STATUS"/>
@@ -22,7 +22,7 @@
         <result property="isDeleted" column="IS_DELETED"/>
     </resultMap>
 
-    <resultMap id="PartResultMap" type="app.domains.assets.model.Part">
+    <resultMap id="PartResultMap" type="app.domains.asset.model.Part">
         <id     property="partId"                  column="PART_ID"/>
         <result property="assetId"                 column="ASSET_ID"/>
         <result property="partName"                column="NAME"/>
@@ -148,7 +148,7 @@
     </select>
 
     <insert id="insertAsset"
-            parameterType="app.domains.assets.model.Asset"
+            parameterType="app.domains.asset.model.Asset"
             keyProperty="assetId"
             keyColumn="ASSET_ID">
         INSERT INTO ASSET

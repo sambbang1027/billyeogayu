@@ -1,6 +1,6 @@
-package app.domains.assets.service;
+package app.domains.asset.service;
 
-import app.domains.assets.model.*;
+import app.domains.asset.model.*;
 
 import java.util.List;
 

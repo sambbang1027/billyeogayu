@@ -1,7 +1,7 @@
-package app.domains.assets.dao;
+package app.domains.asset.dao;
 
-import app.domains.assets.model.Asset;
-import app.domains.assets.model.Part;
+import app.domains.asset.model.Asset;
+import app.domains.asset.model.Part;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

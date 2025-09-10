@@ -1,4 +1,4 @@
-package app.domains.assets.model;
+package app.domains.asset.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

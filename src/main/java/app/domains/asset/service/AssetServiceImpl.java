@@ -1,7 +1,7 @@
-package app.domains.assets.service;
+package app.domains.asset.service;
 
-import app.domains.assets.dao.AssetRepository;
-import app.domains.assets.model.*;
+import app.domains.asset.dao.AssetRepository;
+import app.domains.asset.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

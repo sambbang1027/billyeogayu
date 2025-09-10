@@ -1,7 +1,7 @@
-package app.domains.assets.controller;
+package app.domains.asset.controller;
 
-import app.domains.assets.model.*;
-import app.domains.assets.service.AssetService;
+import app.domains.asset.model.*;
+import app.domains.asset.service.AssetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

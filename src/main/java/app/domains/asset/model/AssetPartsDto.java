@@ -1,4 +1,4 @@
-package app.domains.assets.model;
+package app.domains.asset.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AssetPartsUpdateDto {
+public class AssetPartsDto {
     private Asset asset;
     private List<Part> parts;
-    private boolean assetCycleChanged;
-    private boolean partCyclesChanged;
-    private boolean partCountChanged;
 }
