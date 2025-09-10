@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Asset {
+public class AssetDto {
     private long assetId;
     private String modelName;
     private String assetStatus;
@@ -25,16 +25,22 @@ public class Asset {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime expectedMaintenanceDate;
     private String imagePath;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime deletedAt;
-    private String isDeleted;
 
-    public AssetDto toDto() {
-        return AssetDto.builder()
+    // 변환된 날짜 문자열 Getter
+    public String getExpectedMaintenanceDateFormatted() {
+        return expectedMaintenanceDate != null
+                ? expectedMaintenanceDate.toLocalDate().toString()  // yyyy-MM-dd 형식
+                : "--";
+    }
+
+    public String getLastMaintenanceDateFormatted() {
+        return lastMaintenanceDate != null
+                ? lastMaintenanceDate.toLocalDate().toString()
+                : "--";
+    }
+
+    public Asset toEntity() {
+        return Asset.builder()
                 .assetId(assetId)
                 .modelName(modelName)
                 .assetStatus(assetStatus)

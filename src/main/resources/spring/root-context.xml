@@ -46,11 +46,10 @@
 
 <!-- TODO: mapper 추가 후 주석 해제       -->
         <property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
-        <property name="typeAliasesPackage" value="app.domains"/>
     </bean>
 
     <!-- MyBatis Mapper Scan -->
-    <mybatis-spring:scan base-package="app.domains"/> 
+    <mybatis-spring:scan base-package="app.domains.asset.dao"/>
 
 
     <!-- Transaction Manager -->

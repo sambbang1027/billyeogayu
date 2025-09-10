@@ -19,7 +19,7 @@ public class AdminController {
 
     @GetMapping("/asset")
     public String asset(Model model) {
-        return "forward:/asset/list";
+        return "forward:/admin/asset/list";
     }
 
     @GetMapping("/maintenance")
