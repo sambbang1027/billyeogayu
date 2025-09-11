@@ -190,7 +190,7 @@
             
             // AJAX로 상세 정보 가져오기 (JSON 응답)
             $.ajax({
-                url: `<c:url value='/my/reservations/'/>` + reservationId,
+                url: '<c:url value="/my/reservations/"/>' + reservationId,
                 method: 'GET',
                 dataType: 'json',
                 success: function(data) {
@@ -240,8 +240,8 @@
 
             // 이미지 경로 설정
             const imagePath = reservation.assetImage ? 
-                `<c:url value='/static/images/assets/'/>` + reservation.assetImage : 
-                `<c:url value='/static/images/assets/default.png'/>`;
+                '<c:url value="/static/images/assets/"/>' + reservation.assetImage : 
+                '<c:url value="/static/images/assets/default.png"/>';
 
             // 날짜 포맷팅 함수
             function formatDateTime(dateStr) {
@@ -270,77 +270,67 @@
                 }
             }
 
-            let modalContent = `
-                <div class="modal-asset-info">
-                    <img src="${imagePath}" alt="${reservation.assetName || '농기계'}" class="modal-asset-image">
-                    <div class="modal-asset-details">
-                        <h3>${reservation.assetName || '농기계명'}</h3>
-                        <div class="modal-asset-meta">${reservation.assetCategory || '카테고리'} | ${reservation.assetCompany || '제조사'}</div>
-                        <span class="status-badge status-${statusClass}">${reservation.statusText || reservation.status || '상태'}</span>
-                    </div>
-                </div>
-                
-                <div class="modal-info-grid">
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">예약 기간</div>
-                        <div class="modal-info-value">
-                            ${formatDateTime(reservation.startTime)}<br>
-                            ~ ${formatDateTime(reservation.endTime)}
-                        </div>
-                    </div>
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">사용 목적</div>
-                        <div class="modal-info-value">${reservation.purpose || '목적 정보 없음'}</div>
-                    </div>
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">사용 장소</div>
-                        <div class="modal-info-value">${reservation.fullAddress || reservation.address || '주소 정보 없음'}</div>
-                    </div>
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">신청일</div>
-                        <div class="modal-info-value">${formatDate(reservation.createdAt)}</div>
-                    </div>
-            `;
+            // 모달 컨텐츠를 문자열 연결로 생성 (EL 충돌 방지)
+            let modalContent = '<div class="modal-asset-info">' +
+                '<img src="' + imagePath + '" alt="' + (reservation.assetName || '농기계') + '" class="modal-asset-image">' +
+                '<div class="modal-asset-details">' +
+                    '<h3>' + (reservation.assetName || '농기계명') + '</h3>' +
+                    '<div class="modal-asset-meta">' + (reservation.assetCategory || '카테고리') + ' | ' + (reservation.assetCompany || '제조사') + '</div>' +
+                    '<span class="status-badge status-' + statusClass + '">' + (reservation.statusText || reservation.status || '상태') + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="modal-info-grid">' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">예약 기간</div>' +
+                    '<div class="modal-info-value">' +
+                        formatDateTime(reservation.startTime) + '<br>' +
+                        '~ ' + formatDateTime(reservation.endTime) +
+                    '</div>' +
+                '</div>' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">사용 목적</div>' +
+                    '<div class="modal-info-value">' + (reservation.purpose || '목적 정보 없음') + '</div>' +
+                '</div>' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">사용 장소</div>' +
+                    '<div class="modal-info-value">' + (reservation.fullAddress || reservation.address || '주소 정보 없음') + '</div>' +
+                '</div>' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">신청일</div>' +
+                    '<div class="modal-info-value">' + formatDate(reservation.createdAt) + '</div>' +
+                '</div>';
 
             // 추가 정보 표시 (상태에 따라)
             if (reservation.status === 'REJECTED' && reservation.rejectReason) {
-                modalContent += `
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">거절 사유</div>
-                        <div class="modal-info-value">${reservation.rejectReason}</div>
-                    </div>
-                `;
+                modalContent += '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">거절 사유</div>' +
+                    '<div class="modal-info-value">' + reservation.rejectReason + '</div>' +
+                '</div>';
             }
 
             if (reservation.status === 'COMPLETED') {
                 if (reservation.completedAt) {
-                    modalContent += `
-                        <div class="modal-info-item">
-                            <div class="modal-info-label">완료 시간</div>
-                            <div class="modal-info-value">${formatDateTime(reservation.completedAt)}</div>
-                        </div>
-                    `;
+                    modalContent += '<div class="modal-info-item">' +
+                        '<div class="modal-info-label">완료 시간</div>' +
+                        '<div class="modal-info-value">' + formatDateTime(reservation.completedAt) + '</div>' +
+                    '</div>';
                 }
                 if (reservation.actualUsageTime) {
-                    modalContent += `
-                        <div class="modal-info-item">
-                            <div class="modal-info-label">실제 사용 시간</div>
-                            <div class="modal-info-value">${reservation.actualUsageTime}</div>
-                        </div>
-                    `;
+                    modalContent += '<div class="modal-info-item">' +
+                        '<div class="modal-info-label">실제 사용 시간</div>' +
+                        '<div class="modal-info-value">' + reservation.actualUsageTime + '</div>' +
+                    '</div>';
                 }
             }
 
             if (reservation.adminName) {
-                modalContent += `
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">담당 관리자</div>
-                        <div class="modal-info-value">${reservation.adminName}</div>
-                    </div>
-                `;
+                modalContent += '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">담당 관리자</div>' +
+                    '<div class="modal-info-value">' + reservation.adminName + '</div>' +
+                '</div>';
             }
 
-            modalContent += `</div>`;
+            modalContent += '</div>'; // modal-info-grid 닫는 태그
             
             modalBody.html(modalContent);
         }
@@ -362,7 +352,7 @@
             if (!confirm('정말로 예약을 취소하시겠습니까?')) return;
             
             $.ajax({
-                url: `<c:url value='/my/reservations/'/>` + currentReservationId + '/cancel',
+                url: '<c:url value="/my/reservations/"/>' + currentReservationId + '/cancel',
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

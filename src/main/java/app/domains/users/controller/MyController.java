@@ -175,8 +175,8 @@ public class MyController {
      */
     @GetMapping("/reservations/{reservationId}")
     @ResponseBody
-    public ResponseEntity<MyReservation> getReservationDetail(@PathVariable Long reservationId,
-                                                             HttpServletRequest request) {
+    public ResponseEntity<MyReservation> getReservationDetail(@PathVariable("reservationId") Long reservationId,
+            HttpServletRequest request) {
         Users currentUser = getCurrentUser(request);
         
         if (currentUser == null) {
@@ -205,9 +205,10 @@ public class MyController {
     /**
      * 예약 취소 (AJAX)
      */
+
     @PostMapping("/reservations/{reservationId}/cancel")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> cancelReservation(@PathVariable Long reservationId,
+    public ResponseEntity<Map<String, Object>> cancelReservation(@PathVariable("reservationId") Long reservationId,
                                                                HttpServletRequest request) {
         Users currentUser = getCurrentUser(request);
         Map<String, Object> response = new HashMap<>();

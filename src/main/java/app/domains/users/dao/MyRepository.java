@@ -3,6 +3,8 @@ package app.domains.users.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import app.domains.users.model.MyReservation;
 
 /**
@@ -15,7 +17,7 @@ public interface MyRepository {
      * @param userId 사용자 ID
      * @return 예약 목록
      */
-    List<MyReservation> selectMyReservations(Long userId);
+    List<MyReservation> selectMyReservations(@Param("userId") Long userId);
     
     /**
      * 내 예약 목록 조회 (필터링)
@@ -30,7 +32,8 @@ public interface MyRepository {
      * @param userId 사용자 ID
      * @return 예약 상세 정보
      */
-    MyReservation selectMyReservationDetail(Long reservationId, Long userId);
+    MyReservation selectMyReservationDetail(@Param("reservationId") Long reservationId, 
+                                           @Param("userId") Long userId);
     
     /**
      * 예약 취소 요청
@@ -38,14 +41,15 @@ public interface MyRepository {
      * @param userId 사용자 ID (권한 체크용)
      * @return 업데이트된 행 수
      */
-    int cancelMyReservation(Long reservationId, Long userId);
+    int cancelMyReservation(@Param("reservationId") Long reservationId, 
+                           @Param("userId") Long userId);
     
     /**
      * 내 사용 내역 조회 (RESERVATION 테이블에서 사용이 시작되었거나 완료된 것들)
      * @param userId 사용자 ID
      * @return 사용 내역 목록
      */
-    List<MyReservation> selectMyUsageHistory(Long userId);
+    List<MyReservation> selectMyUsageHistory(@Param("userId") Long userId);
     
     /**
      * 내 사용 내역 조회 (필터링)
@@ -59,14 +63,14 @@ public interface MyRepository {
      * @param userId 사용자 ID
      * @return 사용 통계 정보
      */
-    Map<String, Object> selectMyUsageStatistics(Long userId);
+    Map<String, Object> selectMyUsageStatistics(@Param("userId") Long userId);
     
     /**
      * 예약 건수 조회 (상태별)
      * @param userId 사용자 ID
      * @return 상태별 예약 건수
      */
-    Map<String, Object> selectReservationCountByStatus(Long userId);
+    Map<String, Object> selectReservationCountByStatus(@Param("userId") Long userId);
     
     /**
      * 최근 사용한 농기계 목록
@@ -74,5 +78,5 @@ public interface MyRepository {
      * @param limit 조회 건수
      * @return 최근 사용 농기계 목록
      */
-    List<Map<String, Object>> selectRecentUsedAssets(Long userId, int limit);
+    List<Map<String, Object>> selectRecentUsedAssets(@Param("userId") Long userId,@Param("limit") int limit);
 }
