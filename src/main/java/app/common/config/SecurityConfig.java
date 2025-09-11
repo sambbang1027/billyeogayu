@@ -66,7 +66,8 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/js/**"),
                     new AntPathRequestMatcher("/images/**"),
                     new AntPathRequestMatcher("/static/**"),
-                    new AntPathRequestMatcher("/assets/**")
+                    new AntPathRequestMatcher("/assets/**"),
+                    new AntPathRequestMatcher("/.well-known/**")
                 ).permitAll()
 
                 // 인증 없이 접근 가능한 로그인/회원가입 관련 페이지
