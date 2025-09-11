@@ -11,8 +11,13 @@
                            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <!-- Component Scan for Controllers -->
-	<context:component-scan base-package="app.common"/>
-    <context:component-scan base-package="app.domains"/> 
+
+    <context:component-scan base-package="app.common"/>
+    <context:component-scan base-package="app.domains"/>
+    <!-- USERS -->
+	<context:component-scan base-package="app.users.controller"/>
+
+
 
     <!-- MVC Annotation Driven -->
     <mvc:annotation-driven/>
@@ -35,14 +40,19 @@
         <property name="contentType" value="application/json;charset=UTF-8"/>
     </bean>
 
-    <!-- Exception Handler -->
-<!--     <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-        <property name="defaultErrorView" value="error/500"/>
-        <property name="exceptionMappings">
-            <props>
-                <prop key="java.lang.Exception">error/500</prop>
-            </props>
-        </property>
-    </bean>
- -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
+
+    <context:property-placeholder location="classpath:application.properties"/>
+
+<!--    &lt;!&ndash; Exception Handler &ndash;&gt;-->
+<!--    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">-->
+<!--        <property name="defaultErrorView" value="error/500"/>-->
+<!--        <property name="exceptionMappings">-->
+<!--            <props>-->
+<!--                <prop key="java.lang.Exception">error/500</prop>-->
+<!--            </props>-->
+<!--        </property>-->
+<!--    </bean>-->
+
 </beans>

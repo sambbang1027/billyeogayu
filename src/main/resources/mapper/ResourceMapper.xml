@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.domains.resource.dao.ResourceRepository">
+
+    <!-- 기본 매핑 -->
+    <resultMap id="assetMap" type="app.domains.resource.model.Resource">
+        <id property="assetId" column="ASSET_ID"/>
+        <result property="modelName" column="NAME"/>
+        <result property="category" column="CATEGORY"/>
+        <result property="company" column="COMPANY"/>
+        <result property="assetStatus" column="STATUS"/>
+        <result property="imagePath" column="IMAGE"/>
+        <result property="maintenanceCycle" column="MAINTENANCE_CYCLE"/>
+        <result property="usageTime" column="USAGE_TIME"/>
+        <result property="lastMaintenanceDate" column="LAST_MAINTENANCE_DATE"/>
+        <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE"/>
+        <result property="createAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+        <result property="deletedAt" column="DELETED_AT"/>
+        <result property="isDeleted" column="IS_DELETED"/>
+    </resultMap>
+
+    <!-- 그룹핑용 매핑 -->
+    <resultMap id="assetGroupMap" type="app.domains.resource.model.Resource">
+        <id property="assetId" column="ASSET_ID"/>
+        <result property="modelName" column="NAME"/>
+        <result property="category" column="CATEGORY"/>
+        <result property="company" column="COMPANY"/>
+        <result property="assetStatus" column="STATUS"/>
+        <result property="imagePath" column="IMAGE"/>
+        <result property="maintenanceCycle" column="MAINTENANCE_CYCLE"/>
+        <result property="usageTime" column="USAGE_TIME"/>
+        <result property="lastMaintenanceDate" column="LAST_MAINTENANCE_DATE"/>
+        <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE"/>
+        <result property="createAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+        <result property="deletedAt" column="DELETED_AT"/>
+        <result property="isDeleted" column="IS_DELETED"/>
+        <result property="stock" column="STOCK"/>
+        <result property="availableStock" column="AVAILABLE_STOCK"/>
+        <result property="rentedStock" column="RENTED_STOCK"/>
+    </resultMap>
+
+    <!-- 목록 조회 (검색 + 필터 + 페이징) -->
+    <select id="findAssets" parameterType="map" resultMap="assetMap">
+        SELECT * FROM ASSET 
+        WHERE IS_DELETED = 'N'
+        <if test="q != null and q != ''">
+            AND LOWER(NAME) LIKE '%' || LOWER(#{q}) || '%'
+        </if>
+        <if test="filter != null and filter == 'available'">
+            AND STATUS = 'AVAILABLE'
+        </if>
+        ORDER BY ASSET_ID
+    </select>
+
+    <!-- 총 개수 -->
+    <select id="countAssets" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM ASSET 
+        WHERE IS_DELETED = 'N'
+        <if test="q != null and q != ''">
+            AND LOWER(NAME) LIKE '%' || LOWER(#{q}) || '%'
+        </if>
+        <if test="filter != null and filter == 'available'">
+            AND STATUS = 'AVAILABLE'
+        </if>
+    </select>
+
+    <!-- 그룹핑된 자산 목록 조회 (STATUS 기준으로 단순화) -->
+    <select id="findAssetsGrouped" parameterType="map" resultMap="assetGroupMap">
+        SELECT 
+            MIN(a.ASSET_ID) AS ASSET_ID,
+            a.NAME,
+            a.CATEGORY,
+            a.COMPANY,
+            <!-- AVAILABLE 상태가 하나라도 있으면 AVAILABLE, 아니면 첫 번째 상태 사용 -->
+            CASE 
+                WHEN SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) > 0 THEN 'AVAILABLE'
+                ELSE MIN(a.STATUS)
+            END AS STATUS,
+            MIN(a.IMAGE) AS IMAGE,
+            MIN(a.MAINTENANCE_CYCLE) AS MAINTENANCE_CYCLE,
+            MIN(a.USAGE_TIME) AS USAGE_TIME,
+            MIN(a.LAST_MAINTENANCE_DATE) AS LAST_MAINTENANCE_DATE,
+            MIN(a.EXPECTED_MAINTENANCE_DATE) AS EXPECTED_MAINTENANCE_DATE,
+            MIN(a.CREATED_AT) AS CREATED_AT,
+            MIN(a.UPDATED_AT) AS UPDATED_AT,
+            MIN(a.DELETED_AT) AS DELETED_AT,
+            MIN(CASE WHEN a.IS_DELETED = 'N' THEN 0 ELSE 1 END) AS IS_DELETED,
+            COUNT(a.ASSET_ID) AS STOCK,
+            SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) AS AVAILABLE_STOCK,
+            SUM(CASE WHEN a.STATUS IN ('USING', 'MAINTENANCE_REQUIRED', 'MAINTAINING') THEN 1 ELSE 0 END) AS RENTED_STOCK
+        FROM ASSET a
+        WHERE a.IS_DELETED = 'N'
+        <if test="q != null and q != ''">
+            AND LOWER(a.NAME) LIKE '%' || LOWER(#{q}) || '%'
+        </if>
+        GROUP BY a.NAME, a.CATEGORY, a.COMPANY
+        <if test="filter != null and filter == 'available'">
+            HAVING SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) > 0
+        </if>
+        ORDER BY a.NAME, a.CATEGORY, a.COMPANY
+        <if test="offset != null and pageSize != null">
+            OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+        </if>
+    </select>
+
+    <!-- 그룹핑된 자산의 총 개수 (STATUS 기준으로 단순화) -->
+    <select id="countAssetsGrouped" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM (
+            SELECT a.NAME, a.CATEGORY, a.COMPANY
+            FROM ASSET a
+            WHERE a.IS_DELETED = 'N'
+            <if test="q != null and q != ''">
+                AND LOWER(a.NAME) LIKE '%' || LOWER(#{q}) || '%'
+            </if>
+            GROUP BY a.NAME, a.CATEGORY, a.COMPANY
+            <if test="filter != null and filter == 'available'">
+                HAVING SUM(CASE WHEN a.STATUS = 'AVAILABLE' THEN 1 ELSE 0 END) > 0
+            </if>
+        )
+    </select>
+
+    <!-- 보유대수 계산 (modelName, category, company가 같은 자산의 개수) -->
+    <select id="countAssetStock" resultType="int">
+        SELECT COUNT(*) FROM ASSET 
+        WHERE IS_DELETED = 'N'
+        AND NAME = #{name}
+        AND (CATEGORY = #{category} OR (CATEGORY IS NULL AND #{category} IS NULL))
+        AND (COMPANY = #{company} OR (COMPANY IS NULL AND #{company} IS NULL))
+    </select>
+
+    <!-- 특정 그룹의 사용 가능한 자산들 조회 (STATUS = 'AVAILABLE'만) -->
+    <select id="getAvailableAssets" resultMap="assetMap">
+        SELECT a.* FROM ASSET a
+        WHERE a.IS_DELETED = 'N'
+        AND a.NAME = #{name}
+        AND (a.CATEGORY = #{category} OR (a.CATEGORY IS NULL AND #{category} IS NULL))
+        AND (a.COMPANY = #{company} OR (a.COMPANY IS NULL AND #{company} IS NULL))
+        AND a.STATUS = 'AVAILABLE'
+        ORDER BY a.ASSET_ID
+    </select>
+
+</mapper>
