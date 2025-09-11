@@ -1,11 +1,15 @@
 package app.domains.adminreservation.controller;
 
 import app.domains.adminreservation.model.AdminReservation;
+import app.domains.adminreservation.model.AdminReservationListDto;
 import app.domains.adminreservation.service.AdminReservationService;
+import app.domains.asset.service.AssetService;
+import app.domains.users.service.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +29,7 @@ public class AdminReservationController {
                                     @RequestParam(name = "status", required = false) String status,
                                     @RequestParam(name = "startDate", required = false) String startDate) {
         int total = reservationService.countAll(category, status, startDate);
-        List<AdminReservation> items = reservationService.getPage(page, size, category, status, startDate);
+        List<AdminReservationListDto> items = reservationService.getPage(page, size, category, status, startDate);
 
         Map<String, Object> res = new HashMap<>();
         res.put("items", items);

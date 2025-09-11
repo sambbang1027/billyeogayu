@@ -2,6 +2,7 @@ package app.domains.adminreservation.service;
 
 import app.domains.adminreservation.dao.AdminReservationRepository;
 import app.domains.adminreservation.model.AdminReservation;
+import app.domains.adminreservation.model.AdminReservationListDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class AdminReservationServiceImpl implements AdminReservationService {
     }
 
     @Override
-    public List<AdminReservation> getPage(int page, int size, String category, String status, String startDate) {
+    public List<AdminReservationListDto> getPage(int page, int size, String category, String status, String startDate) {
         int startRow = (page - 1) * size + 1;
         int endRow   = page * size;
         return repository.findAllPaged(startRow, endRow, category, status, startDate);
