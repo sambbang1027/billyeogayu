@@ -1,6 +1,5 @@
 package app.domains.adminreservation.service;
 
-import app.domains.adminreservation.model.AdminReservation;
 import app.domains.adminreservation.model.AdminReservationListDto;
 
 import java.util.List;

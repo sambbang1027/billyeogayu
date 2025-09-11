@@ -1,7 +1,6 @@
 package app.domains.adminreservation.service;
 
 import app.domains.adminreservation.dao.AdminReservationRepository;
-import app.domains.adminreservation.model.AdminReservation;
 import app.domains.adminreservation.model.AdminReservationListDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

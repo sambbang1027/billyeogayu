@@ -1,6 +1,5 @@
 package app.domains.adminreservation.dao;
 
-import app.domains.adminreservation.model.AdminReservation;
 import app.domains.adminreservation.model.AdminReservationListDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
