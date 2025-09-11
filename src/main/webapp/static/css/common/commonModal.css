@@ -1,0 +1,48 @@
+@charset "UTF-8";
+
+  .common-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.3);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 2000;
+    }
+    .common-modal-content {
+      background: #fff;
+      border-radius: 15px;
+      min-width: 320px;
+      max-width: 400px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .common-modal-header {
+      font-weight: bold;
+      text-align: center;
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+    }
+    .common-modal-body {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 1rem;
+    }
+    .common-modal-footer {
+      text-align: center;
+      padding: 1rem;
+    }
+    .common-modal-footer button {
+      margin: 0 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      border: 1px solid #46645E;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .common-btn-primary {
+      background: #46645E;
+      color: #fff;
+    }
+    .common-btn-outline {
+      background: #fff;
+      color: #46645E;
+    }
