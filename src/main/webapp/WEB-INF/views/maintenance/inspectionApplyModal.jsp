@@ -61,7 +61,7 @@
 
     <!-- 푸터 -->
     <div class="inspection-apply-modal-footer">
-      <button class="apply-btn-submit">등록</button>
+      <button class="apply-btn-submit" type="button">등록</button>
       <button class="apply-btn-cancel close-btn">취소</button>
     </div>
   </div>

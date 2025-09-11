@@ -1,24 +1,11 @@
 /**
  *  점검 기록 등록 모달 JS
  */
-let assetId = null;
-
-$(document).ready(function() {
-  // 등록 버튼 클릭 → 모달 열기
-	  $(".maintenance-apply").on("click", function() {
-    $("#inspectionApplyModal").removeClass("hidden").show();
-//	assetId = $(".아이디");
-		assetId = 54;
-	$(".apply-input.asset").val("RS 650A");
-	console.log('가져옵니다 필터');
-	partList(assetId);
-  });
-
+  let adminId;
   // 모달 닫기 버튼 클릭 → 모달 닫기
   $(document).on("click", "#inspectionApplyModal .close-btn", function() {
     $("#inspectionApplyModal").addClass("hidden").hide();
   });
-});
 
 
 // 드롭다운 함수 
@@ -27,7 +14,7 @@ let inspectionSelect;
 document.addEventListener("DOMContentLoaded", function () {
   inspectionSelect = new Choices('#inspectionItems', {
     removeItemButton: true,
-    placeholder: false,
+    placeholder: true,
     placeholderValue: '항목 선택',
     searchEnabled: false,
     shouldSort: false,
@@ -35,6 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
     noChoicesText: '선택할 항목이 없습니다',
     itemSelectText: '클릭해서 선택'
   });
+  
+  getUser ();
 });
 
 //드롭다운에 부품 리스트 넣어주기 
@@ -44,6 +33,7 @@ function partList(assetId){
 		url : "/maintenance/part-list/"+assetId ,
 		type : "GET",
 		success : function(res){
+			console.log("서버 응답:", res); // ✅ 확인 필수
 			 inspectionSelect.clearStore();
 			  inspectionSelect.setChoices(
 			    res.map(item => ({
@@ -60,10 +50,10 @@ function partList(assetId){
 }
 
 // 점검 유형 값 가져오기 
-let selectedStatus = "";
+let inspectionStatus = "";
 
 $(document).on("click", ".dropdown-menu.apply li",function() {
-    selectedStatus = $(this).data("value") || "";
+    inspectionStatus = $(this).data("value") || "";
 	
 	//  $dropdown 먼저 선언해야 함
 	   const $dropdown = $(this).closest(".custom-dropdown.apply");
@@ -71,7 +61,7 @@ $(document).on("click", ".dropdown-menu.apply li",function() {
 	     // 라벨 업데이트
 	       $dropdown.find(".dropdown-label.apply")
 	                .text($(this).text())
-	                .attr("data-value", selectedStatus);
+	                .attr("data-value", inspectionStatus);
 
 	       // 메뉴 닫기
 	       $dropdown.find(".dropdown-menu.apply").hide();
@@ -86,16 +76,18 @@ $(document).on("click", ".apply-btn-submit", function() {
 
 	// 점검자
 	const resolverName = $(".apply-input").val().trim();
-	
 	// 부품 목록 
 		const selectedItems = inspectionSelect.getValue();
 		const data = selectedItems.map(item => ({
 		  partId: item.value,
 		  partName: item.label
 		}));
+		// 모달의 data 속성에서 assetId 가져오기
+		const assetId = $("#inspectionApplyModal").attr("data-asset-id");
 
-		//console.log('담당자 : ', resolverName, '정검 유형 : ', selectedStatus, '항목 : ', JSON.stringify(data));
-	
+		console.log('자원 ID: ', assetId, '점검자 : ', resolverName, '정검 유형 : ', inspectionStatus, '항목 : ', JSON.stringify(data));
+		
+		
 		// 서버 전송 
 	$.ajax({
 		url : "/maintenance/apply",
@@ -104,13 +96,13 @@ $(document).on("click", ".apply-btn-submit", function() {
 		data : JSON.stringify({
 			assetId : assetId,
 			parts : data,
-			adminId : 41,
+			adminId : adminId,
 			resolverName : resolverName,
-			type : selectedStatus
+			type : inspectionStatus
 		}),
 		success : function(res){
 			if(res.code === "SUCCESS"){
-			alert("점검 신청이 등록되었습니다.");				
+			showAlert("점검이 신청되었습니다.", () => location.reload());		
 			$("#inspectionApplyModal").addClass("hidden").hide();
 			location.reload();
 			}
@@ -121,4 +113,23 @@ $(document).on("click", ".apply-btn-submit", function() {
 	})
 })
 
+function getUser () {
+	$.ajax({
+	  url: "/api/profile",
+	  type: "GET",
+	  success: function(res) {
+	   console.log(res);
+	   adminId = res.data.userId;
+	   console.log('유저  : ' , adminId );
+	  },
+	  error: function(xhr) {
+	    if(xhr.status === 401){
+	      alert("로그인이 필요합니다.");
+	      location.href = "/login";
+	    } else {
+	      alert("사용자 정보 조회 실패");
+	    }
+	  }
+	});
+}
 

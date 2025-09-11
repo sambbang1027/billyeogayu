@@ -14,20 +14,31 @@
 		<!-- 드롭다운 (멀티)Choices.js css/js -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 		<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+		
+		<!-- 공통 모달(confirm/ alert) -->
+		<link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
+		<script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 
         <c:if test="${activePage eq 'asset'}">
             <link rel="stylesheet" href="<c:url value='/static/css/asset/assetlist/style.css'/>">
+            
+            <link rel="stylesheet" href="<c:url value='/static/css/maintenance/custom-dropdown.css'/>">
+            <link rel="stylesheet" href="<c:url value='/static/css/maintenance/inspection-apply.css'/>">
+			<script src="<c:url value='/static/js/common/dropdown.js'/>"></script>
+			<script src="<c:url value='/static/js/maintenance/inspectionApply.js'/>"></script>
+            <script src="<c:url value='/static/js/maintenance/maintenanceApply.js'/>"></script>			
+            	
+            
         </c:if>
          <c:if test="${activePage eq 'maintenance'}">
           	    <link rel="stylesheet" href="<c:url value='/static/css/maintenance/maintenance.css'/>">
 		 		<link rel="stylesheet" href="<c:url value='/static/css/maintenance/custom-dropdown.css'/>">
 		 		<link rel="stylesheet" href="<c:url value='/static/css/maintenance/search-dropdown.css'/>">
 		 		<link rel="stylesheet" href="<c:url value='/static/css/maintenance/inspection-modal.css'/>">
-		 		<link rel="stylesheet" href="<c:url value='/static/css/maintenance/inspection-apply.css'/>">
-				<script src="<c:url value='/static/js/maintenance/customDropdown.js'/>"></script>
+				<script src="<c:url value='/static/js/common/dropdown.js'/>"></script>
+				<script src="<c:url value='/static/js/maintenance/filter.js'/>"></script>
 				<script src="<c:url value='/static/js/maintenance/searchDropdown.js'/>"></script>
-				<script src="<c:url value='/static/js/maintenance/maintenanceDetail.js'/>"></script>				
-				<script src="<c:url value='/static/js/maintenance/maintenanceApply.js'/>"></script>				
+				<script src="<c:url value='/static/js/maintenance/maintenanceDetail.js'/>"></script>					
 				<script src="<c:url value='/static/js/maintenance/maintenance.js'/>"></script>
         </c:if>
         <c:if test="${activePage eq 'dashboard'}">
@@ -44,9 +55,11 @@
         
         <c:if test="${activePage eq 'reservation'}">
         		<link rel="stylesheet" href="<c:url value='/static/css/admin-reservation/reservation.css'/>">
-        		<link rel="stylesheet" href="<c:url value='/static/css/maintenance/custom-dropdown.css'/>">
-        		<script src="<c:url value='/static/js/maintenance/customDropdown.js'/>"></script>
+        		<link rel="stylesheet" href="<c:url value='/static/css/admin-reservation/reservationFilter.css'/>">
+        		<link rel="stylesheet" href="<c:url value='/static/css/admin-reservation/rejectModal.css'/>">
+        		<script src="<c:url value='/static/js/admin-reservation/reservationFilter.js'/>"></script>
         		 <script src="<c:url value='/static/js/admin-reservation/reservation.js'/>"></script>
+         		 <script src="<c:url value='/static/js/admin-reservation/action.js'/>"></script>
         		
         		
         		
@@ -70,6 +83,8 @@
     </div>
 </div>
 
+<!-- 공통 모달 JSP include -->
+<jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
 </body>
 
 </html>

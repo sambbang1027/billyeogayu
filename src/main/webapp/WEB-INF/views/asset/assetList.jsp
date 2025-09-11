@@ -586,7 +586,14 @@
 </div>
 
 
+	
 
+<!-- 모달 include (하드코딩된 UI만) -->
+ <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" /> 
+
+
+	<!-- 모달 넣을 자리 -->
+<div id="modal-container"></div>
 
 
 
@@ -973,6 +980,47 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="detail-part-cancel">닫기</div>';
       partBox.appendChild(btns);
 
+      
+      
+      
+      
+     
+
+   // 버튼 생성 직후 바로 이벤트 바인딩
+  const requestBtn = btns.querySelector('.detail-part-request-btn');
+   const cancelBtn = btns.querySelector('.detail-part-cancel');
+   
+   requestBtn.addEventListener('click', function(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	    console.log("점검요청 버튼 클릭됨");
+	    
+	    const modal = document.querySelector(".detail-modal");
+	    const modelName = asset.modelName;
+	    console.log("선택된 자산:", assetId, modelName);
+	    
+	    // 기존 상세 모달을 먼저 닫기
+	    closeModal(detailModal);
+	    
+	    // 새로운 점검요청 모달 열기
+
+	    const inspectionModal = $("#inspectionApplyModal");
+	    inspectionModal.removeClass("hidden").css("display","block");
+	    inspectionModal.attr("data-asset-id", assetId); // data 속성에 저장
+	    
+	    $(".apply-input.asset").val(modelName);
+
+	    
+	    
+	    if (typeof partList === 'function') {
+	        partList(assetId);
+	    }
+	});
+   
+   
+   
+   
+      
       partBox.querySelectorAll(".toggle-icon").forEach(tg => {
         tg.addEventListener("click", () => {
           const box = tg.closest(".detail-part-info-container");

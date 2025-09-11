@@ -102,7 +102,7 @@ $(document).on("click", ".inspection-btn-complete.create", function() {
        }),
 	   success : function(res){
 			if(res.code === "SUCCESS"){
-				alert("점검 완료처리 되었습니다.");
+				showAlert("등록이 완료되었습니다.", () => location.reload());
 				 $("#inspectionModal").hide();
 				location.reload(); // 새로 고침 
 
@@ -132,9 +132,8 @@ $(document).on("click", ".inspection-btn-complete.edit", function(){
 		}),
 		success : function(res){
 			 if(res.code === "SUCCESS"){
-				alert("기록이 수정되었습니다");
+				showAlert("수정이 완료되었습니다.", () => location.reload());
 				$("#inspectionEditModal").hide();
-				location.reload();
 			 }
 		},
 		error : function(xhr, status, error){

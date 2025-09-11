@@ -199,11 +199,12 @@
 
 .choices__input{
 	background-color : transparent;
+	min-width: 0 !important;
+    width: auto !important;
 }
 
 .choices__input:focus {
   border: none !important; 
-  border-bottom: 1px solid #959595 !important; 
   outline: none;
   box-shadow: none !important; 
   border-radius: 0 !important; 
