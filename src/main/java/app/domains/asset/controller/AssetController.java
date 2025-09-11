@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -102,7 +99,7 @@ public class AssetController {
 
         assetService.registerAsset(dto);
 
-        return "redirect:/asset/list";
+        return "redirect:/admin/asset/list";
     }
 
     @PostMapping("/update")

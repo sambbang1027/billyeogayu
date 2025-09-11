@@ -113,7 +113,7 @@ public class AssetServiceImpl implements AssetService{
         Asset asset = dto.getAsset();
         List<Part> parts = dto.getParts();
 
-        if (dto.isAssetCycleChanged()) {
+        if (dto.isAssetCycleChanged() || dto.isImageChanged()) {
             assetRepository.updateAsset(asset);
         }
 
