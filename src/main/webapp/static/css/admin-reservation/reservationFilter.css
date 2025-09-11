@@ -1,22 +1,22 @@
 @charset "UTF-8";
 
-.custom-dropdown {
+.rv-custom-dropdown {
   display: flex;
   align-items: center;
   margin-right: 1rem; 
 }
 
-
-.dropdown-box {
+.rv-dropdown-box {
   position: relative; /* 메뉴 위치 기준 */
 }
-.custom-dropdown-name{
-	/* align-self: center;*/
-    margin-right: 1rem;
-	 white-space: nowrap; 
+
+.rv-custom-dropdown-name {
+  align-self: center;
+  margin-right: 1rem;
+  white-space: nowrap; 
 }
 
-.dropdown-toggle {
+.rv-dropdown-toggle {
   background: #fff;
   border: 1px solid #b4b4b4;
   border-radius: 5px;
@@ -30,18 +30,18 @@
   min-width: 180px;
 }
 
-.dropdown-toggle img {
+.rv-dropdown-toggle img {
   width: 14px;
   height: 14px;
   pointer-events: none;  /* 클릭 시 사라지지 않게 */
   transition: transform 0.2s;
 }
 
-.dropdown-toggle.active img {
+.rv-dropdown-toggle.active img {
   transform: rotate(180deg); /* 열렸을 때 아이콘 회전 */
 }
 
-.dropdown-menu {
+.rv-dropdown-menu {
   display: none;
   position: absolute;
   top: 100%;
@@ -57,18 +57,18 @@
   z-index: 10;
 }
 
-.dropdown-menu li {
+.rv-dropdown-menu li {
   padding: 0.6rem 0.8rem;
   cursor: pointer;
   font-size: 0.95rem;
   color: #333;
 }
 
-.dropdown-menu li:hover {
+.rv-dropdown-menu li:hover {
   background: #deefec;
 }
 
-.dropdown-menu li.active {
+.rv-dropdown-menu li.rv-active {
   background: #deefec;
   font-weight: bold;
 }

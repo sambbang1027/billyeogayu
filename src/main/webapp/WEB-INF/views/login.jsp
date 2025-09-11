@@ -196,7 +196,7 @@
                            } else {
                                // 기본적으로 자원 목록 페이지로 이동
                                alert('로그인되었습니다.');
-                               window.location.href = '<c:url value="/asset/list"/>';
+                               window.location.href = '<c:url value="/resource/list"/>';
                            }
                        } else {
                            // 로그인 실패

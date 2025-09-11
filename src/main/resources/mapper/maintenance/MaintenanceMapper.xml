@@ -30,7 +30,7 @@
 						        LISTAGG(p.name, ', ') WITHIN GROUP (ORDER BY p.name) AS parts,
 						        m.type,
 						        m.status,
-						        TO_CHAR(m.resolved_at, 'YYYY.MM.DD') AS maint_date,
+						        NVL(TO_CHAR(m.resolved_at, 'YYYY.MM.DD'), '') AS maint_date,				        
 						        u.name AS admin_name,
 						        a.company
 						      FROM maintenance m

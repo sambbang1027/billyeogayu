@@ -25,7 +25,7 @@
 	    <div class="filter-bar">
 		    <div class="filter-list">
 		    		<!--  종류 드롭다운   -->
-					<div class="custom-dropdown">
+					<div class="custom-dropdown filter-dropdown">
 						<label class="custom-dropdown-name">종류</label>
 						<div class="dropdown-box">
 										<button class="dropdown-toggle">
@@ -42,7 +42,7 @@
 					</div>
 
 				<!-- 제조사 드롭다운 -->
-				<div class="custom-dropdown">
+				<div class="custom-dropdown filter-dropdown">
 					<label class="custom-dropdown-name">제조사</label>
 					<div class="dropdown-box">
 					  	<button class="dropdown-toggle">
@@ -58,7 +58,7 @@
 				</div>
 				
 		        		<!-- 상태 드롭다운 -->
-				<div class="custom-dropdown">
+				<div class="custom-dropdown filter-dropdown">
 					<label class="custom-dropdown-name">상태</label>
 					<div class="dropdown-box">
 						  <button class="dropdown-toggle">
@@ -86,8 +86,6 @@
 		   		 </div>
 		     </div>
 	    </div>
-	
-		<button class="maintenance-apply" >등록</button>
 	
 	     <button class="btn-download">
 	     			<img alt="download-list" src="<c:url value='/assets/asset/download.svg'/>">
@@ -124,12 +122,7 @@
 <!-- 모달 include (하드코딩된 UI만) -->
 <jsp:include page="/WEB-INF/views/maintenance/inspectionModal.jsp" />
  <jsp:include page="/WEB-INF/views/maintenance/inspectionEditModal.jsp" />
- <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" /> 
 
-<!-- 모달은 기본 숨김 -->
-<style> 
-  #inspectionModal, #inspectionEditModal, #inspectionApplyModal { display: none; }
-</style>
 
 
 	<!-- 모달 넣을 자리 -->
