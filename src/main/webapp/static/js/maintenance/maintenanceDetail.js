@@ -102,15 +102,15 @@ $(document).on("click", ".inspection-btn-complete.create", function() {
        }),
 	   success : function(res){
 			if(res.code === "SUCCESS"){
-				showAlert("등록이 완료되었습니다.", () => location.reload());
-				 $("#inspectionModal").hide();
-				location.reload(); // 새로 고침 
-
+				$("#inspectionModal").hide();
+				showAlert("등록이 완료되었습니다.", () =>{
+					location.reload(); // 새로 고침 
+				}); 
 			}
 	   },
 	   error : function(xhr, status, error){
 		console.error(error);
-		alert("등록 중 오류가 발생하였습니다");
+		showAlert("등록 중 오류가 발생하였습니다", ()=> $("#inspectionModal").hide());
 	   }
 	});
 })
@@ -132,13 +132,15 @@ $(document).on("click", ".inspection-btn-complete.edit", function(){
 		}),
 		success : function(res){
 			 if(res.code === "SUCCESS"){
-				showAlert("수정이 완료되었습니다.", () => location.reload());
 				$("#inspectionEditModal").hide();
+				showAlert("수정이 완료되었습니다.", () => {
+				location.reload();
+				});
 			 }
 		},
 		error : function(xhr, status, error){
 			console.error(error);
-			alert("기록 수정에 실패하였습니다 ");
+			showAlert("기록 수정에 실패하였습니다 ", ()=> $("#inspectionEditModal").hide());
 		}
 		
 	});

@@ -7,11 +7,11 @@
 	    <div class="search-bar">
 		        <div class="search-dropdown">
 					  <button class="search-dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-							  <span class="search-dropdown-label" data-value="" >자원명</span>
+							  <span class="search-dropdown-label" data-value="" >모델명</span>
   							  <img src="<c:url value='/assets/maintenance/arrow-down.svg' />" alt="▼" class="search-dropdown-btn">
 						</button>
 					  <ul class="search-dropdown-menu">
-					    <li data-value="assetName">자원명</li>
+					    <li data-value="assetName">모델명</li>
 					    <li data-value="adminName">담당자</li>
 					  </ul>
 				</div>
@@ -96,7 +96,7 @@
 			  <thead>
 			    <tr>
 			      <th>No</th>
-			      <th>자원명</th>
+			      <th>모델명</th>
 			      <th>점검 일시</th>
 			      <th>점검 유형</th>
 			      <th>점검 상태</th>

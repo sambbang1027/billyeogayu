@@ -4,15 +4,15 @@
 
 // 승인 처리 
 $(document).on("click", ".rv-btn-approve", function(){
-  const reservationId = $(this).data("id");
-  console.log("승인 처리할 예약:", reservationId);
+  const id = $(this).data("id");
+  console.log("승인 처리할 예약:", id);
   
   showConfirm("예약을 승인하시겠습니까?",
     () => {
 				console.log("승인 실행");
 				// → AJAX 요청 보내기
 				$.ajax({
-				url : "/" + reservationId, 
+				url : "/admin/reservations/approve/" + id, 
 				type : "GET", 
 				success : function(res){
 					console.log(res);
@@ -46,11 +46,11 @@ $(document).on("click", ".btn-reject-confirm", function(){
   }
 
   $.ajax({
-    url : "/reservation/reject",   // 실제 API 경로로 교체
+    url : "/admin/reservations/reject/" + id,   // 실제 API 경로로 교체
     type : "POST",
     contentType : "application/json; charset=UTF-8", 
     data : JSON.stringify({
-      reservationId : currentReservationId,
+    
       rejectReason  : rejectReason
     }),
     success : function(res){
@@ -105,12 +105,12 @@ $(document).on("click", ".rv-btn-complete", function(){
 
  // 상세 버튼 클릭 → 반려 사유 모달 열기
  $(document).on("click", ".rv-btn-view", function(){
-   const reservationId = $(this).data("id");
-   console.log("상세 조회할 예약:", reservationId);
+   const id = $(this).data("id");
+   console.log("상세 조회할 예약:", id);
 
    // AJAX로 반려 사유 조회
    $.ajax({
-     url : "/reservation/rejectReason/" + reservationId,  // 실제 API에 맞게 수정
+     url : "/",  // 실제 API에 맞게 수정
      type : "GET",
      success : function(res){
        // 예: res.rejectReason 에 값 있다고 가정
