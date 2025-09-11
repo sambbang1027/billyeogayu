@@ -102,7 +102,7 @@ public class AssetController {
 
         assetService.registerAsset(dto);
 
-        return "redirect:/asset/list";
+        return "redirect:/admin/asset/list";
     }
 
     @PostMapping("/update")
