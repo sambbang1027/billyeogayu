@@ -27,11 +27,6 @@ public interface UsersService {
     Users createUser(Users user) throws IllegalArgumentException;
 
     /**
-     * 회원가입 (기존 호환성)
-     */
-    void registerUser(Users user) throws IllegalArgumentException;
-
-    /**
      * 로그인 ID 중복 확인
      */
     boolean isLoginIdExists(String loginId);

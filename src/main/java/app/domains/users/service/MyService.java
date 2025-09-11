@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import app.domains.users.model.MyReservation;
-import app.domains.users.model.MyUsageHistory;
 
 /**
  * 내 정보 관련 Service 인터페이스
@@ -56,22 +55,22 @@ public interface MyService {
     boolean cancelMyReservation(Long reservationId, Long userId);
     
     /**
-     * 내 사용 이력 조회
+     * 내 사용 내역 조회 (RESERVATION 테이블에서 사용이 시작되었거나 완료된 것들)
      * @param userId 사용자 ID
-     * @return 사용 이력 목록
+     * @return 사용 내역 목록
      */
-    List<MyUsageHistory> getMyUsageHistory(Long userId);
+    List<MyReservation> getMyUsageHistory(Long userId);
     
     /**
-     * 내 사용 이력 조회 (필터링)
+     * 내 사용 내역 조회 (필터링)
      * @param userId 사용자 ID
      * @param startDate 시작 날짜 (선택사항)
      * @param endDate 종료 날짜 (선택사항)
      * @param category 농기계 카테고리 (선택사항)
-     * @param usageStatus 사용 상태 (선택사항)
-     * @return 사용 이력 목록
+     * @param usageStatus 사용 상태 (선택사항: COMPLETED, ACTIVE, OVERDUE)
+     * @return 사용 내역 목록
      */
-    List<MyUsageHistory> getMyUsageHistoryWithFilter(Long userId, Date startDate, 
+    List<MyReservation> getMyUsageHistoryWithFilter(Long userId, Date startDate, 
                                                      Date endDate, String category, String usageStatus);
     
     /**

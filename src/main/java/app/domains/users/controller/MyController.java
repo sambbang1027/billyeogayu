@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import app.domains.users.model.Users;
 import app.domains.users.model.MyReservation;
-import app.domains.users.model.MyUsageHistory;
 import app.domains.users.service.MyService;
 import app.domains.users.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,31 +48,35 @@ public class MyController {
      */
     private Users getCurrentUser(HttpServletRequest request) {
         try {
-            // 세션에서 SecurityContext 복원
             HttpSession session = request.getSession(false);
-            if (session != null) {
-                Object storedContext = session.getAttribute(
-                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
-                if (storedContext instanceof SecurityContext) {
-                    SecurityContextHolder.setContext((SecurityContext) storedContext);
-                }
-            }
-            
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+            if (session == null) {
                 return null;
             }
             
-            String loginId = auth.getName();
-            return usersService.getUserByLoginId(loginId);
+            SecurityContext securityContext = (SecurityContext) session
+                    .getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+            
+            if (securityContext == null) {
+                securityContext = SecurityContextHolder.getContext();
+            }
+            
+            Authentication authentication = securityContext.getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return null;
+            }
+            
+            String username = authentication.getName();
+            if ("anonymousUser".equals(username)) {
+                return null;
+            }
+            
+            return usersService.getUserByLoginId(username);
             
         } catch (Exception e) {
-            log.error("사용자 정보 조회 중 오류 발생", e);
+            log.warn("사용자 인증 정보 조회 실패", e);
             return null;
         }
     }
-    
-
     
     /**
      * 내 예약 내역 페이지
@@ -84,8 +87,17 @@ public class MyController {
                               @RequestParam(value = "endDate", required = false) String endDate,
                               @RequestParam(value = "category", required = false) String category,
                               HttpServletRequest request, Model model) {
+        
+        log.info("=== 내 예약 내역 페이지 요청 ===");
+        log.info("요청 URL: /my/reservations");
+        log.info("세션 ID: {}", request.getSession(false) != null ? request.getSession(false).getId() : "없음");
+        
         Users currentUser = getCurrentUser(request);
+        
+        log.info("현재 사용자: {}", currentUser != null ? currentUser.getEmail() : "null");
+        
         if (currentUser == null) {
+            log.warn("인증되지 않은 사용자 - 로그인 페이지로 리다이렉트");
             return "redirect:/login";
         }
         
@@ -112,6 +124,8 @@ public class MyController {
             // 예약 현황 요약
             Map<String, Object> reservationSummary = myService.getReservationSummary(currentUser.getUserId());
             
+            log.info("조회된 예약 건수: {}", reservations != null ? reservations.size() : 0);
+            
             model.addAttribute("user", currentUser);
             model.addAttribute("reservations", reservations);
             model.addAttribute("reservationSummary", reservationSummary);
@@ -120,45 +134,12 @@ public class MyController {
             model.addAttribute("currentEndDate", endDate);
             model.addAttribute("currentCategory", category);
             
-            return "my/reservations";
+            log.info("JSP 반환: my/myReservations");
+            return "my/myReservations"; // JSP 파일명 수정
             
         } catch (Exception e) {
             log.error("예약 내역 조회 중 오류 발생 - userId: {}", currentUser.getUserId(), e);
             model.addAttribute("error", "예약 내역을 불러오는 중 오류가 발생했습니다.");
-            return "error/500";
-        }
-    }
-    
-    /**
-     * 예약 상세 정보
-     */
-    @GetMapping("/reservations/{reservationId}")
-    public String reservationDetail(@PathVariable Long reservationId,
-                                   HttpServletRequest request, Model model) {
-        Users currentUser = getCurrentUser(request);
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-        
-        try {
-            log.info("예약 상세 정보 조회 - reservationId: {}, userId: {}", reservationId, currentUser.getUserId());
-            
-            MyReservation reservation = myService.getMyReservationDetail(reservationId, currentUser.getUserId());
-            
-            if (reservation == null) {
-                model.addAttribute("error", "예약 정보를 찾을 수 없습니다.");
-                return "error/404";
-            }
-            
-            model.addAttribute("user", currentUser);
-            model.addAttribute("reservation", reservation);
-            
-            return "my/reservation-detail";
-            
-        } catch (Exception e) {
-            log.error("예약 상세 정보 조회 중 오류 발생 - reservationId: {}, userId: {}", 
-                     reservationId, currentUser.getUserId(), e);
-            model.addAttribute("error", "예약 상세 정보를 불러오는 중 오류가 발생했습니다.");
             return "error/500";
         }
     }
@@ -169,10 +150,10 @@ public class MyController {
     @PostMapping("/reservations/{reservationId}/cancel")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> cancelReservation(@PathVariable Long reservationId,
-                                                                HttpServletRequest request) {
+                                                               HttpServletRequest request) {
+        Users currentUser = getCurrentUser(request);
         Map<String, Object> response = new HashMap<>();
         
-        Users currentUser = getCurrentUser(request);
         if (currentUser == null) {
             response.put("success", false);
             response.put("message", "로그인이 필요합니다.");
@@ -186,7 +167,7 @@ public class MyController {
             
             if (success) {
                 response.put("success", true);
-                response.put("message", "예약이 취소되었습니다.");
+                response.put("message", "예약이 성공적으로 취소되었습니다.");
                 return ResponseEntity.ok(response);
             } else {
                 response.put("success", false);
@@ -233,8 +214,8 @@ public class MyController {
                 parsedEndDate = dateFormat.parse(endDate);
             }
             
-            // 사용 내역 조회
-            List<MyUsageHistory> usageHistory = myService.getMyUsageHistoryWithFilter(
+            // 사용 내역 조회 (예약 테이블에서 사용이 시작되었거나 완료된 것들)
+            List<MyReservation> usageHistory = myService.getMyUsageHistoryWithFilter(
                 currentUser.getUserId(), parsedStartDate, parsedEndDate, category, usageStatus);
             
             // 사용 통계
@@ -248,33 +229,12 @@ public class MyController {
             model.addAttribute("currentCategory", category);
             model.addAttribute("currentUsageStatus", usageStatus);
             
-            return "my/usage-history";
+            return "my/myUsageHistory"; // JSP 파일명 수정
             
         } catch (Exception e) {
             log.error("사용 내역 조회 중 오류 발생 - userId: {}", currentUser.getUserId(), e);
             model.addAttribute("error", "사용 내역을 불러오는 중 오류가 발생했습니다.");
             return "error/500";
-        }
-    }
-    
-    /**
-     * 내 정보 API (AJAX용)
-     */
-    @GetMapping("/api/summary")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getApiSummary(HttpServletRequest request) {
-        Users currentUser = getCurrentUser(request);
-        if (currentUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        
-        try {
-            Map<String, Object> summary = myService.getDashboardSummary(currentUser.getUserId());
-            return ResponseEntity.ok(summary);
-            
-        } catch (Exception e) {
-            log.error("API 요약 정보 조회 중 오류 발생 - userId: {}", currentUser.getUserId(), e);
-            return ResponseEntity.status(500).build();
         }
     }
 }

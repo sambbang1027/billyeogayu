@@ -16,37 +16,19 @@
         <result property="addressState" column="ADDRESS_STATE"/>
         <result property="addressCity" column="ADDRESS_CITY"/>
         <result property="createdAt" column="CREATED_AT"/>
-        <result property="updatedAt" column="UPDATED_AT"/>
-        <!-- 자산 정보 -->
-        <result property="assetName" column="ASSET_NAME"/>
-        <result property="assetCategory" column="ASSET_CATEGORY"/>
-        <result property="assetCompany" column="ASSET_COMPANY"/>
-        <result property="assetImage" column="ASSET_IMAGE"/>
-    </resultMap>
-
-    <!-- MyUsageHistory ResultMap -->
-    <resultMap id="MyUsageHistoryMap" type="app.domains.users.model.MyUsageHistory">
-        <id property="usageLogId" column="USAGE_LOG_ID"/>
-        <result property="reservationId" column="RESERVATION_ID"/>
-        <result property="userId" column="USER_ID"/>
-        <result property="assetId" column="ASSET_ID"/>
-        <result property="startTime" column="START_TIME"/>
-        <result property="endTime" column="END_TIME"/>
+        <!-- 사용 관련 정보 -->
+        <result property="completedAt" column="COMPLETED_AT"/>
         <result property="usageDuration" column="USAGE_DURATION"/>
-        <result property="usageStatus" column="USAGE_STATUS"/>
-        <result property="processedBy" column="PROCESSED_BY"/>
-        <result property="createdAt" column="CREATED_AT"/>
-        <result property="updatedAt" column="UPDATED_AT"/>
-        <!-- 예약 정보 -->
-        <result property="purpose" column="PURPOSE"/>
-        <result property="reservationStatus" column="RESERVATION_STATUS"/>
+        <result property="adminId" column="ADMIN_ID"/>
+        <result property="isRejected" column="IS_REJECTED"/>
+        <result property="rejectReason" column="REJECT_REASON"/>
         <!-- 자산 정보 -->
         <result property="assetName" column="ASSET_NAME"/>
         <result property="assetCategory" column="ASSET_CATEGORY"/>
         <result property="assetCompany" column="ASSET_COMPANY"/>
         <result property="assetImage" column="ASSET_IMAGE"/>
-        <!-- 처리자 정보 -->
-        <result property="processedByName" column="PROCESSED_BY_NAME"/>
+        <!-- 관리자 정보 -->
+        <result property="adminName" column="ADMIN_NAME"/>
     </resultMap>
 
     <!-- 내 예약 목록 조회 -->
@@ -63,15 +45,21 @@
             r.ADDRESS_STATE,
             r.ADDRESS_CITY,
             r.CREATED_AT,
-            r.UPDATED_AT,
+            r.COMPLETED_AT,
+            r.USAGE_DURATION,
+            r.ADMIN_ID,
+            r.IS_REJECTED,
+            r.REJECT_REASON,
             a.NAME as ASSET_NAME,
             a.CATEGORY as ASSET_CATEGORY,
             a.COMPANY as ASSET_COMPANY,
-            a.IMAGE as ASSET_IMAGE
+            a.IMAGE as ASSET_IMAGE,
+            u.name as ADMIN_NAME
         FROM RESERVATION r
         JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
         WHERE r.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
+        AND a.IS_DELETED = 'N'
         ORDER BY r.CREATED_AT DESC
     </select>
 
@@ -89,17 +77,40 @@
             r.ADDRESS_STATE,
             r.ADDRESS_CITY,
             r.CREATED_AT,
-            r.UPDATED_AT,
+            r.COMPLETED_AT,
+            r.USAGE_DURATION,
+            r.ADMIN_ID,
+            r.IS_REJECTED,
+            r.REJECT_REASON,
             a.NAME as ASSET_NAME,
             a.CATEGORY as ASSET_CATEGORY,
             a.COMPANY as ASSET_COMPANY,
-            a.IMAGE as ASSET_IMAGE
+            a.IMAGE as ASSET_IMAGE,
+            u.name as ADMIN_NAME
         FROM RESERVATION r
         JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
         WHERE r.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
+        AND a.IS_DELETED = 'N'
         <if test="status != null and status != ''">
-            AND r.STATUS = #{status}
+            <choose>
+                <when test="status == 'COMPLETED'">
+                    AND (r.COMPLETED_AT IS NOT NULL)
+                </when>
+                <when test="status == 'REJECTED'">
+                    AND r.IS_REJECTED = 'Y'
+                </when>
+                <when test="status == 'ACTIVE'">
+                    AND r.STATUS = 'APPROVED' 
+                    AND r.START_TIME &lt;= SYSDATE 
+                    AND r.END_TIME &gt; SYSDATE
+                    AND r.COMPLETED_AT IS NULL
+                </when>
+                <otherwise>
+                    AND r.STATUS = #{status}
+                    AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
+                </otherwise>
+            </choose>
         </if>
         <if test="startDate != null">
             AND r.START_TIME &gt;= #{startDate}
@@ -113,8 +124,8 @@
         ORDER BY r.CREATED_AT DESC
     </select>
 
-    <!-- 내 예약 목록 조회 (기간별) -->
-    <select id="selectMyReservationsByPeriod" resultMap="MyReservationMap">
+    <!-- 내 사용 내역 조회 (사용이 시작되었거나 완료된 예약들) -->
+    <select id="selectMyUsageHistory" resultMap="MyReservationMap">
         SELECT 
             r.RESERVATION_ID,
             r.USER_ID,
@@ -127,17 +138,93 @@
             r.ADDRESS_STATE,
             r.ADDRESS_CITY,
             r.CREATED_AT,
-            r.UPDATED_AT,
+            r.COMPLETED_AT,
+            r.USAGE_DURATION,
+            r.ADMIN_ID,
+            r.IS_REJECTED,
+            r.REJECT_REASON,
             a.NAME as ASSET_NAME,
             a.CATEGORY as ASSET_CATEGORY,
             a.COMPANY as ASSET_COMPANY,
-            a.IMAGE as ASSET_IMAGE
+            a.IMAGE as ASSET_IMAGE,
+            u.name as ADMIN_NAME
         FROM RESERVATION r
         JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
         WHERE r.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
-        AND r.CREATED_AT BETWEEN #{startDate} AND #{endDate}
-        ORDER BY r.CREATED_AT DESC
+        AND a.IS_DELETED = 'N'
+        AND r.STATUS = 'APPROVED'
+        AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
+        AND (
+            r.COMPLETED_AT IS NOT NULL 
+            OR (r.START_TIME &lt;= SYSDATE AND r.END_TIME &gt; SYSDATE)
+            OR r.END_TIME &lt;= SYSDATE
+        )
+        ORDER BY r.START_TIME DESC
+    </select>
+
+    <!-- 내 사용 내역 조회 (필터링) -->
+    <select id="selectMyUsageHistoryWithFilter" resultMap="MyReservationMap">
+        SELECT 
+            r.RESERVATION_ID,
+            r.USER_ID,
+            r.ASSET_ID,
+            r.START_TIME,
+            r.END_TIME,
+            r.PURPOSE,
+            r.STATUS,
+            r.ADDRESS,
+            r.ADDRESS_STATE,
+            r.ADDRESS_CITY,
+            r.CREATED_AT,
+            r.COMPLETED_AT,
+            r.USAGE_DURATION,
+            r.ADMIN_ID,
+            r.IS_REJECTED,
+            r.REJECT_REASON,
+            a.NAME as ASSET_NAME,
+            a.CATEGORY as ASSET_CATEGORY,
+            a.COMPANY as ASSET_COMPANY,
+            a.IMAGE as ASSET_IMAGE,
+            u.name as ADMIN_NAME
+        FROM RESERVATION r
+        JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
+        WHERE r.USER_ID = #{userId}
+        AND a.IS_DELETED = 'N'
+        AND r.STATUS = 'APPROVED'
+        AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
+        AND (
+            r.COMPLETED_AT IS NOT NULL 
+            OR (r.START_TIME &lt;= SYSDATE AND r.END_TIME &gt; SYSDATE)
+            OR r.END_TIME &lt;= SYSDATE
+        )
+        <if test="startDate != null">
+            AND r.START_TIME &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND r.END_TIME &lt;= #{endDate}
+        </if>
+        <if test="category != null and category != ''">
+            AND a.CATEGORY = #{category}
+        </if>
+        <if test="usageStatus != null and usageStatus != ''">
+            <choose>
+                <when test="usageStatus == 'COMPLETED'">
+                    AND (r.COMPLETED_AT IS NOT NULL )
+                </when>
+                <when test="usageStatus == 'ACTIVE'">
+                    AND r.START_TIME &lt;= SYSDATE 
+                    AND r.END_TIME &gt; SYSDATE
+                    AND r.COMPLETED_AT IS NULL
+                </when>
+                <when test="usageStatus == 'OVERDUE'">
+                    AND r.END_TIME &lt; SYSDATE
+                    AND r.COMPLETED_AT IS NULL
+                </when>
+            </choose>
+        </if>
+        ORDER BY r.START_TIME DESC
     </select>
 
     <!-- 예약 상세 정보 조회 -->
@@ -154,126 +241,65 @@
             r.ADDRESS_STATE,
             r.ADDRESS_CITY,
             r.CREATED_AT,
-            r.UPDATED_AT,
+            r.COMPLETED_AT,
+            r.USAGE_DURATION,
+            r.ADMIN_ID,
+            r.IS_REJECTED,
+            r.REJECT_REASON,
             a.NAME as ASSET_NAME,
             a.CATEGORY as ASSET_CATEGORY,
             a.COMPANY as ASSET_COMPANY,
-            a.IMAGE as ASSET_IMAGE
+            a.IMAGE as ASSET_IMAGE,
+            u.name as ADMIN_NAME
         FROM RESERVATION r
         JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
         WHERE r.RESERVATION_ID = #{reservationId}
         AND r.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
+        AND a.IS_DELETED = 'N'
     </select>
 
     <!-- 예약 취소 -->
     <update id="cancelMyReservation">
         UPDATE RESERVATION 
-        SET STATUS = 'CANCELLED',
-            UPDATED_AT = SYSDATE
-        WHERE RESERVATION_ID = #{reservationId}
-        AND USER_ID = #{userId}
+        SET STATUS = 'REJECTED', 
+            IS_REJECTED = 'Y',
+            REJECT_REASON = '사용자 취소'
+        WHERE RESERVATION_ID = #{reservationId} 
+        AND USER_ID = #{userId} 
         AND STATUS = 'PENDING'
+        AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N')
     </update>
-
-    <!-- 내 사용 이력 조회 -->
-    <select id="selectMyUsageHistory" resultMap="MyUsageHistoryMap">
-        SELECT 
-            ul.USAGE_LOG_ID,
-            ul.RESERVATION_ID,
-            ul.USER_ID,
-            ul.ASSET_ID,
-            ul.START_TIME,
-            ul.END_TIME,
-            ul.USAGE_DURATION,
-            ul.USAGE_STATUS,
-            ul.PROCESSED_BY,
-            ul.CREATED_AT,
-            ul.UPDATED_AT,
-            r.PURPOSE,
-            r.STATUS as RESERVATION_STATUS,
-            a.NAME as ASSET_NAME,
-            a.CATEGORY as ASSET_CATEGORY,
-            a.COMPANY as ASSET_COMPANY,
-            a.IMAGE as ASSET_IMAGE,
-            u.NAME as PROCESSED_BY_NAME
-        FROM USAGE_LOG ul
-        JOIN RESERVATION r ON ul.RESERVATION_ID = r.RESERVATION_ID
-        JOIN ASSET a ON ul.ASSET_ID = a.ASSET_ID
-        LEFT JOIN USERS u ON ul.PROCESSED_BY = u.USER_ID
-        WHERE ul.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
-        ORDER BY ul.CREATED_AT DESC
-    </select>
-
-    <!-- 내 사용 이력 조회 (필터링) -->
-    <select id="selectMyUsageHistoryWithFilter" resultMap="MyUsageHistoryMap">
-        SELECT 
-            ul.USAGE_LOG_ID,
-            ul.RESERVATION_ID,
-            ul.USER_ID,
-            ul.ASSET_ID,
-            ul.START_TIME,
-            ul.END_TIME,
-            ul.USAGE_DURATION,
-            ul.USAGE_STATUS,
-            ul.PROCESSED_BY,
-            ul.CREATED_AT,
-            ul.UPDATED_AT,
-            r.PURPOSE,
-            r.STATUS as RESERVATION_STATUS,
-            a.NAME as ASSET_NAME,
-            a.CATEGORY as ASSET_CATEGORY,
-            a.COMPANY as ASSET_COMPANY,
-            a.IMAGE as ASSET_IMAGE,
-            u.NAME as PROCESSED_BY_NAME
-        FROM USAGE_LOG ul
-        JOIN RESERVATION r ON ul.RESERVATION_ID = r.RESERVATION_ID
-        JOIN ASSET a ON ul.ASSET_ID = a.ASSET_ID
-        LEFT JOIN USERS u ON ul.PROCESSED_BY = u.USER_ID
-        WHERE ul.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
-        <if test="startDate != null">
-            AND ul.START_TIME &gt;= #{startDate}
-        </if>
-        <if test="endDate != null">
-            AND ul.END_TIME &lt;= #{endDate}
-        </if>
-        <if test="category != null and category != ''">
-            AND a.CATEGORY = #{category}
-        </if>
-        <if test="usageStatus != null and usageStatus != ''">
-            AND ul.USAGE_STATUS = #{usageStatus}
-        </if>
-        ORDER BY ul.CREATED_AT DESC
-    </select>
 
     <!-- 내 사용 통계 조회 -->
     <select id="selectMyUsageStatistics" resultType="map">
         SELECT 
-            COUNT(*) as TOTAL_USAGE,
-            SUM(CASE WHEN ul.USAGE_STATUS = 'COMPLETED' THEN 1 ELSE 0 END) as COMPLETED_USAGE,
-            SUM(CASE WHEN ul.USAGE_DURATION IS NOT NULL THEN ul.USAGE_DURATION ELSE 0 END) as TOTAL_DURATION,
-            COUNT(DISTINCT ul.ASSET_ID) as UNIQUE_ASSETS
-        FROM USAGE_LOG ul
-        JOIN ASSET a ON ul.ASSET_ID = a.ASSET_ID
-        WHERE ul.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
+            COUNT(*) as totalUsageCount,
+            COUNT(CASE WHEN COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount,
+            COUNT(CASE WHEN START_TIME &lt;= SYSDATE AND END_TIME &gt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as activeCount,
+            COUNT(CASE WHEN END_TIME &lt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as overdueCount,
+            NVL(SUM(USAGE_DURATION), 0) as totalUsageMinutes,
+            NVL(AVG(USAGE_DURATION), 0) as avgUsageMinutes
+        FROM RESERVATION
+        WHERE USER_ID = #{userId}
+        AND STATUS = 'APPROVED'
+        AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N')
+        AND (
+            COMPLETED_AT IS NOT NULL 
+            OR START_TIME &lt;= SYSDATE
+        )
     </select>
 
     <!-- 예약 건수 조회 (상태별) -->
     <select id="selectReservationCountByStatus" resultType="map">
         SELECT 
-            COUNT(*) as TOTAL_RESERVATIONS,
-            SUM(CASE WHEN r.STATUS = 'PENDING' THEN 1 ELSE 0 END) as PENDING_COUNT,
-            SUM(CASE WHEN r.STATUS = 'APPROVED' THEN 1 ELSE 0 END) as APPROVED_COUNT,
-            SUM(CASE WHEN r.STATUS = 'REJECTED' THEN 1 ELSE 0 END) as REJECTED_COUNT,
-            SUM(CASE WHEN r.STATUS = 'CANCELLED' THEN 1 ELSE 0 END) as CANCELLED_COUNT,
-            SUM(CASE WHEN r.STATUS = 'COMPLETED' THEN 1 ELSE 0 END) as COMPLETED_COUNT
-        FROM RESERVATION r
-        JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
-        WHERE r.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
+            COUNT(*) as totalCount,
+            COUNT(CASE WHEN STATUS = 'PENDING' AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N') THEN 1 END) as pendingCount,
+            COUNT(CASE WHEN STATUS = 'APPROVED' AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N') THEN 1 END) as approvedCount,
+            COUNT(CASE WHEN IS_REJECTED = 'Y' THEN 1 END) as rejectedCount,
+            COUNT(CASE WHEN STATUS = 'APPROVED' AND COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount
+        FROM RESERVATION
+        WHERE USER_ID = #{userId}
     </select>
 
     <!-- 최근 사용한 농기계 목록 -->
@@ -281,17 +307,20 @@
         SELECT DISTINCT
             a.ASSET_ID,
             a.NAME as ASSET_NAME,
-            a.CATEGORY,
-            a.COMPANY,
-            a.IMAGE,
-            MAX(ul.CREATED_AT) as LAST_USED
-        FROM USAGE_LOG ul
-        JOIN ASSET a ON ul.ASSET_ID = a.ASSET_ID
-        WHERE ul.USER_ID = #{userId}
-        AND a.IS_DELETED = '0'
+            a.CATEGORY as ASSET_CATEGORY,
+            a.COMPANY as ASSET_COMPANY,
+            a.IMAGE as ASSET_IMAGE,
+            MAX(r.START_TIME) as LAST_USED_DATE
+        FROM RESERVATION r
+        JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        WHERE r.USER_ID = #{userId}
+        AND r.STATUS = 'APPROVED'
+        AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
+        AND r.START_TIME &lt;= SYSDATE
+        AND a.IS_DELETED = 'N'
         GROUP BY a.ASSET_ID, a.NAME, a.CATEGORY, a.COMPANY, a.IMAGE
-        ORDER BY LAST_USED DESC
-        <if test="limit > 0">
+        ORDER BY LAST_USED_DATE DESC
+        <if test="limit != null and limit > 0">
             FETCH FIRST #{limit} ROWS ONLY
         </if>
     </select>

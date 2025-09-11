@@ -1,11 +1,9 @@
 package app.domains.users.dao;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import app.domains.users.model.MyReservation;
-import app.domains.users.model.MyUsageHistory;
 
 /**
  * 내 정보 관련 Repository 인터페이스
@@ -20,18 +18,11 @@ public interface MyRepository {
     List<MyReservation> selectMyReservations(Long userId);
     
     /**
-     * 내 예약 목록 조회 (상태별 필터링)
-     * @param params userId, status 포함한 파라미터 맵
+     * 내 예약 목록 조회 (필터링)
+     * @param params userId, status, startDate, endDate, category 포함한 파라미터 맵
      * @return 예약 목록
      */
     List<MyReservation> selectMyReservationsWithFilter(Map<String, Object> params);
-    
-    /**
-     * 내 예약 목록 조회 (기간별 필터링)
-     * @param params userId, startDate, endDate 포함한 파라미터 맵
-     * @return 예약 목록
-     */
-    List<MyReservation> selectMyReservationsByPeriod(Map<String, Object> params);
     
     /**
      * 예약 상세 정보 조회 (본인 것만)
@@ -50,18 +41,18 @@ public interface MyRepository {
     int cancelMyReservation(Long reservationId, Long userId);
     
     /**
-     * 내 사용 이력 조회
+     * 내 사용 내역 조회 (RESERVATION 테이블에서 사용이 시작되었거나 완료된 것들)
      * @param userId 사용자 ID
-     * @return 사용 이력 목록
+     * @return 사용 내역 목록
      */
-    List<MyUsageHistory> selectMyUsageHistory(Long userId);
+    List<MyReservation> selectMyUsageHistory(Long userId);
     
     /**
-     * 내 사용 이력 조회 (기간별 필터링)
-     * @param params userId, startDate, endDate, category 포함한 파라미터 맵
-     * @return 사용 이력 목록
+     * 내 사용 내역 조회 (필터링)
+     * @param params userId, startDate, endDate, category, usageStatus 포함한 파라미터 맵
+     * @return 사용 내역 목록
      */
-    List<MyUsageHistory> selectMyUsageHistoryWithFilter(Map<String, Object> params);
+    List<MyReservation> selectMyUsageHistoryWithFilter(Map<String, Object> params);
     
     /**
      * 내 사용 통계 조회
