@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 예약 내역</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/login/style.css'/>">
-    <link rel="stylesheet" href="<c:url value='/static/css/myReservations.css'/>">
+    <link rel="stylesheet" href="<c:url value='/static/css/layout/user/my/myReservation.css'/>">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 </head>
 <body>
@@ -110,33 +110,12 @@
                             <c:forEach var="reservation" items="${reservations}">
                                 <div class="reservation-card" 
                                      data-reservation-id="${reservation.reservationId}"
-                                     data-reservation='{
-                                         "reservationId": "${reservation.reservationId}",
-                                         "assetName": "<c:out value='${reservation.assetName}'/>",
-                                         "assetCategory": "<c:out value='${reservation.assetCategory}'/>",
-                                         "assetCompany": "<c:out value='${reservation.assetCompany}'/>",
-                                         "assetImage": "${reservation.assetImage}",
-                                         "status": "<c:out value='${reservation.statusText}'/>",
-                                         "startTime": "<fmt:formatDate value='${reservation.startTime}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "endTime": "<fmt:formatDate value='${reservation.endTime}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "purpose": "<c:out value='${reservation.purpose}'/>",
-                                         "address": "<c:out value='${reservation.fullAddress}'/>",
-                                         "createdAt": "<fmt:formatDate value='${reservation.createdAt}' pattern='yyyy-MM-dd'/>",
-                                         "usageDuration": "<c:out value='${reservation.formattedUsageDuration}'/>",
-                                         "actualUsageTime": "<c:out value='${reservation.actualUsageTime}'/>",
-                                         "adminName": "<c:out value='${reservation.adminName}'/>",
-                                         "completedAt": "<fmt:formatDate value='${reservation.completedAt}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "returnedAt": "<fmt:formatDate value='${reservation.returnedAt}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "rejectReason": "<c:out value='${reservation.rejectReason}'/>",
-                                         "cancellable": ${reservation.cancellable}
-                                     }'
-                                     onclick="openReservationModal('${reservation.reservationId}')">>
+                                     onclick="openReservationModal('${reservation.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${reservation.assetImage}'/>" 
+                                            <img src="<c:url value='/static/images/assets/${empty reservation.assetImage ? "default.png" : reservation.assetImage}'/>" 
                                                  alt="<c:out value='${reservation.assetName}'/>" 
-                                                 class="asset-image"
-                                                 onerror="this.src='<c:url value='/static/images/assets/default.png'/>'">
+                                                 class="asset-image">
                                             <div class="asset-details">
                                                 <h3><c:out value="${reservation.assetName}"/></h3>
                                                 <div class="asset-meta"><c:out value="${reservation.assetCategory}"/> | <c:out value="${reservation.assetCompany}"/></div>
@@ -209,19 +188,16 @@
         function openReservationModal(reservationId) {
             currentReservationId = reservationId;
             
-            // AJAX로 상세 정보 가져오기
+            // AJAX로 상세 정보 가져오기 (JSON 응답)
             $.ajax({
-                url: `/my/reservations/${reservationId}`,
+                url: `<c:url value='/my/reservations/'/>` + reservationId,
                 method: 'GET',
+                dataType: 'json',
                 success: function(data) {
-                    // HTML 응답을 파싱하여 모달에 표시
-                    const $data = $(data);
-                    const reservationData = extractReservationData($data);
-                    
-                    displayReservationModal(reservationData);
+                    displayReservationModal(data);
                     
                     // 취소 가능한 예약인지 확인하여 버튼 표시
-                    if (reservationData.cancellable) {
+                    if (data.cancellable) {
                         $('#cancelBtn').show();
                     } else {
                         $('#cancelBtn').hide();
@@ -231,68 +207,140 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Error:', error);
-                    alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+                    if (xhr.status === 404) {
+                        alert('예약 정보를 찾을 수 없습니다.');
+                    } else if (xhr.status === 401) {
+                        alert('로그인이 필요합니다.');
+                        window.location.href = '<c:url value="/login"/>';
+                    } else {
+                        alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+                    }
                 }
             });
         }
 
         /**
-         * 예약 데이터 추출
-         */
-        function extractReservationData($data) {
-            // 서버에서 받은 HTML에서 필요한 데이터 추출
-            return {
-                reservationId: currentReservationId,
-                assetName: $data.find('.asset-name').text() || '농기계명',
-                assetCategory: $data.find('.asset-category').text() || '카테고리',
-                assetCompany: $data.find('.asset-company').text() || '제조사',
-                assetImage: $data.find('.asset-image').attr('src') || '/static/images/assets/default.png',
-                status: $data.find('.status').text() || '상태',
-                startTime: $data.find('.start-time').text() || '시작시간',
-                endTime: $data.find('.end-time').text() || '종료시간',
-                purpose: $data.find('.purpose').text() || '사용목적',
-                address: $data.find('.address').text() || '주소',
-                createdAt: $data.find('.created-at').text() || '신청일',
-                cancellable: $data.find('.cancellable').data('value') === 'true'
-            };
-        }
-
-        /**
          * 모달에 예약 정보 표시
          */
-        function displayReservationModal(data) {
+        function displayReservationModal(reservation) {
             const modalBody = $('#modalBody');
             
-            const modalContent = `
+            // 상태 클래스 결정
+            let statusClass = 'pending';
+            if (reservation.status) {
+                switch(reservation.status.toUpperCase()) {
+                    case 'PENDING': statusClass = 'pending'; break;
+                    case 'APPROVED': statusClass = 'approved'; break;
+                    case 'REJECTED': statusClass = 'rejected'; break;
+                    case 'COMPLETED': statusClass = 'completed'; break;
+                    case 'ACTIVE': statusClass = 'active'; break;
+                    default: statusClass = 'pending';
+                }
+            }
+
+            // 이미지 경로 설정
+            const imagePath = reservation.assetImage ? 
+                `<c:url value='/static/images/assets/'/>` + reservation.assetImage : 
+                `<c:url value='/static/images/assets/default.png'/>`;
+
+            // 날짜 포맷팅 함수
+            function formatDateTime(dateStr) {
+                if (!dateStr) return '';
+                try {
+                    const date = new Date(dateStr);
+                    return date.toLocaleString('ko-KR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } catch (e) {
+                    return dateStr;
+                }
+            }
+
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                try {
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('ko-KR');
+                } catch (e) {
+                    return dateStr;
+                }
+            }
+
+            let modalContent = `
                 <div class="modal-asset-info">
-                    <img src="${data.assetImage}" alt="${data.assetName}" class="modal-asset-image" 
-                         onerror="this.src='/static/images/assets/default.png'">
+                    <img src="${imagePath}" alt="${reservation.assetName || '농기계'}" class="modal-asset-image">
                     <div class="modal-asset-details">
-                        <h3>${data.assetName}</h3>
-                        <div class="modal-asset-meta">${data.assetCategory} | ${data.assetCompany}</div>
-                        <span class="status-badge modal-status">${data.status}</span>
+                        <h3>${reservation.assetName || '농기계명'}</h3>
+                        <div class="modal-asset-meta">${reservation.assetCategory || '카테고리'} | ${reservation.assetCompany || '제조사'}</div>
+                        <span class="status-badge status-${statusClass}">${reservation.statusText || reservation.status || '상태'}</span>
                     </div>
                 </div>
                 
                 <div class="modal-info-grid">
                     <div class="modal-info-item">
                         <div class="modal-info-label">예약 기간</div>
-                        <div class="modal-info-value">${data.startTime}<br>~ ${data.endTime}</div>
+                        <div class="modal-info-value">
+                            ${formatDateTime(reservation.startTime)}<br>
+                            ~ ${formatDateTime(reservation.endTime)}
+                        </div>
                     </div>
                     <div class="modal-info-item">
                         <div class="modal-info-label">사용 목적</div>
-                        <div class="modal-info-value">${data.purpose}</div>
+                        <div class="modal-info-value">${reservation.purpose || '목적 정보 없음'}</div>
                     </div>
                     <div class="modal-info-item">
                         <div class="modal-info-label">사용 장소</div>
-                        <div class="modal-info-value">${data.address}</div>
+                        <div class="modal-info-value">${reservation.fullAddress || reservation.address || '주소 정보 없음'}</div>
                     </div>
                     <div class="modal-info-item">
                         <div class="modal-info-label">신청일</div>
-                        <div class="modal-info-value">${data.createdAt}</div>
+                        <div class="modal-info-value">${formatDate(reservation.createdAt)}</div>
                     </div>
-                </div>
             `;
+
+            // 추가 정보 표시 (상태에 따라)
+            if (reservation.status === 'REJECTED' && reservation.rejectReason) {
+                modalContent += `
+                    <div class="modal-info-item">
+                        <div class="modal-info-label">거절 사유</div>
+                        <div class="modal-info-value">${reservation.rejectReason}</div>
+                    </div>
+                `;
+            }
+
+            if (reservation.status === 'COMPLETED') {
+                if (reservation.completedAt) {
+                    modalContent += `
+                        <div class="modal-info-item">
+                            <div class="modal-info-label">완료 시간</div>
+                            <div class="modal-info-value">${formatDateTime(reservation.completedAt)}</div>
+                        </div>
+                    `;
+                }
+                if (reservation.actualUsageTime) {
+                    modalContent += `
+                        <div class="modal-info-item">
+                            <div class="modal-info-label">실제 사용 시간</div>
+                            <div class="modal-info-value">${reservation.actualUsageTime}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            if (reservation.adminName) {
+                modalContent += `
+                    <div class="modal-info-item">
+                        <div class="modal-info-label">담당 관리자</div>
+                        <div class="modal-info-value">${reservation.adminName}</div>
+                    </div>
+                `;
+            }
+
+            modalContent += `</div>`;
             
             modalBody.html(modalContent);
         }
@@ -314,7 +362,7 @@
             if (!confirm('정말로 예약을 취소하시겠습니까?')) return;
             
             $.ajax({
-                url: `/my/reservations/${currentReservationId}/cancel`,
+                url: `<c:url value='/my/reservations/'/>` + currentReservationId + '/cancel',
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -329,7 +377,12 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Error:', error);
-                    alert('예약 취소 중 오류가 발생했습니다.');
+                    if (xhr.status === 401) {
+                        alert('로그인이 필요합니다.');
+                        window.location.href = '<c:url value="/login"/>';
+                    } else {
+                        alert('예약 취소 중 오류가 발생했습니다.');
+                    }
                 }
             });
         }

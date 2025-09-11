@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 사용 내역</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/login/style.css'/>">
-    <link rel="stylesheet" href="<c:url value='/static/css/my/myUsageHistory.css'/>">
+    <link rel="stylesheet" href="<c:url value='/static/css/layout/user/my/myUsageHistory.css'/>">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 </head>
 <body>

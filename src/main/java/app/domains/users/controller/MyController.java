@@ -96,6 +96,15 @@ public class MyController {
         
         log.info("현재 사용자: {}", currentUser != null ? currentUser.getEmail() : "null");
         
+        // 🔍 추가 디버깅 정보
+        if (currentUser != null) {
+            log.info("=== 현재 로그인 사용자 상세 정보 ===");
+            log.info("사용자 ID: {}", currentUser.getUserId());
+            log.info("사용자 이메일: {}", currentUser.getEmail());
+            log.info("사용자 이름: {}", currentUser.getName());
+            log.info("사용자 로그인 ID: {}", currentUser.getLoginId());
+        }
+        
         if (currentUser == null) {
             log.warn("인증되지 않은 사용자 - 로그인 페이지로 리다이렉트");
             return "redirect:/login";
@@ -126,6 +135,23 @@ public class MyController {
             
             log.info("조회된 예약 건수: {}", reservations != null ? reservations.size() : 0);
             
+            // 🔍 각 예약의 사용자 ID 확인
+            if (reservations != null && !reservations.isEmpty()) {
+                log.info("=== 조회된 예약 목록 상세 ===");
+                for (int i = 0; i < Math.min(reservations.size(), 10); i++) { // 최대 10개만 로그
+                    MyReservation reservation = reservations.get(i);
+                    log.info("예약 #{}: ID={}, 사용자ID={}, 농기계={}, 상태={}", 
+                        i+1, 
+                        reservation.getReservationId(),
+                        reservation.getUserId(),
+                        reservation.getAssetName(),
+                        reservation.getStatus());
+                }
+                if (reservations.size() > 10) {
+                    log.info("... 나머지 {} 건의 예약이 더 있습니다.", reservations.size() - 10);
+                }
+            }
+            
             model.addAttribute("user", currentUser);
             model.addAttribute("reservations", reservations);
             model.addAttribute("reservationSummary", reservationSummary);
@@ -135,12 +161,44 @@ public class MyController {
             model.addAttribute("currentCategory", category);
             
             log.info("JSP 반환: my/myReservations");
-            return "my/myReservations"; // JSP 파일명 수정
+            return "my/myReservations";
             
         } catch (Exception e) {
             log.error("예약 내역 조회 중 오류 발생 - userId: {}", currentUser.getUserId(), e);
             model.addAttribute("error", "예약 내역을 불러오는 중 오류가 발생했습니다.");
             return "error/500";
+        }
+    }
+    
+    /**
+     * 예약 상세 정보 조회 (AJAX)
+     */
+    @GetMapping("/reservations/{reservationId}")
+    @ResponseBody
+    public ResponseEntity<MyReservation> getReservationDetail(@PathVariable Long reservationId,
+                                                             HttpServletRequest request) {
+        Users currentUser = getCurrentUser(request);
+        
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            log.info("예약 상세 정보 조회 - reservationId: {}, userId: {}", reservationId, currentUser.getUserId());
+            
+            MyReservation reservation = myService.getMyReservationDetail(reservationId, currentUser.getUserId());
+            
+            if (reservation == null) {
+                log.warn("예약을 찾을 수 없음 - reservationId: {}, userId: {}", reservationId, currentUser.getUserId());
+                return ResponseEntity.notFound().build();
+            }
+            
+            return ResponseEntity.ok(reservation);
+            
+        } catch (Exception e) {
+            log.error("예약 상세 정보 조회 중 오류 발생 - reservationId: {}, userId: {}", 
+                     reservationId, currentUser.getUserId(), e);
+            return ResponseEntity.status(500).build();
         }
     }
     

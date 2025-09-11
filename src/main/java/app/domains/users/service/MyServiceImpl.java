@@ -57,7 +57,19 @@ public class MyServiceImpl implements MyService {
         params.put("endDate", endDate);
         params.put("category", category);
         
-        return myRepository.selectMyReservationsWithFilter(params);
+        // 🔍 MyBatis 파라미터 확인
+        log.info("=== MyBatis 쿼리 파라미터 ===");
+        log.info("userId: {}", params.get("userId"));
+        log.info("status: {}", params.get("status"));
+        log.info("startDate: {}", params.get("startDate"));
+        log.info("endDate: {}", params.get("endDate"));
+        log.info("category: {}", params.get("category"));
+        
+        List<MyReservation> result = myRepository.selectMyReservationsWithFilter(params);
+        
+        log.info("MyBatis 쿼리 실행 결과: {} 건", result != null ? result.size() : 0);
+        
+        return result;
     }
     
     @Override

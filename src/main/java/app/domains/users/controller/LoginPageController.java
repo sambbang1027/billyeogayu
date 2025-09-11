@@ -216,51 +216,17 @@ public class LoginPageController {
         return "redirect:/login";
     }
 
-//    /**
-//     * 메인 페이지 (로그인 후)
-//     */
-//    @GetMapping("/")
-//    public String home(Model model, HttpServletRequest request, HttpSession session) {
-//        log.info("=== 메인 페이지 요청 ===");
-//
-//        try {
-//            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//
-//            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-//                // 로그인된 사용자
-//                String loginId = auth.getName();
-//                Users user = usersService.getUserByLoginId(loginId);
-//
-//                if (user != null) {
-//                    model.addAttribute("loginUser", user);
-//                    model.addAttribute("isLoggedIn", true);
-//                    log.info("로그인된 사용자 정보 설정: {} ({})", user.getName(), user.getLoginId());
-//
-//                    // 저장된 returnUrl이 있으면 해당 페이지로 리다이렉트
-//                    String returnUrl = (String) session.getAttribute("returnUrl");
-//                    if (returnUrl != null && !returnUrl.trim().isEmpty()) {
-//                        session.removeAttribute("returnUrl"); // 사용 후 제거
-//                        log.info("저장된 returnUrl로 리다이렉트: {}", returnUrl);
-//                        return "redirect:" + returnUrl;
-//                    }
-//                } else {
-//                    log.warn("인증된 사용자지만 사용자 정보를 찾을 수 없음: {}", loginId);
-//                    model.addAttribute("isLoggedIn", false);
-//                }
-//            } else {
-//                // 비로그인 사용자
-//                model.addAttribute("isLoggedIn", false);
-//                log.info("비로그인 사용자의 메인 페이지 접근");
-//            }
-//
-//        } catch (Exception e) {
-//            log.error("메인 페이지 처리 중 오류 발생", e);
-//            model.addAttribute("isLoggedIn", false);
-//        }
-//
-//        return "home";
-//    }
-//
+    @GetMapping("/")
+    public String mainPage(HttpServletRequest request, Model model) {
+        log.info("=== 메인 페이지 요청 ===");
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            return "redirect:/asset/list";
+        } else {
+            return "redirect:/login";
+        }
+    }
 
 
     /**

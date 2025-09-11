@@ -327,6 +327,65 @@
     gap: 1rem;
 }
 
+/* 모달 내부 스타일 */
+.modal-asset-info {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.0625rem solid #e5e5e5;
+}
+
+.modal-asset-image {
+    width: 5rem;
+    height: 5rem;
+    background: #f6f6f6;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.modal-asset-details {
+    flex: 1;
+}
+
+.modal-asset-details h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 0.5rem;
+}
+
+.modal-asset-meta {
+    font-size: 0.875rem;
+    color: #6f6f6f;
+    margin-bottom: 0.5rem;
+}
+
+.modal-info-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.modal-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.modal-info-label {
+    font-weight: 600;
+    color: #6f6f6f;
+    font-size: 0.875rem;
+}
+
+.modal-info-value {
+    color: #111;
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
 .btn-cancel {
     background: #dc3545;
     color: #ffffff;
@@ -406,5 +465,14 @@
 
     .modal-footer button {
         width: 100%;
+    }
+
+    .modal-asset-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .modal-asset-image {
+        align-self: center;
     }
 }
