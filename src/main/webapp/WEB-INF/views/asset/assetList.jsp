@@ -1222,6 +1222,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
        let assetCycleChanged = false;
        let partCyclesChanged = false;
+       let imageChanged = false;
+
+       const origImagePath = asset?.imagePath || "";
+
 
        const mergedParts = Array.isArray(parts) ? [...parts] : [];
 
@@ -1269,12 +1273,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
        const partCountChanged = mergedParts.length !== origCount;
 
+       const newImageUrl = document.getElementById("editImageUrl")?.value?.trim();
+
+       if (newImageUrl && newImageUrl !== origImagePath) {
+         asset.imagePath = newImageUrl;
+         imageChanged = true;
+       }
+
        const payload = {
          asset,
          parts: mergedParts,
          assetCycleChanged,
          partCyclesChanged,
-         partCountChanged
+         partCountChanged,
+         imageChanged
        };
 
        const postRes = await fetch("<c:url value='/admin/asset/update'/>", {

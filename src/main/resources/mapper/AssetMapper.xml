@@ -187,7 +187,8 @@
 
     <update id="updateAsset">
         UPDATE asset
-        SET maintenance_cycle = #{maintenanceCycle}
+        SET maintenance_cycle = #{maintenanceCycle},
+        image = #{imagePath}
         WHERE asset_id = #{assetId}
     </update>
 

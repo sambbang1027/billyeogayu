@@ -17,4 +17,5 @@ public class AssetPartsUpdateDto {
     private boolean assetCycleChanged;
     private boolean partCyclesChanged;
     private boolean partCountChanged;
+    private boolean imageChanged;
 }
