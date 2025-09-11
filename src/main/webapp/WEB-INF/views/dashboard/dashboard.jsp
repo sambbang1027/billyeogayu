@@ -10,23 +10,23 @@
             <div class="metrics-grid-first">
                 <div class="metric-card">
                     <div class="metric-title">총 자원 수</div>
-                    <div class="metric-value">7,265</div>
+                    <div class="metric-value">${metrics.total}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-title">가용 자원 수</div>
-                    <div class="metric-value">3,671</div>
+                    <div class="metric-value">${metrics.available}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-title">점검 필요 자원 수</div>
-                    <div class="metric-value">156</div>
+                    <div class="metric-value">${metrics.maintenanceRequired}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-title">사용중인 자원 수</div>
-                    <div class="metric-value">2,318</div>
+                    <div class="metric-value">${metrics.using}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-title">점검중인 자원 수</div>
-                    <div class="metric-value">156</div>
+                    <div class="metric-value">${metrics.maintaining}</div>
                 </div>
             </div>
         </div>

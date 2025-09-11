@@ -317,7 +317,7 @@
 
 <!-- 자산등록 모달 -->
 <div class="modal" id="assetRegisterModal">
-    <div class="modal-content">
+    <div class="register-modal-content">
         <div class="modal-title-container">
             <h2 class="modal-title">자산등록</h2>
         </div>
@@ -595,12 +595,6 @@
 	<!-- 모달 넣을 자리 -->
 <div id="modal-container"></div>
 
-
-
-
-
-
-
 <script>
 
 
@@ -643,7 +637,7 @@
   const openBtn      = document.getElementById("openRegisterModal");
   const cancelBtn    = document.getElementById("cancelRegisterBtn");
   const partList     = document.getElementById("partList");
-  const modalContent = document.querySelector("#assetRegisterModal .modal-content");
+  const modalContent = document.querySelector("#assetRegisterModal .register-modal-content");
   const addPartBtn   = document.getElementById("addPartBtn");
 
   function makePartRow() {
