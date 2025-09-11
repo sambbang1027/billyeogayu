@@ -19,7 +19,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import app.domains.users.auth.CustomUserDetailsService;
 
 @Configuration
-@EnableWebSecurity(debug=false)
+@EnableWebSecurity(debug=true)
 public class SecurityConfig {
 
     @Autowired
@@ -112,8 +112,8 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/my/**"),             // 마이페이지
                     new AntPathRequestMatcher("/profile/**"),        // 프로필 관리
                     new AntPathRequestMatcher("/reservation/**"),    // 예약 관리
-                    new AntPathRequestMatcher("/resource/**"),       // 리소스 목록 및 관리
-                    new AntPathRequestMatcher("/dashboard")          // 사용자 대시보드
+                    new AntPathRequestMatcher("/resource/**")        // 리소스 목록 및 관리
+                    // "/dashboard" 제거 - 관리자 전용으로 변경됨
                 ).hasAnyRole("COMMON", "ADMIN")
 
                 // 사용자 전용 API (로그인 필요)
