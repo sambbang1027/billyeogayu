@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-@RequestMapping("/dashboard")
+@RequestMapping("/admin/dashboard")
 public class DashBoardController {
 
     @GetMapping("")

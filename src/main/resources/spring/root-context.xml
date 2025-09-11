@@ -21,6 +21,10 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
     
+    <!-- USERS -->
+    <context:component-scan base-package="app.domains.users">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <!-- Properties Configuration -->
     <context:property-placeholder location="classpath:application.properties" ignore-unresolvable="true"/>
@@ -64,14 +68,12 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
         <property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
+        <!--  USERS -->
         <property name="typeAliasesPackage" value="app.domains"/>
     </bean>
 
-
-
-	<!--     <mybatis-spring:scan base-package="app.domains"/> 
-	 -->
-	 <mybatis-spring:scan base-package="app.domains.*.dao"/>
+    <!-- MyBatis Mapper Scan -->
+ 	<mybatis-spring:scan base-package="app.domains.*.dao"/>
 
 
 
