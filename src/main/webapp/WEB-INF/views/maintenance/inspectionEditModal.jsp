@@ -55,7 +55,7 @@
     </div>
 
     <div class="inspection-modal-footer">
-      <button class="inspection-btn-complete edit">저장</button>
+      <button class="inspection-btn-complete edit" type="button">저장</button>
       <button class="inspection-btn-cancel close-btn">닫기</button>
     </div>
   </div>

@@ -104,11 +104,11 @@ $(document).on("click", ".apply-btn-submit", function() {
 			if(res.code === "SUCCESS"){
 			showAlert("점검이 신청되었습니다.", () => location.reload());		
 			$("#inspectionApplyModal").addClass("hidden").hide();
-			location.reload();
 			}
 		},
 		error : function(xhr, status, error){
-			console.error('점검 신청 실패', error);
+			showAlert("점검 신청이 실패되었습니다", () => 	console.error('점검 신청 실패', error));
+			$("#inspectionApplyModal").addClass("hidden").hide();
 		}
 	})
 })
@@ -127,8 +127,9 @@ function getUser () {
 	      alert("로그인이 필요합니다.");
 	      location.href = "/login";
 	    } else {
-	      alert("사용자 정보 조회 실패");
-	    }
+	      showAlert("회원정보를 가져올 수 없습니다", () =>{
+			 	console.error('점검 신청 실패', error); location.reload();})
+	  	}
 	  }
 	});
 }

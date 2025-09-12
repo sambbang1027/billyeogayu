@@ -11,7 +11,13 @@ $(document).ready(function() {
   // flatpickr 초기화
   const picker = flatpickr("#rv-inspectionDate", {
     dateFormat: "Y-m-d",
-    locale: "ko"
+    locale: "ko",
+    onChange: function(selectedDates, dateStr, instance) {
+      // ✅ 날짜 선택 시 필터에 반영
+      rvActiveFilters.startDate = dateStr;
+      renderRvActiveFilters();
+      loadRvList(1);
+    }
   });
 
   // 아이콘 클릭 → 달력 열기
@@ -25,23 +31,27 @@ function getRvFilterValues(){
   return {
     assetKind   : rvActiveFilters.assetKind || "",
     status       : rvActiveFilters.status || "",
-    createdAt : rvActiveFilters.createdAt || ""
+    startDate : rvActiveFilters.startDate || ""
   };
 }
 
 
 // 리스트 로드 
-function loadList(page = 1){
-	const filters = getFilterValues();
+function loadRvList(page = 1){
+	const filters = getRvFilterValues();
 	console.log('서버에 필터링 보내는 중 ' , filters);
 	$.ajax({
-		url : "/admin-reservation/search",
-		type : "GET",
-		data : {...filters, page : page}, //DTO 매핑
+		url : "/admin/reservations/list",
+		type : "POST",
+		data : {
+			category :filters.assetKind,
+			status : filters.status,
+			startDate : filters.startDate,
+			 page : page}, //DTO 매핑
 		success : function(res){
-		//	console.log(res);
-			renderTable(res.list);
-			renderPagination(res.currentPage, res.totalPage);
+			//console.log(res);
+			 renderTable(res.items);
+			renderRvPagination(res.page, res.totalPages);
 		},
 		error : function(xhr, status, err){
 			console.error("리스트 로드 실패 -> ", err);
@@ -74,14 +84,14 @@ function renderTable(list){
 			actionHtml = `
 			<div class="rv-btn-container">
                 <div class="rv-btn-box">
-                    <button class="rv-btn-approve" data-id="${row.reservationId}>승인</button>        
+                    <button class="rv-btn-approve" data-id="${row.reservationId}">승인</button>        
                 </div>
                 <div class="rv-btn-box">
-                    <button class="rv-btn-reject" data-id="${row.reservationId}>반려</button>
+                    <button class="rv-btn-reject" data-id="${row.reservationId}">반려</button>
                 </div>
             </div>
 			`
-		}else if(row.status === "USING"){
+		}else if(row.status === "APPROVED"){
 			statusHtml = `
 			<div class="rv-status using">
 				<span>사용중</span>                    	
@@ -89,7 +99,7 @@ function renderTable(list){
 			`
 			actionHtml = `
 			<div class="rv-btn-box">
-			    <button class="rv-btn-complete" data-id="${row.reservationId}>반납</button>
+			    <button class="rv-btn-complete" data-id="${row.reservationId}">반납</button>
 			</div>			
 			`
 		}else if(row.status === "REJECTED"){
@@ -100,27 +110,30 @@ function renderTable(list){
 			`
 			actionHtml=`
 			<div class="rv-btn-box">
-			    <button class="rv-btn-view" data-id="${row.reservationId}>상세</button>
+			    <button class="rv-btn-view" data-id="${row.reservationId}">사유</button>
 			</div>
 			`
-		}else if(row.status === "DONE"){
+		}else if(row.status === "COMPLETED"){
 			statusHtml = `
 			<div class="rv-status done">
 					 <span>반납완료</span>                    	
 			</div>
 			`
 		}
-		
+
+		let startTime = formatDateTime(row.startTime);
+		let endTime = formatDateTime(row.endTime);
+		let createdAt = row.createdAt;
 		
 		$tbody.append(`
 			<tr>
 					<td>${i + 1}</td>
 					<td>${row.assetName}</td>
-					 <td>${row.startDate}</td>
-					<td>${row.endDate}</td>
+					 <td>${startTime}</td>
+					<td>${endTime}</td>
 					<td>${row.userName}</td>
 					<td>${statusHtml}</td>
-					<td>${row.createdAt}</td>
+					<td>${createdAt[0]}.${String(createdAt[1]).padStart(2,"0")}.${String(createdAt[2]).padStart(2,"0")}</td>
 					<td>${actionHtml}</td>
 			</tr>
 			`);
@@ -128,7 +141,14 @@ function renderTable(list){
 }
 
 
-
+function formatDateTime(arr) {
+  if (!arr || arr.length < 5) return "";
+  const [year, month, day, hour, minute] = arr;
+  return (
+    `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")} ` +
+    `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`
+  );
+}
 
 
 // 페이지네이션 렌더링

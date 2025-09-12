@@ -4,6 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!-- 오버레이 -->
+
 <div id="rv-rejectDetailOverlay" class="rv-overlay"></div>
 	
 	<!-- 모달 -->

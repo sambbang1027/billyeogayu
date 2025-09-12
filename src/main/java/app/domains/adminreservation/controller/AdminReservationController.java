@@ -24,9 +24,16 @@ public class AdminReservationController {
                                     @RequestParam(name = "category", required = false) String category,
                                     @RequestParam(name = "status", required = false) String status,
                                     @RequestParam(name = "startDate", required = false) String startDate) {
+    	
+    	System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+    	System.out.println(status + "상태");
+    	System.out.println("종류 "+ category);
+    	System.out.println("시작일 "+ startDate);
         int total = reservationService.countAll(category, status, startDate);
         List<AdminReservationListDto> items = reservationService.getPage(page, size, category, status, startDate);
 
+        System.out.println("ffffffffffffffff"+ items);
+        
         Map<String, Object> res = new HashMap<>();
         res.put("items", items);
         res.put("page", page);

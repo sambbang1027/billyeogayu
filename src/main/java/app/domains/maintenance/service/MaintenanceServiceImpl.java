@@ -162,4 +162,10 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 		}
 	}
 	
+	
+	@Override
+	public	List<Maintenance>findForExport(String keyword,String assetKind,  String company, String status){
+		return maintenanceRepository.findForExport(keyword,assetKind,company,status);
+	}
+
 }
