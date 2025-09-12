@@ -1,6 +1,7 @@
 package app.domains.asset.dao;
 
 import app.domains.asset.model.Asset;
+import app.domains.asset.model.AssetDto;
 import app.domains.asset.model.Part;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,16 +21,18 @@ public interface AssetRepository {
     int countAll(@Param("assetStatus") String assetStatus,
                  @Param("category")     String category,
                  @Param("company")      String company,
+                 @Param("location")    String location,
                  @Param("field")        String field,        // "all" | "category" | "company" | "modelName" | "status"
                  @Param("keywordLike")  String keywordLike); // "%ESCAPED%"
 
-    List<Asset> findAllPaged(@Param("assetStatus") String assetStatus,
-                             @Param("category")     String category,
-                             @Param("company")      String company,
-                             @Param("field")        String field,
-                             @Param("keywordLike")  String keywordLike,
-                             @Param("startRow")     int startRow,   // rn BETWEEN startRow AND endRow
-                             @Param("endRow")       int endRow);
+    List<AssetDto> findAllPaged(@Param("assetStatus") String assetStatus,
+                                @Param("category")     String category,
+                                @Param("company")      String company,
+                                @Param("location")    String location,
+                                @Param("field")        String field,
+                                @Param("keywordLike")  String keywordLike,
+                                @Param("startRow")     int startRow,   // rn BETWEEN startRow AND endRow
+                                @Param("endRow")       int endRow);
 
     List<String> findCategories();
     List<String> findCompanies();
