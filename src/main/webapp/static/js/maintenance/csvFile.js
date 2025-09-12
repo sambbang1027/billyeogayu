@@ -36,7 +36,7 @@ $(function(){
     }
 
     // 최종 URL
-    let url = contextPath + "/maintenance/export";
+    let url = contextPath + "/admin/maintenance/export";
     if (sp.toString()) {
       url += "?" + sp.toString();
     }
