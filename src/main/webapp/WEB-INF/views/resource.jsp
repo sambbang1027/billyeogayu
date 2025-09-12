@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
@@ -23,7 +24,8 @@
 					<c:if
 						test="${empty param.filter || param.filter ne 'available' || it.rentable}">
 						<article class="resource-card" data-available="${it.rentable}">
-							<div class="resource-card__badge ${it.rentable ? 'is-ok' : 'is-no'}">
+							<div
+								class="resource-card__badge ${it.rentable ? 'is-ok' : 'is-no'}">
 								<span>${it.rentable ? '임대가능' : '임대불가'}</span>
 							</div>
 
@@ -87,10 +89,10 @@
 				<c:when test="${page > 1}">
 					<a class="resource-paging__item"
 						href="<c:url value='/resource/list'>
-                     <c:param name='q' value='${param.q}'/>
-                     <c:param name='filter' value='${param.filter}'/>
-                     <c:param name='page' value='1'/>
-                   </c:url>">&laquo;</a>
+                    <c:param name='q' value='${param.q}'/>
+                    <c:param name='filter' value='${param.filter}'/>
+                    <c:param name='page' value='1'/>
+                 </c:url>">&laquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="resource-paging__item" aria-disabled="true">&laquo;</span>
@@ -102,55 +104,35 @@
 				<c:when test="${page > 1}">
 					<a class="resource-paging__item"
 						href="<c:url value='/resource/list'>
-                     <c:param name='q' value='${param.q}'/>
-                     <c:param name='filter' value='${param.filter}'/>
-                     <c:param name='page' value='${prevPage}'/>
-                   </c:url>">&lsaquo;</a>
+                    <c:param name='q' value='${param.q}'/>
+                    <c:param name='filter' value='${param.filter}'/>
+                    <c:param name='page' value='${prevPage}'/>
+                 </c:url>">&lsaquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="resource-paging__item" aria-disabled="true">&lsaquo;</span>
 				</c:otherwise>
 			</c:choose>
 
-			<!-- 이전 블록 -->
-			<c:if test="${hasPrevBlock}">
-				<a class="resource-paging__item"
-					href="<c:url value='/resource/list'>
-                   <c:param name='q' value='${param.q}'/>
-                   <c:param name='filter' value='${param.filter}'/>
-                   <c:param name='page' value='${prevBlockPage}'/>
-                 </c:url>">...</a>
-			</c:if>
-
-			<!-- 현재 블록의 페이지들 -->
+			<!-- 현재 블록의 페이지들 (예: 1~10, 11~20 ...) -->
 			<c:forEach var="p" begin="${startPage}" end="${endPage}">
 				<a class="resource-paging__item ${p == page ? 'is-active' : ''}"
 					href="<c:url value='/resource/list'>
-                   <c:param name='q' value='${param.q}'/>
-                   <c:param name='filter' value='${param.filter}'/>
-                   <c:param name='page' value='${p}'/>
-                 </c:url>">${p}</a>
+                  <c:param name='q' value='${param.q}'/>
+                  <c:param name='filter' value='${param.filter}'/>
+                  <c:param name='page' value='${p}'/>
+               </c:url>">${p}</a>
 			</c:forEach>
-
-			<!-- 다음 블록 -->
-			<c:if test="${hasNextBlock}">
-				<a class="resource-paging__item"
-					href="<c:url value='/resource/list'>
-                   <c:param name='q' value='${param.q}'/>
-                   <c:param name='filter' value='${param.filter}'/>
-                   <c:param name='page' value='${nextBlockPage}'/>
-                 </c:url>">...</a>
-			</c:if>
 
 			<!-- 다음(›) -->
 			<c:choose>
 				<c:when test="${page < totalPages}">
 					<a class="resource-paging__item"
 						href="<c:url value='/resource/list'>
-                     <c:param name='q' value='${param.q}'/>
-                     <c:param name='filter' value='${param.filter}'/>
-                     <c:param name='page' value='${nextPage}'/>
-                   </c:url>">&rsaquo;</a>
+                    <c:param name='q' value='${param.q}'/>
+                    <c:param name='filter' value='${param.filter}'/>
+                    <c:param name='page' value='${nextPage}'/>
+                 </c:url>">&rsaquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="resource-paging__item" aria-disabled="true">&rsaquo;</span>
@@ -162,10 +144,10 @@
 				<c:when test="${page < totalPages}">
 					<a class="resource-paging__item"
 						href="<c:url value='/resource/list'>
-                     <c:param name='q' value='${param.q}'/>
-                     <c:param name='filter' value='${param.filter}'/>
-                     <c:param name='page' value='${totalPages}'/>
-                   </c:url>">&raquo;</a>
+                    <c:param name='q' value='${param.q}'/>
+                    <c:param name='filter' value='${param.filter}'/>
+                    <c:param name='page' value='${totalPages}'/>
+                 </c:url>">&raquo;</a>
 				</c:when>
 				<c:otherwise>
 					<span class="resource-paging__item" aria-disabled="true">&raquo;</span>
@@ -174,6 +156,7 @@
 
 		</nav>
 	</c:if>
+
 </section>
 
 <!-- jQuery -->

@@ -92,7 +92,7 @@ public class ResourceController {
             List<Resource> items = service.getAssets(q, filter, page, pageSize);
 
             // 7) 페이지 블록(버튼 20개 단위)
-            final int blockSize = 20;
+            final int blockSize = 10;
             int startPage = ((page - 1) / blockSize) * blockSize + 1;
             int endPage = Math.min(startPage + blockSize - 1, totalPages);
             boolean hasPrevBlock = startPage > 1;

@@ -20,15 +20,16 @@
             </div>
         </c:if>
 
+
         <header class="header">
             <div class="logo-container">
-               <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유">" alt="빌려가유 - 농기계 공유 플랫폼" class="logo-image"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                 <h1 class="main-title">"농기계, 이제 <span class="highlight">빌려쓰자!</span>"</h1>
             </div>
             <h2 class="subtitle">
                 <span class="tractor-icon">🚜</span>
-                빌려가유 에서 쉽고 빠르게
+                <img src="<c:url value='/static/images/logo.png'/>" alt="빌려가유" class="logo-image"
+                     onerror="this.outerHTML='<span class=&quot;logo-text&quot;>빌려가유</span>';">
+                에서 쉽고 빠르게
             </h2>
             <div class="description">
                 <p>누구나 쉽게 접속해 필요한 농기계를 찾아보고,</p>
@@ -40,21 +41,22 @@
             <c:choose>
                 <c:when test="${isLoggedIn}">
                     <!-- 로그인된 상태 -->
-                    <a href="<c:url value='/asset/list'/>" class="btn btn-primary">농기계 조회하기</a>
+                    <a href="<c:url value='/resource/list'/>" class="btn btn-primary">농기계 조회하기</a>
                     <a href="<c:url value='/reservation/list'/>" class="btn btn-secondary">내 예약 현황</a>
                 </c:when>
                 <c:otherwise>
                     <!-- 로그아웃된 상태 -->
                     <a href="<c:url value='/login'/>" class="btn btn-primary">로그인하기</a>
-                    <a href="<c:url value='/asset/list'/>" class="btn btn-secondary">농기계 조회하기</a>
+                    <a href="<c:url value='/resource/list'/>" class="btn btn-secondary">농기계 조회하기</a>
                 </c:otherwise>
             </c:choose>
         </div>
 
         <div class="main-visual">
-            <img src="<c:url value='/assets/layout/user/map.png'/>" alt="빌려가유 서비스 소개" class="visual-content" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <div class="visual-fallback">
+            <!-- 실제 파일 경로로 수정 -->
+            <img src="<c:url value='/assets/layout/user/map.png'/>" alt="" class="visual-content" 
+                 onerror="this.style.display='none'; document.getElementById('visual-fallback').style.display='block';">
+            <div id="visual-fallback" class="visual-fallback" style="display: none;">
                 🚜 농기계 공유 플랫폼 빌려가유 🚜<br>
                 <div class="fallback-detail">
                     📍 신청 → 조회 → 수령 → 반납<br>
@@ -102,7 +104,8 @@
                     },
                     error: function() {
                         // 오류가 발생해도 로그아웃 처리
-                        window.location.href = '<c:url value="/logout"/>';
+                        alert('로그아웃되었습니다.');
+                        window.location.reload();
                     }
                 });
             }

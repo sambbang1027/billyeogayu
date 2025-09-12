@@ -27,6 +27,12 @@
         <result property="endAt" column="END_AT" />
     </resultMap>
 
+    <!-- Reservation 매핑 -->
+    <resultMap id="reservationMap" type="app.domains.reservation.model.Reservation">
+        <result property="startAt" column="START_TIME" />
+        <result property="endAt" column="END_TIME" />
+    </resultMap>
+
     <!-- 자산 조회 -->
     <select id="findAssetById" resultMap="assetMap">
         SELECT 
@@ -49,18 +55,22 @@
         AND IS_DELETED = 'N'
     </select>
 
-    <!-- 예약된 날짜 범위 조회 -->
+    <!-- 예약된 날짜 범위 조회 (기존 호환성 유지) -->
     <select id="findBlockedRanges" resultMap="blockedRangeMap">
         SELECT START_TIME AS START_AT, END_TIME AS END_AT
-        FROM RESERVATION
-        WHERE ASSET_ID = #{assetId}
-        AND STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
-        AND END_TIME &gt;= #{from}
-        AND START_TIME &lt;= #{to}
-        ORDER BY START_TIME
+        FROM RESERVATION r
+        INNER JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        WHERE a.NAME = (SELECT NAME FROM ASSET WHERE ASSET_ID = #{assetId} AND IS_DELETED = 'N')
+        AND a.CATEGORY = (SELECT CATEGORY FROM ASSET WHERE ASSET_ID = #{assetId} AND IS_DELETED = 'N')
+        AND a.COMPANY = (SELECT COMPANY FROM ASSET WHERE ASSET_ID = #{assetId} AND IS_DELETED = 'N')
+        AND a.IS_DELETED = 'N'
+        AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
+        AND r.END_TIME &gt;= #{from}
+        AND r.START_TIME &lt;= #{to}
+        ORDER BY r.START_TIME
     </select>
 
-    <!-- 겹치는 예약 개수 확인 -->
+    <!-- 기존 겹치는 예약 개수 확인 (기존 호환성 유지) -->
     <select id="countOverlap" resultType="int">
         SELECT COUNT(*) FROM RESERVATION
         WHERE ASSET_ID = #{assetId}
@@ -70,6 +80,48 @@
             (START_TIME &lt; #{endAt} AND END_TIME &gt;= #{endAt}) OR
             (START_TIME &gt;= #{startAt} AND END_TIME &lt;= #{endAt})
         )
+    </select>
+
+    <!-- 시간별 겹침 체크 (동일한 name, category, company를 가진 모든 자산 대상) -->
+    <select id="countOverlapByTime" resultType="int">
+        SELECT COUNT(*) 
+        FROM RESERVATION r
+        INNER JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        WHERE a.NAME = #{name}
+        AND a.CATEGORY = #{category}
+        AND a.COMPANY = #{company}
+        AND a.IS_DELETED = 'N'
+        AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
+        AND (
+            (r.START_TIME &lt;= #{startAt} AND r.END_TIME &gt; #{startAt}) OR
+            (r.START_TIME &lt; #{endAt} AND r.END_TIME &gt;= #{endAt}) OR
+            (r.START_TIME &gt;= #{startAt} AND r.END_TIME &lt;= #{endAt})
+        )
+    </select>
+
+    <!-- 보유대수 계산 (modelName, category, company가 같은 자산의 개수) - 사용 가능한 자산만 카운트 -->
+    <select id="countAssetStock" resultType="int">
+        SELECT COUNT(*) FROM ASSET 
+        WHERE IS_DELETED = 'N'
+        AND NAME = #{name}
+        AND (CATEGORY = #{category} OR (CATEGORY IS NULL AND #{category} IS NULL))
+        AND (COMPANY = #{company} OR (COMPANY IS NULL AND #{company} IS NULL))
+        AND STATUS = 'AVAILABLE'
+    </select>
+
+    <!-- 전체 기간의 예약 데이터를 한 번에 조회 (성능 최적화) -->
+    <select id="findReservationsByAssetGroup" resultMap="reservationMap">
+        SELECT r.START_TIME, r.END_TIME
+        FROM RESERVATION r
+        INNER JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+        WHERE a.NAME = #{name}
+        AND a.CATEGORY = #{category}
+        AND a.COMPANY = #{company}
+        AND a.IS_DELETED = 'N'
+        AND r.STATUS IN ('PENDING', 'APPROVED', 'ACTIVE')
+        AND r.END_TIME &gt;= #{from}
+        AND r.START_TIME &lt;= #{to}
+        ORDER BY r.START_TIME
     </select>
 
     <!-- 예약 생성 (실제 DB 구조에 맞춤) -->

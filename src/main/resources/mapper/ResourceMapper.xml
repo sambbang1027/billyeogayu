@@ -47,7 +47,7 @@
         SELECT * FROM ASSET 
         WHERE IS_DELETED = 'N'
         <if test="q != null and q != ''">
-            AND LOWER(NAME) LIKE '%' || LOWER(#{q}) || '%'
+            AND LOWER(CATEGORY) LIKE '%' || LOWER(#{q}) || '%'
         </if>
         <if test="filter != null and filter == 'available'">
             AND STATUS = 'AVAILABLE'
@@ -60,7 +60,7 @@
         SELECT COUNT(*) FROM ASSET 
         WHERE IS_DELETED = 'N'
         <if test="q != null and q != ''">
-            AND LOWER(NAME) LIKE '%' || LOWER(#{q}) || '%'
+            AND LOWER(CATEGORY) LIKE '%' || LOWER(#{q}) || '%'
         </if>
         <if test="filter != null and filter == 'available'">
             AND STATUS = 'AVAILABLE'
@@ -94,7 +94,7 @@
         FROM ASSET a
         WHERE a.IS_DELETED = 'N'
         <if test="q != null and q != ''">
-            AND LOWER(a.NAME) LIKE '%' || LOWER(#{q}) || '%'
+            AND LOWER(a.CATEGORY) LIKE '%' || LOWER(#{q}) || '%'
         </if>
         GROUP BY a.NAME, a.CATEGORY, a.COMPANY
         <if test="filter != null and filter == 'available'">
@@ -113,7 +113,7 @@
             FROM ASSET a
             WHERE a.IS_DELETED = 'N'
             <if test="q != null and q != ''">
-                AND LOWER(a.NAME) LIKE '%' || LOWER(#{q}) || '%'
+                AND LOWER(a.CATEGORY) LIKE '%' || LOWER(#{q}) || '%'
             </if>
             GROUP BY a.NAME, a.CATEGORY, a.COMPANY
             <if test="filter != null and filter == 'available'">
