@@ -97,9 +97,12 @@
                 <when test="status == 'COMPLETED'">
                     AND (r.COMPLETED_AT IS NOT NULL)
                 </when>
-                <when test="status == 'REJECTED'">
-                    AND r.IS_REJECTED = 'Y'
-                </when>
+                <when test="status == 'CANCELLED'">
+		            AND r.STATUS = 'CANCELLED'
+		        </when>
+		        <when test="status == 'REJECTED'">
+		            AND r.IS_REJECTED = 'Y' AND r.REJECT_REASON != '사용자 취소'
+		        </when>
                 <when test="status == 'ACTIVE'">
                     AND r.STATUS = 'APPROVED' 
                     AND r.START_TIME &lt;= SYSDATE 
@@ -262,7 +265,7 @@
     <!-- 예약 취소 -->
     <update id="cancelMyReservation">
         UPDATE RESERVATION 
-        SET STATUS = 'REJECTED', 
+        SET STATUS = 'CANCELLED', 
             IS_REJECTED = 'Y',
             REJECT_REASON = '사용자 취소'
         WHERE RESERVATION_ID = #{reservationId} 

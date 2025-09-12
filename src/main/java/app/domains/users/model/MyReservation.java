@@ -47,8 +47,14 @@ public class MyReservation {
     private String adminName;
     
     // 상태 표시용 메서드
+
     public String getStatusText() {
-        // 거절된 경우
+        // 사용자 취소인 경우 (새로 추가)
+        if ("Y".equals(isRejected) && "사용자 취소".equals(rejectReason)) {
+            return "취소됨";
+        }
+        
+        // 관리자 거절인 경우
         if ("Y".equals(isRejected)) {
             return "거절됨";
         }
@@ -66,11 +72,18 @@ public class MyReservation {
                     return "승인됨";
                 }
             case "REJECTED": return "거절됨";
+            case "CANCELLED": return "취소됨";  // 새로 추가
             default: return status;
         }
     }
     
     public String getStatusClass() {
+        // 사용자 취소인 경우
+        if ("Y".equals(isRejected) && "사용자 취소".equals(rejectReason)) {
+            return "status-cancelled";
+        }
+        
+        // 관리자 거절인 경우
         if ("Y".equals(isRejected)) {
             return "status-rejected";
         }
@@ -85,6 +98,11 @@ public class MyReservation {
             } else {
                 return "status-approved";
             }
+        }
+        
+        // CANCELLED 상태 처리 추가
+        if ("CANCELLED".equals(status)) {
+            return "status-cancelled";
         }
         
         return "status-" + (status != null ? status.toLowerCase() : "unknown");

@@ -70,6 +70,7 @@
                                 <option value="APPROVED" ${currentStatus == 'APPROVED' ? 'selected' : ''}>승인됨</option>
                                 <option value="REJECTED" ${currentStatus == 'REJECTED' ? 'selected' : ''}>거절됨</option>
                                 <option value="COMPLETED" ${currentStatus == 'COMPLETED' ? 'selected' : ''}>완료됨</option>
+                                <option value="CANCELLED">취소됨</option>
                                 <option value="ACTIVE" ${currentStatus == 'ACTIVE' ? 'selected' : ''}>사용 중</option>
                             </select>
                         </div>

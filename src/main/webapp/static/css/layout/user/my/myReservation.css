@@ -475,4 +475,13 @@
     .modal-asset-image {
         align-self: center;
     }
+    .status-cancelled {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+	}	
+	
+	.status-cancelled span {
+	    color: #dc2626;
+	}
 }
