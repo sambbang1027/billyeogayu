@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.domains.adminreservation.dao.AdminReservationRepository">
+
+    <resultMap id="ReservationResultMap" type="app.domains.adminreservation.model.AdminReservation">
+        <id     property="reservationId" column="RESERVATION_ID"/>
+        <result property="userId"        column="USER_ID"/>
+        <result property="assetId"       column="ASSET_ID"/>
+        <result property="startTime"     column="START_TIME"     jdbcType="TIMESTAMP"/>
+        <result property="endTime"       column="END_TIME"       jdbcType="TIMESTAMP"/>
+        <result property="purpose"       column="PURPOSE"/>
+        <result property="status"        column="STATUS"/>
+        <result property="address"       column="ADDRESS"/>
+        <result property="addressState"  column="ADDRESS_STATE"/>
+        <result property="addressCity"   column="ADDRESS_CITY"/>
+        <result property="createdAt"     column="CREATED_AT"     jdbcType="TIMESTAMP"/>
+        <result property="completedAt"   column="COMPLETED_AT"   jdbcType="TIMESTAMP"/>
+        <result property="usageDuration" column="USAGE_DURATION"/>
+        <result property="adminId"       column="ADMIN_ID"/>
+        <result property="isRejected"    column="IS_REJECTED"/>
+        <result property="rejectReason"  column="REJECT_REASON"/>
+    </resultMap>
+
+    <resultMap id="ReservationListResultMap" type="app.domains.adminreservation.model.AdminReservationListDto">
+        <id     property="reservationId" column="RESERVATION_ID"/>
+        <result property="userId"        column="USER_ID"/>
+        <result property="assetId"       column="ASSET_ID"/>
+        <result property="startTime"     column="START_TIME"     jdbcType="TIMESTAMP"/>
+        <result property="endTime"       column="END_TIME"       jdbcType="TIMESTAMP"/>
+        <result property="purpose"       column="PURPOSE"/>
+        <result property="status"        column="STATUS"/>
+        <result property="address"       column="ADDRESS"/>
+        <result property="addressState"  column="ADDRESS_STATE"/>
+        <result property="addressCity"   column="ADDRESS_CITY"/>
+        <result property="createdAt"     column="CREATED_AT"     jdbcType="TIMESTAMP"/>
+        <result property="completedAt"   column="COMPLETED_AT"   jdbcType="TIMESTAMP"/>
+        <result property="usageDuration" column="USAGE_DURATION"/>
+        <result property="adminId"       column="ADMIN_ID"/>
+        <result property="isRejected"    column="IS_REJECTED"/>
+        <result property="rejectReason"  column="REJECT_REASON"/>
+        <result property="assetName"    column="ASSET_NAME"/>
+        <result property="userName"  column="USER_NAME"/>
+    </resultMap>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM RESERVATION r
+        LEFT JOIN ASSET a ON a.ASSET_ID = r.ASSET_ID
+        WHERE 1 = 1
+        <if test="category != null and category != ''">
+            AND a.CATEGORY = #{category}
+        </if>
+        <if test="status != null and status != ''">
+            AND r.STATUS = #{status}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND TRUNC(r.START_TIME) = TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+    </select>
+
+    <select id="findAllPaged" resultMap="ReservationListResultMap">
+        SELECT *
+        FROM (
+        SELECT r.*,
+        a.CATEGORY AS ASSET_NAME,   -- 자산명은 asset.category
+        u.NAME     AS USER_NAME,    -- 유저명은 users.name
+        ROW_NUMBER() OVER (ORDER BY r.CREATED_AT DESC, r.RESERVATION_ID DESC) rn
+        FROM RESERVATION r
+        LEFT JOIN ASSET a  ON a.ASSET_ID = r.ASSET_ID
+        LEFT JOIN USERS u  ON u.USER_ID  = r.USER_ID
+        WHERE 1 = 1
+        <if test="category != null and category != ''">
+            AND a.CATEGORY = #{category}
+        </if>
+        <if test="status != null and status != ''">
+            AND r.STATUS = #{status}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND TRUNC(r.START_TIME) = TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        )
+        WHERE rn BETWEEN #{startRow} AND #{endRow}
+    </select>
+
+    <update id="approve">
+        UPDATE RESERVATION
+        SET STATUS = 'APPROVED'
+        WHERE RESERVATION_ID = #{id}
+    </update>
+
+    <update id="reject">
+        UPDATE RESERVATION
+        SET STATUS = 'REJECTED',
+        IS_REJECTED = 'Y',
+        REJECT_REASON = #{reason},
+        COMPLETED_AT = SYSDATE
+        WHERE RESERVATION_ID = #{id}
+    </update>
+
+    <update id="complete">
+        UPDATE RESERVATION
+        SET STATUS = 'COMPLETED',
+        USAGE_DURATION = ROUND((SYSDATE - START_TIME) * 24 * 60),
+        COMPLETED_AT = SYSDATE
+        WHERE RESERVATION_ID = #{id}
+    </update>
+
+    <select id="getRejectReason" resultType="string">
+        SELECT REJECT_REASON
+        FROM RESERVATION
+        WHERE RESERVATION_ID = #{id}
+    </select>
+</mapper>

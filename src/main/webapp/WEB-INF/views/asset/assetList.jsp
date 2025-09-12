@@ -15,7 +15,7 @@
                     <option value="all">전체</option>
                     <option value="name">종류</option>
                     <option value="type">제조사</option>
-                    <option value="location">부품</option>
+                    <option value="location">위치</option>
                 </select>
             </div>
             <div class="input-box">
@@ -101,7 +101,6 @@
            </div>
          </c:forEach>
 
-         <!-- 위치(컬럼 없으면 보여만 주고 SQL은 무시) -->
          <c:forEach var="v" items="${paramValues.location}">
            <div class="filter-tag" data-key="location" data-label="${v}">
              <span class="filter-text">${v}</span>
@@ -158,7 +157,7 @@
                         <td>${asset.company}</td>
                         <td>${asset.modelName}</td>
                         <td>${asset.usageTime}시간</td>
-                        <td>농기계공사</td> <!-- 추후에 값 바꿔야함 -->
+                        <td>${asset.location}</td>
                         <td>
                           <c:choose>
                             <c:when test="${not empty asset.expectedMaintenanceDate}">
@@ -317,7 +316,7 @@
 
 <!-- 자산등록 모달 -->
 <div class="modal" id="assetRegisterModal">
-    <div class="modal-content">
+    <div class="register-modal-content">
         <div class="modal-title-container">
             <h2 class="modal-title">자산등록</h2>
         </div>
@@ -586,13 +585,14 @@
 </div>
 
 
+	
+
+<!-- 모달 include (하드코딩된 UI만) -->
+ <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" /> 
 
 
-
-
-
-
-
+	<!-- 모달 넣을 자리 -->
+<div id="modal-container"></div>
 
 <script>
 
@@ -636,7 +636,7 @@
   const openBtn      = document.getElementById("openRegisterModal");
   const cancelBtn    = document.getElementById("cancelRegisterBtn");
   const partList     = document.getElementById("partList");
-  const modalContent = document.querySelector("#assetRegisterModal .modal-content");
+  const modalContent = document.querySelector("#assetRegisterModal .register-modal-content");
   const addPartBtn   = document.getElementById("addPartBtn");
 
   function makePartRow() {
@@ -973,6 +973,47 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="detail-part-cancel">닫기</div>';
       partBox.appendChild(btns);
 
+      
+      
+      
+      
+     
+
+   // 버튼 생성 직후 바로 이벤트 바인딩
+  const requestBtn = btns.querySelector('.detail-part-request-btn');
+   const cancelBtn = btns.querySelector('.detail-part-cancel');
+   
+   requestBtn.addEventListener('click', function(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	    console.log("점검요청 버튼 클릭됨");
+	    
+	    const modal = document.querySelector(".detail-modal");
+	    const modelName = asset.modelName;
+	    console.log("선택된 자산:", assetId, modelName);
+	    
+	    // 기존 상세 모달을 먼저 닫기
+	    closeModal(detailModal);
+	    
+	    // 새로운 점검요청 모달 열기
+
+	    const inspectionModal = $("#inspectionApplyModal");
+	    inspectionModal.removeClass("hidden").css("display","block");
+	    inspectionModal.attr("data-asset-id", assetId); // data 속성에 저장
+	    
+	    $(".apply-input.asset").val(modelName);
+
+	    
+	    
+	    if (typeof partList === 'function') {
+	        partList(assetId);
+	    }
+	});
+   
+   
+   
+   
+      
       partBox.querySelectorAll(".toggle-icon").forEach(tg => {
         tg.addEventListener("click", () => {
           const box = tg.closest(".detail-part-info-container");
@@ -1180,6 +1221,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
        let assetCycleChanged = false;
        let partCyclesChanged = false;
+       let imageChanged = false;
+
+       const origImagePath = asset?.imagePath || "";
+
 
        const mergedParts = Array.isArray(parts) ? [...parts] : [];
 
@@ -1227,12 +1272,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
        const partCountChanged = mergedParts.length !== origCount;
 
+       const newImageUrl = document.getElementById("editImageUrl")?.value?.trim();
+
+       if (newImageUrl && newImageUrl !== origImagePath) {
+         asset.imagePath = newImageUrl;
+         imageChanged = true;
+       }
+
        const payload = {
          asset,
          parts: mergedParts,
          assetCycleChanged,
          partCyclesChanged,
-         partCountChanged
+         partCountChanged,
+         imageChanged
        };
 
        const postRes = await fetch("<c:url value='/admin/asset/update'/>", {
@@ -1301,16 +1354,22 @@ function redirectWith(mutator){
     'filter-location': 'location',
     'filter-status'  : 'assetStatus'
   };
+
+    function applySingle(key, val){
+      redirectWith(sp=>{
+        // '전체' 선택 시 해당 키 제거, 그 외에는 '치환'
+        if (!val || val === 'all') sp.delete(key);
+        else sp.set(key, val);   // ← 핵심: 기존 append 대신 set 사용
+      });
+    }
+
   document.querySelectorAll('.selection-container select').forEach(sel=>{
     sel.addEventListener('change', ()=>{
       const key = map[sel.id];
       const val = (sel.value||'').trim();
       if (!key || !val) return;
 
-      redirectWith(sp=>{
-        const exists = sp.getAll(key).includes(val);
-        if (!exists) sp.append(key, val);
-      });
+      applySingle(key, val);
 
       sel.value = '';
     });
@@ -1322,13 +1381,10 @@ function redirectWith(mutator){
     const x = e.target.closest('.xbtn'); if(!x) return;
     const tag = x.closest('.filter-tag');
     const key = tag?.dataset.key;
-    const val = tag?.dataset.label;
     if(!key) return;
 
     redirectWith(sp=>{
-      const all = sp.getAll(key);
       sp.delete(key);
-      all.filter(v=>v!==val).forEach(v=>sp.append(key,v));
     });
   });
 })();

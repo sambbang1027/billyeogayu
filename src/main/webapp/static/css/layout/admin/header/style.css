@@ -3,7 +3,6 @@
     align-items: center;
     justify-content: flex-end;
     gap: 2rem;
-    margin: 0 3rem 0 0;
     background-color: white;
     border: none;
     border-bottom: 1px solid #E7E7E7;
@@ -21,4 +20,9 @@
 .logout-img {
     width: 1rem;
     height: 1rem;
+}
+
+.logout-img-box {
+	cursor: pointer;
+	margin-right : 3rem;
 }

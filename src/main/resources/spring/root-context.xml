@@ -66,15 +66,15 @@
         <property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
     </bean>
 
+    <!-- MyBatis Mapper Scan -->
 	 <mybatis-spring:scan base-package="app.domains.*.dao"/>
-
-
 
 
     <!-- list용: Repository에서 SqlSessionTemplate 직접 사용 -->
     <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
         <constructor-arg index="0" ref="sqlSessionFactory"/>
     </bean>
+
 
     <!-- Transaction Manager -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

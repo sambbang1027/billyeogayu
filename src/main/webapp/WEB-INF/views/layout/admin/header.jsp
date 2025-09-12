@@ -9,6 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
          <link rel="stylesheet" href="<c:url value='/static/css/layout/admin/header/style.css'/>">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="<c:url value='/static/js/admin/header.js'/>"></script>
 
         <!-- 알람 모달 전용 CSS/JS -->
         <link rel="stylesheet" href="<c:url value='/static/css/layout/admin/alarm/style.css'/>">
@@ -35,7 +36,7 @@
                          src="<c:url value='/assets/layout/admin/person.svg'/>"
                          alt="유저" />
                 </div>
-                <div class="alarm-text-box">
+                <div class="user-text-box">
                     관리자 A
                 </div>
             </div>

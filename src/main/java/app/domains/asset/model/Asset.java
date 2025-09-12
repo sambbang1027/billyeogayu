@@ -32,19 +32,4 @@ public class Asset {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime deletedAt;
     private String isDeleted;
-
-    public AssetDto toDto() {
-        return AssetDto.builder()
-                .assetId(assetId)
-                .modelName(modelName)
-                .assetStatus(assetStatus)
-                .category(category)
-                .company(company)
-                .maintenanceCycle(maintenanceCycle)
-                .usageTime(usageTime)
-                .lastMaintenanceDate(lastMaintenanceDate)
-                .expectedMaintenanceDate(expectedMaintenanceDate)
-                .imagePath(imagePath)
-                .build();
-    }
 }

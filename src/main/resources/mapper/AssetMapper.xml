@@ -22,6 +22,24 @@
         <result property="isDeleted" column="IS_DELETED"/>
     </resultMap>
 
+    <resultMap id="AssetDtoResultMap" type="app.domains.asset.model.AssetDto">
+        <id property="assetId" column="ASSET_ID"/>
+        <result property="modelName" column="NAME"/>
+        <result property="assetStatus" column="STATUS"/>
+        <result property="category" column="CATEGORY"/>
+        <result property="company" column="COMPANY"/>
+        <result property="maintenanceCycle" column="MAINTENANCE_CYCLE"/>
+        <result property="usageTime" column="USAGE_TIME"/>
+        <result property="lastMaintenanceDate" column="LAST_MAINTENANCE_DATE"/>
+        <result property="expectedMaintenanceDate" column="EXPECTED_MAINTENANCE_DATE"/>
+        <result property="imagePath" column="IMAGE"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+        <result property="deletedAt" column="DELETED_AT"/>
+        <result property="isDeleted" column="IS_DELETED"/>
+        <result property="location" column="LOCATION"/>
+    </resultMap>
+
     <resultMap id="PartResultMap" type="app.domains.asset.model.Part">
         <id     property="partId"                  column="PART_ID"/>
         <result property="assetId"                 column="ASSET_ID"/>
@@ -49,6 +67,7 @@
             AND COMPANY = #{company}
         </if>
 
+        <!-- 교체 후: 'all'일 때만 OR 검색. 'location'은 여기서 건들지 않음 -->
         <if test="keywordLike != null and keywordLike != ''">
             <choose>
                 <when test="field == 'category'">
@@ -63,35 +82,84 @@
                 <when test="field == 'status'">
                     AND UPPER(STATUS)   LIKE UPPER(#{keywordLike}) ESCAPE '\'
                 </when>
-                <!-- location 컬럼은 없으므로 무시. 'all' 또는 그 외 -->
-                <otherwise>
+
+                <!-- all(전체) 검색일 때만 묶어서 OR -->
+                <when test="field == null or field == '' or field == 'all'">
                     AND (
                     UPPER(CATEGORY) LIKE UPPER(#{keywordLike}) ESCAPE '\'
                     OR UPPER(COMPANY)  LIKE UPPER(#{keywordLike}) ESCAPE '\'
                     OR UPPER(NAME)     LIKE UPPER(#{keywordLike}) ESCAPE '\'
                     OR UPPER(STATUS)   LIKE UPPER(#{keywordLike}) ESCAPE '\'
                     )
-                </otherwise>
+                </when>
+
+                <!-- field == 'location'은 여기서 조건 추가하지 않음 (findAllPaged/countAll에서 처리) -->
             </choose>
         </if>
+
     </sql>
 
     <select id="countAll" resultType="int">
         SELECT COUNT(*)
-        FROM ASSET
+        FROM (
+        SELECT
+        a.asset_id,
+        COALESCE((
+        SELECT r.address_city
+        FROM reservation r
+        WHERE r.asset_id = a.asset_id
+        AND r.status = 'APPROVED'
+        FETCH FIRST 1 ROWS ONLY
+        ), '농촌진흥청') AS location
+        FROM asset a
         <include refid="AssetFilters"/>
+        ) t
+        <where>
+            <if test="location != null and location != ''">
+                AND t.location = #{location}
+            </if>
+            <if test="field == 'location' and keywordLike != null and keywordLike != ''">
+                AND UPPER(t.location) LIKE UPPER(#{keywordLike}) ESCAPE '\'
+            </if>
+        </where>
     </select>
 
-    <select id="findAllPaged" resultMap="AssetResultMap">
-        SELECT * FROM (
-        SELECT a.*,
-        ROW_NUMBER() OVER (ORDER BY a.CREATED_AT DESC) rn
-        FROM ASSET a
+
+    <!-- 교체: findAllPaged -->
+    <select id="findAllPaged" resultMap="AssetDtoResultMap">
+        SELECT *
+        FROM (
+        SELECT t.*, ROW_NUMBER() OVER (ORDER BY t.created_at DESC) rn
+        FROM (
+        SELECT
+        a.*,
+        COALESCE((
+        SELECT r.address_city
+        FROM reservation r
+        WHERE r.asset_id = a.asset_id
+        AND r.status = 'APPROVED'
+        FETCH FIRST 1 ROWS ONLY
+        ), '농촌진흥청') AS location
+        FROM asset a
         <include refid="AssetFilters"/>
+        ) t
+        <where>
+            <!-- 필터 드롭다운으로 넘긴 location=값 -->
+            <if test="location != null and location != ''">
+                AND t.location = #{location}
+            </if>
+            <!-- 상단 검색창: field=location & keyword -->
+            <if test="field == 'location' and keywordLike != null and keywordLike != ''">
+                AND UPPER(t.location) LIKE UPPER(#{keywordLike}) ESCAPE '\'
+            </if>
+        </where>
         )
         WHERE rn BETWEEN #{startRow} AND #{endRow}
         ORDER BY rn
     </select>
+
+
+
 
     <select id="findAll" resultMap="AssetResultMap">
         SELECT *
@@ -187,7 +255,8 @@
 
     <update id="updateAsset">
         UPDATE asset
-        SET maintenance_cycle = #{maintenanceCycle}
+        SET maintenance_cycle = #{maintenanceCycle},
+        image = #{imagePath}
         WHERE asset_id = #{assetId}
     </update>
 
@@ -219,6 +288,7 @@
         SELECT DISTINCT CATEGORY
         FROM ASSET
         WHERE NULLIF(TRIM(CATEGORY), '') IS NOT NULL
+        AND IS_DELETED = 'N'
         ORDER BY CATEGORY
     </select>
 
@@ -226,13 +296,20 @@
         SELECT DISTINCT COMPANY
         FROM ASSET
         WHERE NULLIF(TRIM(COMPANY), '') IS NOT NULL
+        AND IS_DELETED = 'N'
         ORDER BY COMPANY
     </select>
 
     <select id="findLocations" resultType="string">
-        SELECT DISTINCT LOCATION
-        FROM ASSET
-        WHERE NULLIF(TRIM(LOCATION), '') IS NOT NULL
-        ORDER BY LOCATION
+        SELECT DISTINCT COALESCE((
+        SELECT r.address_city
+        FROM reservation r
+        WHERE r.asset_id = a.asset_id
+        AND r.status = 'APPROVED'
+        FETCH FIRST 1 ROWS ONLY
+        ), '농촌진흥청') AS location
+        FROM asset a
+        WHERE a.is_deleted = 'N'
+        ORDER BY location
     </select>
 </mapper>
