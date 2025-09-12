@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.domains.dashboard.dao.DashBoardRepository">
+
+    <select id="getTotalAssetCount" resultType="long">
+        SELECT COUNT(asset_id) 
+        FROM asset 
+        WHERE is_deleted = 'N'
+    </select>
+    
+    <select id="getAssetCountByStatus" parameterType="string" resultType="long">
+        SELECT COUNT(asset_id) 
+        FROM asset 
+        WHERE status = #{status} 
+          AND is_deleted = 'N'
+    </select>
+    
+    <select id="getAssetCountByCategory" resultType="app.domains.dashboard.dto.CategoryDataDto">
+        SELECT 
+            category,
+            COUNT(*) as totalCount,
+            COUNT(CASE WHEN status = 'MAINTENANCE_REQUIRED' THEN 1 END) as maintenanceRequiredCount
+        FROM asset 
+        WHERE is_deleted = 'N' 
+          AND category IN ('TRACTOR', 'COMBINE', 'RICE_PLANT', 'TRANSPORT', 'LOADER')
+        GROUP BY category
+        ORDER BY COUNT(*) DESC
+    </select>
+
+</mapper>

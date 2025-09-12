@@ -15,11 +15,11 @@
 		  <div>
 		    <div class="inspection-row">
 		      <span class="inspection-label">점검일시</span>
-		      <span class="inspection-value">2025.09.03 10:45:99</span>
+		      <span class="inspection-value date"></span>
 		    </div>
 		    <div class="inspection-row">
 		      <span class="inspection-label">자원종류</span>
-		      <span class="inspection-value">트랙터</span>
+		      <span class="inspection-value assetType"></span>
 		    </div>
 		  </div>
 		
@@ -27,11 +27,11 @@
 		  <div>
 		    <div class="inspection-row">
 		      <span class="inspection-label">점검자</span>
-		      <span class="inspection-value">이전문</span>
+		      <span class="inspection-value assetName"></span>
 		    </div>
 		    <div class="inspection-row">
 		      <span class="inspection-label">점검유형</span>
-		      <span class="inspection-value">정기 점검</span>
+		      <span class="inspection-value type">정기 점검</span>
 		    </div>
 		  </div>
 		</div>
@@ -39,28 +39,23 @@
 		<div class="inspection-row column">
 		  <span class="inspection-label">점검항목</span>
 		  <div class="inspection-tags">
-		    <span class="tag">타이어</span>
-		    <span class="tag">엔진</span>
 		  </div>
 		</div>
 
 
       <div class="inspection-row column" >
         <span class="inspection-label">조치내역</span>
-        <div class="inspection-record-textarea" contenteditable="false">
-		  엔진에서 심한 잡음이 들려 엔진을 교체하려했으나 여분의 엔진이 없어 교체하지 못함.
-		엔진 재고가 들어오면 교체 요망
-		</div>
+        <div class="inspection-record-textarea" contenteditable="false"></div>
       </div>
 
       <div class="inspection-row column">
         <span class="inspection-label">비고</span>
-        <textarea class="inspection-textarea"></textarea>
+        <textarea class="inspection-textarea note"></textarea>
       </div>
     </div>
 
     <div class="inspection-modal-footer">
-      <button class="inspection-btn-complete">저장</button>
+      <button class="inspection-btn-complete edit" type="button">저장</button>
       <button class="inspection-btn-cancel close-btn">닫기</button>
     </div>
   </div>

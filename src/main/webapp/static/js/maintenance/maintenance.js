@@ -4,19 +4,8 @@
 
 $(function () {
 	//console.log('페이지 로드 시작 ');
-	getFilterList();
   loadList(1); // 처음 로드될 때 1페이지 데이터 호출
 });
-
-function getFilterList(){
-	$.ajax({
-		url: "/maintenance/filter",
-		type : "GET",
-		success : function(res){
-			console.log(res);
-		}
-	})
-}
 
 
 // 필터 + 검색 값 수집
@@ -93,12 +82,12 @@ function renderTable(list){
 			<tr>
 					<td>${i + 1}</td>
 					<td>${row.assetName}</td>
-					<td>${row.maintDate}</td>
+					 <td>${row.maintDate && row.maintDate !== "null" ? row.maintDate : ""}</td>
 					<td>${typeHtml}</td>
 					<td>${statusHtml}</td>
 					<td>${row.adminName}</td>
 					<td>
-							<button class="edit-btn">
+							<button class="edit-btn"  data-id="${row.requestId}">
 									<img src="/assets/maintenance/edit-btn.svg" alt="수정">
 							</button>
 					</td>

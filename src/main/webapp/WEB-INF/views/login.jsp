@@ -180,6 +180,7 @@
                 
                 // AJAX 로그인 요청
                 $.ajax({
+
                     url: '<c:url value="/api/login"/>',
                     type: 'POST',
                     contentType: 'application/json',

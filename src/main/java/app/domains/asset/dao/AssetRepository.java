@@ -1,42 +1,41 @@
 package app.domains.asset.dao;
 
-import java.util.List;
-import java.util.Map;
-
+import app.domains.asset.model.Asset;
+import app.domains.asset.model.AssetDto;
+import app.domains.asset.model.Part;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import app.domains.asset.model.Asset;
+import java.util.List;
 
 @Mapper
 public interface AssetRepository {
-    /**
-     * 기존 메서드들
-     */
-    List<Asset> findAssets(Map<String, Object> params);
-    int countAssets(Map<String, Object> params);
+    Asset findById(@Param("assetId") long assetId);
+    List<Part> findByAssetId(@Param("assetId") Long assetId);
+    int insertAsset(Asset asset);
+    int insertParts(@Param("assetId") long assetId, @Param("parts") List<Part> parts);
+    int updateAsset(Asset asset);
+    int updateParts(@Param("assetId") long assetId, @Param("parts") List<Part> parts);
+    int deleteAsset(@Param("assetId") long assetId, @Param("deletedBy") String deletedBy);
+    int deletePart(@Param("partId") long partId);
+    int countAll(@Param("assetStatus") String assetStatus,
+                 @Param("category")     String category,
+                 @Param("company")      String company,
+                 @Param("location")    String location,
+                 @Param("field")        String field,        // "all" | "category" | "company" | "modelName" | "status"
+                 @Param("keywordLike")  String keywordLike); // "%ESCAPED%"
 
-    /**
-     * 그룹핑된 자산 목록 조회 (name, category, company 기준으로 그룹핑하여 실제 재고 정보 포함)
-     */
-    List<Asset> findAssetsGrouped(Map<String, Object> params);
+    List<AssetDto> findAllPaged(@Param("assetStatus") String assetStatus,
+                                @Param("category")     String category,
+                                @Param("company")      String company,
+                                @Param("location")    String location,
+                                @Param("field")        String field,
+                                @Param("keywordLike")  String keywordLike,
+                                @Param("startRow")     int startRow,   // rn BETWEEN startRow AND endRow
+                                @Param("endRow")       int endRow);
 
-    /**
-     * 그룹핑된 자산의 총 개수 (중복 제거)
-     */
-    int countAssetsGrouped(Map<String, Object> params);
+    List<String> findCategories();
+    List<String> findCompanies();
+    List<String> findLocations();
 
-    /**
-     * 특정 name, category, company 조합의 보유대수 계산
-     */
-    int countAssetStock(@Param("name") String name,
-                       @Param("category") String category,
-                       @Param("company") String company);
-
-    /**
-     * 특정 그룹의 사용 가능한 자산들 조회
-     */
-    List<Asset> getAvailableAssets(@Param("name") String name,
-                                 @Param("category") String category,
-                                 @Param("company") String company);
 }

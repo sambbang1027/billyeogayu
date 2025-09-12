@@ -30,7 +30,7 @@
 						        LISTAGG(p.name, ', ') WITHIN GROUP (ORDER BY p.name) AS parts,
 						        m.type,
 						        m.status,
-						        TO_CHAR(m.resolved_at, 'YYYY.MM.DD') AS maint_date,
+						        NVL(TO_CHAR(m.resolved_at, 'YYYY.MM.DD'), '') AS maint_date,				        
 						        u.name AS admin_name,
 						        a.company
 						      FROM maintenance m
@@ -98,5 +98,36 @@
 		<select id="getCompanyList" resultType="String">
 		SELECT DISTINCT company FROM asset
 		</select>
+		
+<select id="findForExport" resultType="app.domains.maintenance.model.Maintenance">
+  SELECT 
+         m.request_id      AS requestId,
+         a.name            AS assetName,
+         a.category        AS assetKind,
+         a.company         AS company,
+         m.type            AS maintType,
+         m.status          AS maintStatus,
+         TO_CHAR(m.resolved_at, 'YYYY-MM-DD') AS maintDate,
+         u.name            AS adminName
+  FROM maintenance m
+  JOIN asset a ON a.asset_id = m.asset_id
+  JOIN users u ON u.user_id = m.admin_id
+  WHERE 1=1
+    <if test="keyword != null and keyword != ''">
+      AND a.name LIKE '%' || #{keyword} || '%'
+    </if>
+    <if test="assetKind != null and assetKind != ''">
+      AND a.category = #{assetKind}
+    </if>
+    <if test="company != null and company != ''">
+      AND a.company = #{company}
+    </if>
+    <if test="maintStatus != null and maintStatus != ''">
+      AND m.status = #{maintStatus}
+    </if>
+  ORDER BY m.resolved_at DESC
+</select>
+
+		
 		
 </mapper>

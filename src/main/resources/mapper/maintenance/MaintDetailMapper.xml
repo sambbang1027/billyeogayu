@@ -1,0 +1,78 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="app.domains.maintenance.dao.MaintenanceRepository">
+
+			<resultMap type="app.domains.maintenance.model.MaintDetail" id="DetailMap">
+				 <result property="requestId" column="request_id" />
+				 <result property="assetName" column="asset_name" />
+				 <result property="assetKind" column="asset_kind" />
+				 <result property="parts" column="parts"/>	
+				 <result property="type" column="type"/>
+				 <result property="resolverName" column="resolver_name"/>
+				 <result property="description" column="resolve_description"/>
+				 <result property="note" column="note" />
+				 <result property="resolvedAt"  column="resolved_at"/>
+		</resultMap>
+		
+	
+		<select  id="getMaintDetail"  resultMap="DetailMap" parameterType="int">
+					SELECT 
+					    m.request_id,
+					    a.name AS asset_name,
+					    LISTAGG(p.name, ', ') WITHIN GROUP (ORDER BY p.name) AS parts,
+					    MAX(m.type)        AS type,
+					    MAX(m.resolver_name)        AS resolver_name,
+					    MAX(a.category)    AS asset_kind,
+					    MAX(m.resolve_description) AS resolve_description,
+					    MAX(m.note)        AS note,
+						TO_CHAR(MAX(m.resolved_at), 'YYYY.MM.DD HH24:MI') AS resolved_at
+					
+					FROM maintenance m
+					JOIN asset a ON a.asset_id = m.asset_id
+					JOIN part p ON p.part_id = m.part_id
+					WHERE m.request_id = #{requestId}
+					GROUP BY m.request_id, a.name
+		</select>
+		
+		<update id="completeMaintenance" parameterType="app.domains.maintenance.model.MaintenanceComplete">
+					UPDATE maintenance 
+					SET resolve_description = #{description}
+					    , note = #{note}
+					    , status = 'COMPLETED'
+					    , resolved_at = SYSDATE
+					WHERE request_id = #{requestId}
+		</update>
+		
+		<update id="updateRecord" parameterType="app.domains.maintenance.model.MaintenanceEdit"> 
+				UPDATE maintenance
+				SET note = #{note}
+					, updated_at = SYSDATE
+				WHERE request_id = #{requestId}
+		</update>
+		
+		<select  id="findByAssetId" resultType ="hashmap">
+				SELECT asset_id, part_id
+				FROM maintenance
+				WHERE request_id = #{requestId}
+		</select>
+		
+		
+		<update id="updateAssetStatusAfterMaintenance" parameterType = "int">
+				UPDATE asset
+				SET last_maintenance_date = SYSDATE
+						, status = 'AVAILABLE'
+						, expected_maintenance_date = SYSDATE +NUMTODSINTERVAL(maintenance_cycle, 'HOUR')
+				WHERE asset_id = #{assetId}
+		</update>
+		
+		<update id="updatePartStatusAfterMaintenance" parameterType="int">
+				UPDATE part
+				SET last_maintenance_date = SYSDATE
+						, status = 'AVAILABLE'
+						, expected_maintenance_date = SYSDATE + NUMTODSINTERVAL(maintenance_cycle, 'HOUR')
+				WHERE part_id = #{partId}
+		</update>
+		
+</mapper>

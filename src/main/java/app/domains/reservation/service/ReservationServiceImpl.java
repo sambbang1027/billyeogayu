@@ -1,25 +1,33 @@
 package app.domains.reservation.service;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import app.domains.asset.model.Asset;
 import app.domains.reservation.dao.ReservationRepository;
 import app.domains.reservation.model.BlockedRange;
 import app.domains.reservation.model.Reservation;
+import app.domains.reservation.model.TimeSlotAvailability;
+import app.domains.resource.model.Resource;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository repo;
 
     @Override
-    public Asset getAsset(Long assetId) {
+    public Resource getAsset(Long assetId) {
         return repo.findAssetById(assetId);
     }
 
@@ -29,45 +37,248 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public List<TimeSlotAvailability> getTimeSlotAvailability(Long assetId, Date from, Date to) {
+        log.info("=== getTimeSlotAvailability 시작 ===");
+        log.info("파라미터 - assetId: {}, from: {}, to: {}", assetId, from, to);
+        
+        // 해당 자산의 정보 조회
+        Resource asset = repo.findAssetById(assetId);
+        if (asset == null) {
+            log.warn("자산을 찾을 수 없습니다. assetId: {}", assetId);
+            return new ArrayList<>();
+        }
+        
+        log.info("자산 정보 조회 성공 - name: {}, category: {}, company: {}", 
+                asset.getModelName(), asset.getCategory(), asset.getCompany());
+        
+        // 동일한 name, category, company를 가진 자산들의 총 수량 조회 (사용 가능한 자산만)
+        int totalStock = repo.countAssetStock(asset.getModelName(), asset.getCategory(), asset.getCompany());
+        log.info("총 사용 가능한 자산 수: {}", totalStock);
+        
+        if (totalStock == 0) {
+            log.warn("사용 가능한 자산이 없습니다. name: {}, category: {}, company: {}", 
+                    asset.getModelName(), asset.getCategory(), asset.getCompany());
+            return new ArrayList<>();
+        }
+        
+        // 핵심 최적화: 전체 기간의 예약 데이터를 한 번에 조회
+        List<Reservation> allReservations = repo.findReservationsByAssetGroup(
+            asset.getModelName(), asset.getCategory(), asset.getCompany(), from, to);
+        
+        log.info("전체 예약 데이터 조회 완료 - 예약 건수: {}", allReservations.size());
+        
+        // 시간대별 예약 카운트 맵 생성 (메모리에서 처리)
+        Map<String, Integer> reservationCountMap = new HashMap<>();
+        for (Reservation reservation : allReservations) {
+            List<String> overlappingSlots = getOverlappingTimeSlots(reservation.getStartAt(), reservation.getEndAt());
+            for (String slotKey : overlappingSlots) {
+                reservationCountMap.merge(slotKey, 1, Integer::sum);
+            }
+        }
+        
+        List<TimeSlotAvailability> timeSlots = new ArrayList<>();
+        
+        // 30분 단위로 시간대를 생성 (9:00 ~ 18:00, 점심시간 제외)
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(from);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(to);
+        endCal.set(Calendar.HOUR_OF_DAY, 23);
+        endCal.set(Calendar.MINUTE, 59);
+        endCal.set(Calendar.SECOND, 59);
+        endCal.set(Calendar.MILLISECOND, 999);
+        
+        log.info("날짜 범위 설정 - 시작: {}, 종료: {}", cal.getTime(), endCal.getTime());
+        
+        while (!cal.after(endCal)) {
+            // 주말 제외
+            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+                log.debug("{} 주말이므로 건너뜀", cal.getTime());
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+                continue;
+            }
+            
+            log.debug("=== {} 날짜 처리 시작 ===", cal.getTime());
+            
+            // 하루 동안의 30분 단위 슬롯 생성
+            for (int hour = 9; hour <= 18; hour++) {
+                for (int minute : new int[]{0, 30}) {
+                    // 18:30은 제외
+                    if (hour == 18 && minute == 30) break;
+                    
+                    // 점심시간 제외 (12:00, 12:30, 13:00)
+                    if ((hour == 12) || (hour == 13 && minute == 0)) {
+                        continue;
+                    }
+                    
+                    Calendar slotCal = (Calendar) cal.clone();
+                    slotCal.set(Calendar.HOUR_OF_DAY, hour);
+                    slotCal.set(Calendar.MINUTE, minute);
+                    slotCal.set(Calendar.SECOND, 0);
+                    slotCal.set(Calendar.MILLISECOND, 0);
+                    
+                    Date slotStart = slotCal.getTime();
+                    slotCal.add(Calendar.MINUTE, 30);
+                    Date slotEnd = slotCal.getTime();
+                    
+                    // 메모리에서 예약 수 확인 (DB 쿼리 없음)
+                    String slotKey = createSlotKey(slotStart, slotEnd);
+                    int reservedCount = reservationCountMap.getOrDefault(slotKey, 0);
+                    
+                    int availableCount = Math.max(0, totalStock - reservedCount);
+                    
+                    log.debug("시간대 {}:{} - 총:{}, 예약:{}, 가용:{}", 
+                             hour, (minute == 0 ? "00" : "30"), totalStock, reservedCount, availableCount);
+                    
+                    TimeSlotAvailability slot = TimeSlotAvailability.builder()
+                            .startTime(slotStart)
+                            .endTime(slotEnd)
+                            .availableCount(availableCount)
+                            .totalCount(totalStock)
+                            .build();
+                    
+                    timeSlots.add(slot);
+                }
+            }
+            
+            // 다음 날로 이동
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        
+        log.info("시간대별 예약 가능성 조회 완료. 총 {} 개 슬롯 생성", timeSlots.size());
+        
+        // 처음 몇 개 슬롯 상세 로그
+        if (!timeSlots.isEmpty()) {
+            log.info("=== 생성된 슬롯 샘플 (처음 5개) ===");
+            for (int i = 0; i < Math.min(5, timeSlots.size()); i++) {
+                TimeSlotAvailability slot = timeSlots.get(i);
+                log.info("슬롯 {}: {} ~ {}, 가용: {}/{}", 
+                        i + 1, slot.getStartTime(), slot.getEndTime(), 
+                        slot.getAvailableCount(), slot.getTotalCount());
+            }
+        }
+        
+        return timeSlots;
+    }
+
+    // 예약이 겹치는 시간 슬롯들의 키 목록 반환
+    private List<String> getOverlappingTimeSlots(Date reservationStart, Date reservationEnd) {
+        List<String> overlappingSlots = new ArrayList<>();
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(reservationStart);
+        
+        // 30분 단위로 겹치는 슬롯 찾기
+        while (!cal.getTime().after(reservationEnd)) {
+            int hour = cal.get(Calendar.HOUR_OF_DAY);
+            int minute = cal.get(Calendar.MINUTE);
+            
+            // 업무시간 내의 슬롯만 처리
+            if (hour >= 9 && hour <= 18 && !(hour == 12 || (hour == 13 && minute == 0))) {
+                Calendar slotStart = (Calendar) cal.clone();
+                slotStart.set(Calendar.MINUTE, minute < 30 ? 0 : 30);
+                slotStart.set(Calendar.SECOND, 0);
+                slotStart.set(Calendar.MILLISECOND, 0);
+                
+                Calendar slotEnd = (Calendar) slotStart.clone();
+                slotEnd.add(Calendar.MINUTE, 30);
+                
+                // 예약 시간과 슬롯이 겹치는지 확인
+                if (isTimeOverlap(reservationStart, reservationEnd, slotStart.getTime(), slotEnd.getTime())) {
+                    String slotKey = createSlotKey(slotStart.getTime(), slotEnd.getTime());
+                    overlappingSlots.add(slotKey);
+                }
+            }
+            
+            cal.add(Calendar.MINUTE, 30);
+        }
+        
+        return overlappingSlots;
+    }
+
+    // 시간 겹침 확인
+    private boolean isTimeOverlap(Date start1, Date end1, Date start2, Date end2) {
+        return start1.before(end2) && end1.after(start2);
+    }
+
+    // 슬롯 키 생성 (날짜-시간 형태)
+    private String createSlotKey(Date startTime, Date endTime) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm");
+        return formatter.format(startTime);
+    }
+
+    @Override
     @Transactional
     public boolean apply(Long assetId, Long userId,
                         Date startAt, Date endAt,
                         String purpose,
                         String useZipcode, String useAddr1, String useAddr2) {
 
-        // 기본 유효성
+        // 기본 유효성 검증
         if (assetId == null || userId == null) {
-			return false;
-		}
+            log.warn("필수 파라미터 누락: assetId={}, userId={}", assetId, userId);
+            return false;
+        }
+        
         if (startAt == null || endAt == null || !startAt.before(endAt)) {
-			return false;
-		}
+            log.warn("잘못된 날짜 범위: startAt={}, endAt={}", startAt, endAt);
+            return false;
+        }
+        
         if (purpose == null || purpose.trim().isEmpty() || useZipcode == null || useZipcode.trim().isEmpty()) {
-			return false;
-		}
+            log.warn("필수 입력값 누락: purpose 또는 zipcode가 비어있음");
+            return false;
+        }
+        
         if (useAddr1 == null || useAddr1.trim().isEmpty()) {
-			return false;
-		}
+            log.warn("주소 정보 누락: addr1이 비어있음");
+            return false;
+        }
+        
         if (useAddr2 == null) {
-			useAddr2 = "";
-		}
+            useAddr2 = "";
+        }
 
         // PURPOSE 길이 체크 (DB는 100 BYTE 제한)
         if (purpose.trim().length() > 100) {
+            log.warn("목적 텍스트가 너무 깁니다: {} 글자", purpose.trim().length());
             return false;
         }
 
-        // 겹침 재검증(동일 트랜잭션)
-        int overlap = repo.countOverlap(assetId, startAt, endAt);
-        if (overlap > 0) {
-			return false;
-		}
+        // 해당 자산 정보 조회
+        Resource asset = repo.findAssetById(assetId);
+        if (asset == null) {
+            log.warn("자산을 찾을 수 없습니다: assetId={}", assetId);
+            return false;
+        }
+
+        // 시간별 재고 기반 겹침 재검증 (동일 트랜잭션)
+        int totalStock = repo.countAssetStock(asset.getModelName(), asset.getCategory(), asset.getCompany());
+        int reservedCount = repo.countOverlapByTime(asset.getModelName(), asset.getCategory(), 
+                                                   asset.getCompany(), startAt, endAt);
+        
+        log.info("예약 신청 검증 - 자산: {}, 총 재고: {}, 예약된 수: {}, 사용 가능: {}", 
+                asset.getModelName(), totalStock, reservedCount, (totalStock - reservedCount));
+        
+        if (reservedCount >= totalStock) {
+            log.warn("예약 가능한 자산이 없습니다. 총 재고: {}, 예약된 수: {}", totalStock, reservedCount);
+            return false;
+        }
 
         // === 주소 파생값 생성 ===
         String[] parsed = parseKoreanAddress(useAddr1);
         String addressState = parsed[0]; // 시/도
         String addressCity = parsed[1]; // 시/군/구(또는 시+구)
         String addressFull = buildFullAddress(useZipcode, useAddr1, useAddr2);
+
+        log.debug("주소 파싱 결과 - 시/도: {}, 시/군/구: {}, 전체주소: {}", 
+                 addressState, addressCity, addressFull);
 
         Reservation r = Reservation.builder()
                 .assetId(assetId)
@@ -81,7 +292,17 @@ public class ReservationServiceImpl implements ReservationService {
                 .status("PENDING")
                 .build();
 
-        return repo.insertReservation(r) == 1;
+        int insertResult = repo.insertReservation(r);
+        boolean success = insertResult == 1;
+        
+        if (success) {
+            log.info("예약 신청 성공 - userId: {}, assetId: {}, 기간: {} ~ {}", 
+                    userId, assetId, startAt, endAt);
+        } else {
+            log.error("예약 신청 실패 - DB 삽입 실패. userId: {}, assetId: {}", userId, assetId);
+        }
+        
+        return success;
     }
 
     private static String buildFullAddress(String zipcode, String addr1, String addr2) {
@@ -99,13 +320,13 @@ public class ReservationServiceImpl implements ReservationService {
     private static String[] parseKoreanAddress(String addr1) {
         String a = addr1 == null ? "" : addr1.trim();
         if (a.isEmpty()) {
-			return new String[]{"기타", "기타"};
-		}
+            return new String[]{"기타", "기타"};
+        }
 
         String[] token = a.split("\\s+");
         if (token.length == 0) {
-			return new String[]{"기타", "기타"};
-		}
+            return new String[]{"기타", "기타"};
+        }
 
         // 시/도 정규화 및 판별
         String sido = normalizeSido(token[0]);
@@ -170,32 +391,32 @@ public class ReservationServiceImpl implements ReservationService {
 
                 // 도 단위 처리
                 if (normalized.equals("경기")) {
-					return "경기도";
-				}
+                    return "경기도";
+                }
                 if (normalized.equals("강원")) {
-					return "강원도";
-				}
+                    return "강원도";
+                }
                 if (normalized.equals("충북") || normalized.equals("충청북도")) {
-					return "충청북도";
-				}
+                    return "충청북도";
+                }
                 if (normalized.equals("충남") || normalized.equals("충청남도")) {
-					return "충청남도";
-				}
+                    return "충청남도";
+                }
                 if (normalized.equals("전북") || normalized.equals("전라북도")) {
-					return "전라북도";
-				}
+                    return "전라북도";
+                }
                 if (normalized.equals("전남") || normalized.equals("전라남도")) {
-					return "전라남도";
-				}
+                    return "전라남도";
+                }
                 if (normalized.equals("경북") || normalized.equals("경상북도")) {
-					return "경상북도";
-				}
+                    return "경상북도";
+                }
                 if (normalized.equals("경남") || normalized.equals("경상남도")) {
-					return "경상남도";
-				}
+                    return "경상남도";
+                }
                 if (normalized.equals("제주")) {
-					return "제주특별자치도";
-				}
+                    return "제주특별자치도";
+                }
 
                 return "기타";
         }

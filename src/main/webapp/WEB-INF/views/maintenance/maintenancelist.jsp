@@ -7,11 +7,11 @@
 	    <div class="search-bar">
 		        <div class="search-dropdown">
 					  <button class="search-dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-							  <span class="search-dropdown-label" data-value="" >자원명</span>
+							  <span class="search-dropdown-label" data-value="" >모델명</span>
   							  <img src="<c:url value='/assets/maintenance/arrow-down.svg' />" alt="▼" class="search-dropdown-btn">
 						</button>
 					  <ul class="search-dropdown-menu">
-					    <li data-value="assetName">자원명</li>
+					    <li data-value="assetName">모델명</li>
 					    <li data-value="adminName">담당자</li>
 					  </ul>
 				</div>
@@ -25,7 +25,7 @@
 	    <div class="filter-bar">
 		    <div class="filter-list">
 		    		<!--  종류 드롭다운   -->
-					<div class="custom-dropdown">
+					<div class="custom-dropdown filter-dropdown">
 						<label class="custom-dropdown-name">종류</label>
 						<div class="dropdown-box">
 										<button class="dropdown-toggle">
@@ -42,7 +42,7 @@
 					</div>
 
 				<!-- 제조사 드롭다운 -->
-				<div class="custom-dropdown">
+				<div class="custom-dropdown filter-dropdown">
 					<label class="custom-dropdown-name">제조사</label>
 					<div class="dropdown-box">
 					  	<button class="dropdown-toggle">
@@ -58,7 +58,7 @@
 				</div>
 				
 		        		<!-- 상태 드롭다운 -->
-				<div class="custom-dropdown">
+				<div class="custom-dropdown filter-dropdown">
 					<label class="custom-dropdown-name">상태</label>
 					<div class="dropdown-box">
 						  <button class="dropdown-toggle">
@@ -87,8 +87,6 @@
 		     </div>
 	    </div>
 	
-		<button class="maintenance-apply" >등록</button>
-	
 	     <button class="btn-download">
 	     			<img alt="download-list" src="<c:url value='/assets/asset/download.svg'/>">
 	     </button>
@@ -98,7 +96,7 @@
 			  <thead>
 			    <tr>
 			      <th>No</th>
-			      <th>자원명</th>
+			      <th>모델명</th>
 			      <th>점검 일시</th>
 			      <th>점검 유형</th>
 			      <th>점검 상태</th>
@@ -124,13 +122,14 @@
 <!-- 모달 include (하드코딩된 UI만) -->
 <jsp:include page="/WEB-INF/views/maintenance/inspectionModal.jsp" />
  <jsp:include page="/WEB-INF/views/maintenance/inspectionEditModal.jsp" />
- <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" /> 
 
-<!-- 모달은 기본 숨김 -->
-<style> 
-  #inspectionModal, #inspectionEditModal, #inspectionApplyModal { display: none; }
-</style>
 
 
 	<!-- 모달 넣을 자리 -->
 <div id="modal-container"></div>
+
+
+<script>
+  var contextPath = "${pageContext.request.contextPath}";
+</script>
+

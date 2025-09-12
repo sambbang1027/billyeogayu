@@ -128,27 +128,6 @@
   width: 250px; /* input 폭 */
 }
 
-.date-input {
-  width: 100%;
-  padding: 10px 40px 10px 12px; /* 오른쪽에 아이콘 공간 확보 */
-  border: 1px solid #cfcfcf;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.calendar-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-}
-
-.calendar-icon img {
-  width: 24px;
-  height: 24px;
-  pointer-events: none; /* 클릭 영역은 span 전체 */
-}
 
 /* 드롭다운   */
 
@@ -220,11 +199,12 @@
 
 .choices__input{
 	background-color : transparent;
+	min-width: 0 !important;
+    width: auto !important;
 }
 
 .choices__input:focus {
   border: none !important; 
-  border-bottom: 1px solid #959595 !important; 
   outline: none;
   box-shadow: none !important; 
   border-radius: 0 !important; 
