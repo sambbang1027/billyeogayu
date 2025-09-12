@@ -20,6 +20,7 @@
             </div>
         </c:if>
 
+
         <header class="header">
             <div class="logo-container">
                 <h1 class="main-title">"농기계, 이제 <span class="highlight">빌려쓰자!</span>"</h1>
