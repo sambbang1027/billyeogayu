@@ -32,7 +32,6 @@ public class AssetController {
     public String asset(@RequestParam(name = "assetStatus", required = false) String assetStatus,
                         @RequestParam(name = "category",     required = false) String category,
                         @RequestParam(name = "company",      required = false) String company,
-                        // 예약에서 장소 가져와야함
                         @RequestParam(name = "location",     required = false) String location,
 
                         @RequestParam(name = "field",   required = false) String field,
@@ -45,7 +44,7 @@ public class AssetController {
 
         String kwLike = toLikePattern(keyword);
 
-        int totalCount = assetService.countAssets(assetStatus, category, company, field, kwLike);
+        int totalCount = assetService.countAssets(assetStatus, category, company, location, field, kwLike);
         page     = Math.max(1, page);
         pageSize = Math.max(1, pageSize);
         int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) pageSize));
@@ -56,7 +55,7 @@ public class AssetController {
 
         // 목록 조회
         List<AssetDto> pageList =
-                assetService.findAssetsPaged(assetStatus, category, company, field, kwLike, startRow, endRow);
+                assetService.findAssetsPaged(assetStatus, category, company, location, field, kwLike, startRow, endRow);
 
         // 필터 옵션 데이터
         var opts = assetService.loadFilterOptions();
@@ -180,7 +179,7 @@ public class AssetController {
     public void exportCsv(@RequestParam(name = "assetStatus", required = false) String assetStatus,
                           @RequestParam(name = "category",     required = false) String category,
                           @RequestParam(name = "company",      required = false) String company,
-                          @RequestParam(name = "location",     required = false) String location, // TODO: 실제 값 연동
+                          @RequestParam(name = "location",     required = false) String location,
                           @RequestParam(name = "field",        required = false) String field,
                           @RequestParam(name = "keyword",      required = false) String keyword,
                           HttpServletResponse resp) throws Exception {
@@ -188,7 +187,7 @@ public class AssetController {
         String kwLike = toLikePattern(keyword);
 
         final int chunkSize = 1000;
-        int totalCount = assetService.countAssets(assetStatus, category, company, field, kwLike);
+        int totalCount = assetService.countAssets(assetStatus, category, company, location, field, kwLike);
         int totalPages = Math.max(1, (int)Math.ceil(totalCount / (double)chunkSize));
 
         DownloadCSV.send(resp, "자원리스트.csv", csv -> {
@@ -200,7 +199,7 @@ public class AssetController {
                 int endRow   = page * chunkSize;
 
                 List<AssetDto> list = assetService.findAssetsPaged(
-                        assetStatus, category, company, field, kwLike, startRow, endRow
+                        assetStatus, category, company, location, field, kwLike, startRow, endRow
                 );
 
                 for (AssetDto a : list) {
@@ -210,7 +209,7 @@ public class AssetController {
                     String comp  = nz(a.getCompany());
                     String model = nz(a.getModelName());
                     String part  = nz(a.getUsageTime());
-                    String loc   = "농기계공사"; // TODO: location 실제 값으로 변경
+                    String loc   = nz(a.getLocation());
                     String exp   = fmtDate(a.getExpectedMaintenanceDate());
                     String stat  = mapStatusLabel(nz(a.getAssetStatus()));
 

@@ -15,7 +15,7 @@
                     <option value="all">전체</option>
                     <option value="name">종류</option>
                     <option value="type">제조사</option>
-                    <option value="location">부품</option>
+                    <option value="location">위치</option>
                 </select>
             </div>
             <div class="input-box">
@@ -101,7 +101,6 @@
            </div>
          </c:forEach>
 
-         <!-- 위치(컬럼 없으면 보여만 주고 SQL은 무시) -->
          <c:forEach var="v" items="${paramValues.location}">
            <div class="filter-tag" data-key="location" data-label="${v}">
              <span class="filter-text">${v}</span>
@@ -158,7 +157,7 @@
                         <td>${asset.company}</td>
                         <td>${asset.modelName}</td>
                         <td>${asset.usageTime}시간</td>
-                        <td>농기계공사</td> <!-- 추후에 값 바꿔야함 -->
+                        <td>${asset.location}</td>
                         <td>
                           <c:choose>
                             <c:when test="${not empty asset.expectedMaintenanceDate}">
@@ -1355,16 +1354,22 @@ function redirectWith(mutator){
     'filter-location': 'location',
     'filter-status'  : 'assetStatus'
   };
+
+    function applySingle(key, val){
+      redirectWith(sp=>{
+        // '전체' 선택 시 해당 키 제거, 그 외에는 '치환'
+        if (!val || val === 'all') sp.delete(key);
+        else sp.set(key, val);   // ← 핵심: 기존 append 대신 set 사용
+      });
+    }
+
   document.querySelectorAll('.selection-container select').forEach(sel=>{
     sel.addEventListener('change', ()=>{
       const key = map[sel.id];
       const val = (sel.value||'').trim();
       if (!key || !val) return;
 
-      redirectWith(sp=>{
-        const exists = sp.getAll(key).includes(val);
-        if (!exists) sp.append(key, val);
-      });
+      applySingle(key, val);
 
       sel.value = '';
     });
@@ -1376,13 +1381,10 @@ function redirectWith(mutator){
     const x = e.target.closest('.xbtn'); if(!x) return;
     const tag = x.closest('.filter-tag');
     const key = tag?.dataset.key;
-    const val = tag?.dataset.label;
     if(!key) return;
 
     redirectWith(sp=>{
-      const all = sp.getAll(key);
       sp.delete(key);
-      all.filter(v=>v!==val).forEach(v=>sp.append(key,v));
     });
   });
 })();

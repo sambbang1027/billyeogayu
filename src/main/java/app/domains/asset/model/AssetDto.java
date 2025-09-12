@@ -25,6 +25,14 @@ public class AssetDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime expectedMaintenanceDate;
     private String imagePath;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime deletedAt;
+    private String isDeleted;
+    private String location;
 
     // 변환된 날짜 문자열 Getter
     public String getExpectedMaintenanceDateFormatted() {
@@ -37,20 +45,5 @@ public class AssetDto {
         return lastMaintenanceDate != null
                 ? lastMaintenanceDate.toLocalDate().toString()
                 : "--";
-    }
-
-    public Asset toEntity() {
-        return Asset.builder()
-                .assetId(assetId)
-                .modelName(modelName)
-                .assetStatus(assetStatus)
-                .category(category)
-                .company(company)
-                .maintenanceCycle(maintenanceCycle)
-                .usageTime(usageTime)
-                .lastMaintenanceDate(lastMaintenanceDate)
-                .expectedMaintenanceDate(expectedMaintenanceDate)
-                .imagePath(imagePath)
-                .build();
     }
 }

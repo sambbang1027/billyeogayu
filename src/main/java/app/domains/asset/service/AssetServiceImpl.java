@@ -18,17 +18,14 @@ public class AssetServiceImpl implements AssetService{
     private final AssetRepository assetRepository;
 
     @Override
-    public List<AssetDto> findAssetsPaged(String assetStatus, String category, String company,
+    public List<AssetDto> findAssetsPaged(String assetStatus, String category, String company, String location,
                                           String field, String keywordLike, int startRow, int endRow) {
-        return assetRepository.findAllPaged(assetStatus, category, company, field, keywordLike, startRow, endRow)
-                .stream()
-                .map(Asset::toDto)
-                .toList();
+        return assetRepository.findAllPaged(assetStatus, category, company, location, field, keywordLike, startRow, endRow);
     }
 
     @Override
-    public int countAssets(String assetStatus, String category, String company, String field, String keywordLike) {
-        return assetRepository.countAll(assetStatus, category, company, field, keywordLike);
+    public int countAssets(String assetStatus, String category, String company, String location, String field, String keywordLike) {
+        return assetRepository.countAll(assetStatus, category, company, location, field, keywordLike);
     }
 
     @Override
