@@ -127,3 +127,9 @@
 
 	<!-- 모달 넣을 자리 -->
 <div id="modal-container"></div>
+
+
+<script>
+  var contextPath = "${pageContext.request.contextPath}";
+</script>
+

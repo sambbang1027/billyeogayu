@@ -4,7 +4,7 @@
 let rvActiveFilters = {
     assetKind: null,
     status: null,
-    createdAt: null
+    startDate: null
 };
 
 $(function (){
@@ -52,7 +52,7 @@ $(function (){
         const filterType = $dropdown.find(".rv-custom-dropdown-name").text().trim();
         if (filterType === "종류") rvActiveFilters.assetKind = value;
         if (filterType === "상태") rvActiveFilters.status = value;
-        if (filterType ==="신청일자") rvActiveFilters.createdAt = value;
+        if (filterType ==="시작일") rvActiveFilters.startDate = value;
     
         // 적용된 필터 태그 렌더링
         renderRvActiveFilters();
@@ -76,9 +76,9 @@ function renderRvActiveFilters(){
     
     const statusMap = {
         "PENDING": "승인대기",
-        "USING": "사용중",
+        "APPROVED": "사용중",
         "REJECTED": "반려",
-        "DONE": "반납완료"
+        "COMPLETED": "반납완료"
     };
     
     Object.entries(rvActiveFilters).forEach(([key, value]) => {
@@ -111,7 +111,7 @@ function bindRvFilterCancel(){
 }
 
 $(document).on("click",  ".rv-btn-reset", function(){
-    rvActiveFilters = { assetKind: null, company: null, reservationStatus: null };
+    rvActiveFilters = { assetKind: null, status: null, startDate: null };
     renderRvActiveFilters();
     loadRvList(1);
 });

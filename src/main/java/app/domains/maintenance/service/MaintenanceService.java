@@ -33,6 +33,8 @@ public interface MaintenanceService {
 	
 	// 점검 신청 
 	void applyMaintenance(MaintenanceApply maintenanceApply);
-
+	
+	// CSV 추출 
+	List<Maintenance>findForExport(String keyword,String assetKind,  String company, String status);
 
 }

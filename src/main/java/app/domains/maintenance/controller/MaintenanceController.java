@@ -1,5 +1,6 @@
 package app.domains.maintenance.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import app.common.util.DownloadCSV;
 import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
 import app.domains.maintenance.model.Maintenance;
@@ -23,6 +25,7 @@ import app.domains.maintenance.model.MaintenanceApply;
 import app.domains.maintenance.model.MaintenanceComplete;
 import app.domains.maintenance.model.MaintenanceEdit;
 import app.domains.maintenance.service.MaintenanceService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -151,4 +154,38 @@ public class MaintenanceController {
     	return response;
     }
 
+
+    @GetMapping("/export")
+    public void exportMaintenance(HttpServletResponse response,
+                                  @RequestParam(value = "keword", required= false) String keyword,
+                                  @RequestParam(value = "assetKind", required = false) String assetKind,
+                                  @RequestParam(value = "company", required = false) String company,
+                                  @RequestParam(value = "mainStatus", required = false) String maintStatus) throws IOException {
+
+        List<Maintenance> list = maintenanceService.findForExport(keyword, assetKind, company, maintStatus);
+
+        DownloadCSV.send(response, "점검관리.csv", csv -> {
+            csv.header("No", "요청ID", "모델명", "종류", "제조사", "부품",
+                       "점검 유형", "점검 상태", "점검 일시", "담당자");
+
+            int no = 1;
+            for (Maintenance dto : list) {
+                csv.row(
+                    String.valueOf(no++),
+                    String.valueOf(dto.getRequestId()),
+                    dto.getAssetName(),
+                    dto.getAssetKind(),
+                    dto.getCompany(),
+                    dto.getParts(),
+                    dto.getMaintType(),
+                    dto.getMaintStatus(),
+                    dto.getMaintDate(),
+                    dto.getAdminName()
+                );
+            }
+        });
+    }
+
+ 
+    
 }

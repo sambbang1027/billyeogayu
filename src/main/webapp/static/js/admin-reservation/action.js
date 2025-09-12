@@ -9,7 +9,6 @@ $(document).on("click", ".rv-btn-approve", function(){
   
   showConfirm("예약을 승인하시겠습니까?",
     () => {
-				console.log("승인 실행");
 				// → AJAX 요청 보내기
 				$.ajax({
 				url : "/admin/reservations/approve/" + id, 
@@ -41,26 +40,22 @@ $(document).on("click", ".btn-reject-confirm", function(){
   const rejectReason = $("#rejectReason").val().trim();
 
   if(!rejectReason){
-    alert("반려 사유를 입력해주세요.");
+    showAlert("반려 사유를 입력해주세요.");
     return;
   }
 
   $.ajax({
-    url : "/admin/reservations/reject/" + id,   // 실제 API 경로로 교체
+    url : "/admin/reservations/reject/" + currentReservationId,   
     type : "POST",
-    contentType : "application/json; charset=UTF-8", 
-    data : JSON.stringify({
-    
-      rejectReason  : rejectReason
-    }),
+    data : {rejectReason :rejectReason } ,
     success : function(res){
-      alert("예약이 반려되었습니다.");
-      $("#rv-rejectOverlay, #rv-rejectModal").fadeOut();
-      $("#rejectReason").val(""); 
-      location.reload();
-    }, 
+		showAlert("예약이 반려되었습니다.", () => {
+		  $("#rejectReason").val(""); 
+		  $("#rv-rejectOverlay, #rv-rejectModal").fadeOut();
+		  location.reload();
+		})},
     error : function(xhr, status, error){
-      console.error("예약 반려 실패", error);
+	  showAlert("예약 반려 처리 실패되었습니다", () =>  console.error("예약 반려 실패", error));
     }
   });
 });
@@ -82,17 +77,18 @@ $(document).on("click", "#rv-rejectOverlay", function(){
 
 // 반납 처리 
 $(document).on("click", ".rv-btn-complete", function(){
-  const reservationId = $(this).data("id");
-  console.log("반납 처리할 예약:", reservationId);
+  const id = $(this).data("id");
+ //  console.log("반납 처리할 예약:", id);
 
   showConfirm("반납처리 하시겠습니까?",
     () => {
       $.ajax({
-        url : "/" + reservationId, 
+        url : "/admin/reservations/complete/" + id, 
         type : "GET", 
         success : function(res){
-          console.log(res);
-          location.reload();
+			if(res.success){
+				showAlert("반납되었습니다.", () =>  location.reload())	
+			}
         }, 
         error : function(xhr, status, error){
           console.error("반납 실패", error);
@@ -106,16 +102,17 @@ $(document).on("click", ".rv-btn-complete", function(){
  // 상세 버튼 클릭 → 반려 사유 모달 열기
  $(document).on("click", ".rv-btn-view", function(){
    const id = $(this).data("id");
-   console.log("상세 조회할 예약:", id);
+   // console.log("상세 조회할 예약:", id);
 
    // AJAX로 반려 사유 조회
    $.ajax({
-     url : "/",  // 실제 API에 맞게 수정
+     url : "/admin/reservations/reject-reason/"+ id,  
      type : "GET",
      success : function(res){
-       // 예: res.rejectReason 에 값 있다고 가정
-       $("#rv-rejectDetailReason").val(res.rejectReason || "등록된 반려 사유가 없습니다.");
-       $("#rv-rejectDetailOverlay, #rv-rejectDetailModal").fadeIn();
+	//	console.log("응답:", res);
+	//	console.log("모달 존재?", $("#rv-rejectDetailModal").length);
+		$("#rv-rejectDetailReason").val(res.reason || "등록된 반려 사유가 없습니다.");
+		$("#rv-rejectDetailOverlay, #rv-rejectDetailModal").fadeIn();
      },
      error : function(xhr, status, error){
        console.error("반려 상세 조회 실패", error);

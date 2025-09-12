@@ -8,6 +8,8 @@
         <title><c:out value="${pageTitle}" /></title>
         <link rel="stylesheet" href="<c:url value='/static/css/layout/admin/style.css'/>">
       	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  
+        
         <!-- 달력 flatpickr css/js -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -40,6 +42,7 @@
 				<script src="<c:url value='/static/js/maintenance/searchDropdown.js'/>"></script>
 				<script src="<c:url value='/static/js/maintenance/maintenanceDetail.js'/>"></script>					
 				<script src="<c:url value='/static/js/maintenance/maintenance.js'/>"></script>
+				<script src="<c:url value='/static/js/maintenance/csvFile.js'/>"></script>
         </c:if>
         <c:if test="${activePage eq 'dashboard'}">
             <link rel="stylesheet" href="<c:url value='/static/css/dashboard/style.css'/>">

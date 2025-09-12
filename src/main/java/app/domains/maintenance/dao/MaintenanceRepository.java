@@ -3,6 +3,7 @@ package app.domains.maintenance.dao;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import app.domains.maintenance.model.MaintDetail;
 import app.domains.maintenance.model.MaintSearch;
@@ -44,5 +45,13 @@ public interface MaintenanceRepository {
 		int applyMaintenance(Map<String, Object> param);
 		int updateAssetStatus(int assetId);
 
+		
+
+		    List<Maintenance> findForExport(
+		        @Param("keyword") String keyword,
+		        @Param("assetKind") String assetKind,
+		        @Param("company") String company,
+		        @Param("maintStatus") String maintStatus
+		    );
 		
 }

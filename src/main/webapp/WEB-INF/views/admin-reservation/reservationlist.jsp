@@ -34,16 +34,16 @@
                     <ul class="rv-dropdown-menu">
                         <li class="rv-active">전체</li>
                         <li data-value="PENDING">승인대기</li>
-                        <li data-value="IN_PROGRESS">사용중</li>
+                        <li data-value="APPROVED">사용중</li>
                         <li data-value="REJECTED">반려</li>
-                        <li data-value="RETURNED">반납완료</li>
+                        <li data-value="COMPLETED">반납완료</li>
                     </ul>
                 </div>
             </div>
             
             <!-- 신청일자 -->
             <div class="rv-custom-dropdown rv-filter-dropdown">
-                <label class="rv-custom-dropdown-name">신청일자</label>
+                <label class="rv-custom-dropdown-name">시작일</label>
                 <div class="rv-dropdown-box">
                     <input type="text" id="rv-inspectionDate" class="rv-date-input" placeholder="날짜 선택">
                     <span class="rv-calendar-icon">
@@ -169,13 +169,7 @@
 
 <!-- 모달 include (하드코딩된 UI만) -->
 <jsp:include page="/WEB-INF/views/admin-reservation/rejectModal.jsp" />
-
-
-<!-- 모달은 기본 숨김 -->
-<style> 
-  #rv-rejectModal { display: none; }
-</style>
-
+<jsp:include page="/WEB-INF/views/admin-reservation/rejectDetail.jsp" />
 
 <!-- 모달 넣을 자리 -->
 <div id="rv-modal-container"></div>
