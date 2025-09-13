@@ -120,7 +120,7 @@
                                      onclick="openReservationModal('${reservation.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${empty reservation.assetImage ? "default.png" : reservation.assetImage}'/>" 
+                                            <img src="<c:url value='${empty reservation.assetImage ? "default.png" : reservation.assetImage}'/>" 
                                                  alt="<c:out value='${reservation.assetName}'/>" 
                                                  class="asset-image">
                                             <div class="asset-details">

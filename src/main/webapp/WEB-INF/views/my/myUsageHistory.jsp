@@ -136,7 +136,7 @@
                                      onclick="openUsageModal('${usage.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${empty usage.assetImage ? "default.png" : usage.assetImage}'/>" 
+                                            <img src="<c:url value='${empty usage.assetImage ? "default.png" : usage.assetImage}'/>" 
                                                  alt="<c:out value='${usage.assetName}'/>" 
                                                  class="asset-image">
                                             <div class="asset-details">
