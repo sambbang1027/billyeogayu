@@ -2,6 +2,9 @@ package app.domains.dashboard.service;
 
 import app.domains.dashboard.dao.DashBoardRepository;
 import app.domains.dashboard.dto.CategoryDataDto;
+import app.domains.dashboard.dto.CategoryModelDto;
+import app.domains.dashboard.dto.UsageDataDto;
+import app.domains.dashboard.dto.InspectionDataDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +41,7 @@ public class DashBoardServiceImpl implements DashBoardService {
 
         // 데이터베이스에서 정렬된 순서 유지 (COUNT(*) DESC)
         List<String> labels = categoryDataList.stream()
-            .map(this::getKoreanLabel)
+            .map(CategoryDataDto::getCategory)
             .collect(Collectors.toList());
         
         List<Long> totalCounts = categoryDataList.stream()
@@ -65,7 +68,7 @@ public class DashBoardServiceImpl implements DashBoardService {
 
         // 데이터베이스에서 정렬된 순서 유지 (COUNT(*) DESC)
         List<String> labels = categoryDataList.stream()
-            .map(this::getKoreanLabel)
+            .map(CategoryDataDto::getCategory)
             .collect(Collectors.toList());
         
         List<Long> data = categoryDataList.stream()
@@ -78,18 +81,96 @@ public class DashBoardServiceImpl implements DashBoardService {
         );
     }
 
-    /**
-     * 카테고리 영문명을 한글명으로 변환
-     */
-    private String getKoreanLabel(CategoryDataDto dto) {
-        Map<String, String> labelMap = Map.of(
-            "TRACTOR", "트랙터",
-            "COMBINE", "콤바인", 
-            "RICE_PLANT", "이앙기",
-            "TRANSPORT", "운반차",
-            "LOADER", "로더"
+    @Override
+    public Map<String, Object> getUsageChartFilters() {
+        // 실제 데이터베이스에서 카테고리-모델 관계 조회
+        List<CategoryModelDto> categoryModels = dashBoardRepository.getAssetModelsByCategory();
+        
+        // 카테고리별로 모델 그룹화 (중복 제거)
+        Map<String, List<String>> categoryModelMap = categoryModels.stream()
+            .collect(Collectors.groupingBy(
+                CategoryModelDto::getCategory,
+                Collectors.mapping(CategoryModelDto::getModelName, 
+                    Collectors.collectingAndThen(Collectors.toSet(), ArrayList::new))
+            ));
+        
+        // 각 카테고리별 모델 리스트 정렬
+        categoryModelMap.values().forEach(Collections::sort);
+        
+        // 지역 데이터 (임시 더미, 나중에 실제 데이터로 변경)
+        List<String> addresses = List.of("서울특별시", "경기도", "강원도", "경상남도", "경상북도", "전라남도", "전라북도", "제주도");
+        
+        return Map.of(
+            "categoryModels", categoryModelMap,
+            "addresses", addresses
         );
-        return labelMap.get(dto.getCategory());
+    }
+
+    @Override
+    public Map<String, Object> getUsageChartData(String category, String model, String address) {
+        List<UsageDataDto> usageDataList = dashBoardRepository.getUsageDataByFilters(category, model, address);
+        
+        // 2016~2025년 전체 범위에서 누락된 연도는 0으로 채우기
+        List<String> labels = new ArrayList<>();
+        List<Long> data = new ArrayList<>();
+        
+        for (int year = 2016; year <= 2025; year++) {
+            final int currentYear = year; // effectively final 변수로 만들기
+            labels.add(String.valueOf(year));
+            Optional<UsageDataDto> yearData = usageDataList.stream()
+                .filter(dto -> dto.getYear() == currentYear)
+                .findFirst();
+            data.add(yearData.map(UsageDataDto::getReservationCount).orElse(0L));
+        }
+        
+        return Map.of(
+            "labels", labels,
+            "data", data
+        );
+    }
+
+    @Override
+    public Map<String, Object> getInspectionChartFilters() {
+        // 사용량 차트와 동일한 카테고리-모델 데이터 사용
+        List<CategoryModelDto> categoryModels = dashBoardRepository.getAssetModelsByCategory();
+        
+        // 카테고리별로 모델 그룹화 (중복 제거)
+        Map<String, List<String>> categoryModelMap = categoryModels.stream()
+            .collect(Collectors.groupingBy(
+                CategoryModelDto::getCategory,
+                Collectors.mapping(CategoryModelDto::getModelName, 
+                    Collectors.collectingAndThen(Collectors.toSet(), ArrayList::new))
+            ));
+        
+        // 각 카테고리별 모델 리스트 정렬
+        categoryModelMap.values().forEach(Collections::sort);
+        
+        return Map.of(
+            "categoryModels", categoryModelMap
+        );
+    }
+
+    @Override
+    public Map<String, Object> getInspectionChartData(String category, String model) {
+        List<InspectionDataDto> inspectionDataList = dashBoardRepository.getInspectionDataByFilters(category, model);
+        
+        // 2016~2025년 전체 범위에서 누락된 연도는 0으로 채우기
+        List<String> labels = new ArrayList<>();
+        List<Long> data = new ArrayList<>();
+        
+        for (int year = 2016; year <= 2025; year++) {
+            final int currentYear = year; // effectively final 변수로 만들기
+            labels.add(String.valueOf(year));
+            Optional<InspectionDataDto> yearData = inspectionDataList.stream()
+                .filter(dto -> dto.getYear() == currentYear)
+                .findFirst();
+            data.add(yearData.map(InspectionDataDto::getInspectionCount).orElse(0L));
+        }
+        
+        return Map.of(
+            "labels", labels,
+            "data", data
+        );
     }
 
     /**

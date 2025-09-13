@@ -224,3 +224,27 @@ canvas {
     color: white;
     border-color: #007bff;
 }
+
+/* 드롭다운 필터 스타일 */
+.filter-dropdown {
+    display: inline-block;
+    margin-right: 10px;
+}
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 120px;
+    transition: all 0.2s ease;
+}
+.filter-select:hover {
+    border-color: #007bff;
+}
+.filter-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
