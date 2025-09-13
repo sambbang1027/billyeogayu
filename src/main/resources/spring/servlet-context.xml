@@ -13,6 +13,7 @@
     <!-- Component Scan for Controllers only -->
     <context:component-scan base-package="app.domains.*.controller"/>
     <context:component-scan base-package="app.common.controller"/>
+	
 
 
     <!-- MVC Annotation Driven -->

@@ -14,18 +14,6 @@
 </head>
 <body>
     <div class="component">
-        <!-- 헤더 -->
-        <div class="header">
-            <div class="header-content">
-                <img class="logo" src="<c:url value='/static/images/logo.png'/>" alt="빌려가유 로고" />
-                <div class="header-links">
-                    <span class="header-link">회원가입</span>
-                    <span class="header-link">로그인</span>
-                    <span class="header-link">마이페이지</span>
-                    <span class="header-link">로그아웃</span>
-                </div>
-            </div>
-        </div>
 
         <div class="frame">
             <!-- 사이드바 -->
