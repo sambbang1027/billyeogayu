@@ -216,17 +216,17 @@ public class LoginPageController {
         return "redirect:/login";
     }
 
-    @GetMapping("/")
-    public String mainPage(HttpServletRequest request, Model model) {
-        log.info("=== 메인 페이지 요청 ===");
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            return "redirect:/asset/list";
-        } else {
-            return "redirect:/login";
-        }
-    }
+//    @GetMapping("/")
+//    public String mainPage(HttpServletRequest request, Model model) {
+//        log.info("=== 메인 페이지 요청 ===");
+//        
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+//            return "redirect:/asset/list";
+//        } else {
+//            return "redirect:/login";
+//        }
+//    }
 
 
     /**

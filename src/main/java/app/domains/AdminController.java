@@ -32,16 +32,25 @@ public class AdminController {
 	@Autowired
     private MaintenanceService maintenanceService;
     
-    @GetMapping("/reservation")
-    public String reservation(Model model) {
-    	
-    	List<String> categoryList = maintenanceService.getAssetCategoryList();
-
-    	model.addAttribute("categoryList", categoryList);
-    	
-        model.addAttribute("pageTitle", "예약 관리");
-        model.addAttribute("contentPage", "/WEB-INF/views/admin-reservation/reservationlist.jsp");
-        model.addAttribute("activePage", "reservation");
-        return "layout/admin/main";
-    }
+	@GetMapping("/reservation")
+	public String reservation(Model model) {
+	    System.out.println("=== AdminController.reservation() 호출됨 ===");
+	    
+	    try {
+	        List<String> categoryList = maintenanceService.getAssetCategoryList();
+	        System.out.println("categoryList: " + categoryList);
+	        
+	        model.addAttribute("categoryList", categoryList);
+	        model.addAttribute("pageTitle", "예약 관리");
+	        model.addAttribute("contentPage", "/WEB-INF/views/admin-reservation/reservationlist.jsp");
+	        model.addAttribute("activePage", "reservation");
+	        
+	        System.out.println("=== layout/admin/main 반환 ===");
+	        return "layout/admin/main";
+	    } catch (Exception e) {
+	        System.out.println("오류 발생: " + e.getMessage());
+	        e.printStackTrace();
+	        throw e;
+	    }
+	}
 }
