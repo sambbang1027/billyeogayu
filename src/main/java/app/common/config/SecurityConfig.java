@@ -172,7 +172,7 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/register/info"),     // 회원가입 정보 입력 페이지 (인증 완료 후)
                     new AntPathRequestMatcher("/find-id/result"),    // 아이디 찾기 결과 페이지 (인증 완료 후)
                     new AntPathRequestMatcher("/reset-password/form") // 비밀번호 재설정 폼 페이지 (인증 완료 후)
-                ).authenticated()
+                ).permitAll()
 
                 // 사용자 전용 페이지 (로그인 필요, 일반 사용자도 접근 가능)
                 .requestMatchers(

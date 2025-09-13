@@ -41,28 +41,30 @@
                 </div>
 
                 <!-- 사용 통계 -->
-                <c:if test="${not empty usageStatistics}">
-                    <div class="stats-card">
-                        <div class="stats-grid">
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.totalUsageCount != null ? usageStatistics.totalUsageCount : 0}"/></h4>
-                                <small>총 사용 횟수</small>
-                            </div>
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.completedCount != null ? usageStatistics.completedCount : 0}"/></h4>
-                                <small>완료된 사용</small>
-                            </div>
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.activeCount != null ? usageStatistics.activeCount : 0}"/></h4>
-                                <small>사용 중</small>
-                            </div>
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.totalUsageFormatted != null ? usageStatistics.totalUsageFormatted : '0분'}"/></h4>
-                                <small>총 사용 시간</small>
-                            </div>
-                        </div>
-                    </div>
-                </c:if>
+				<!-- 사용 통계 -->
+				<c:if test="${not empty usageStatistics}">
+				    <div class="stats-card">
+				        <div class="stats-grid">
+				            <div class="stats-item">
+				                <h4><c:out value="${usageStatistics.TOTALUSAGECOUNT != null ? usageStatistics.TOTALUSAGECOUNT : 0}"/></h4>
+				                <small>총 사용 횟수</small>
+				            </div>
+				            <div class="stats-item">
+				                <h4><c:out value="${usageStatistics.COMPLETEDCOUNT != null ? usageStatistics.COMPLETEDCOUNT : 0}"/></h4>
+				                <small>완료된 사용</small>
+				            </div>
+				            <div class="stats-item">
+				                <h4><c:out value="${usageStatistics.ACTIVECOUNT != null ? usageStatistics.ACTIVECOUNT : 0}"/></h4>
+				                <small>사용 중</small>
+				            </div>
+				            <div class="stats-item">
+				                <!-- 시간 포맷팅은 서비스에서 처리된 값 사용 -->
+				                <h4><c:out value="${usageStatistics.totalUsageFormatted != null ? usageStatistics.totalUsageFormatted : '0분'}"/></h4>
+				                <small>총 사용 시간</small>
+				            </div>
+				        </div>
+				    </div>
+				</c:if>
 
                 <!-- 필터링 -->
                 <div class="filter-card">
@@ -134,7 +136,7 @@
                                      onclick="openUsageModal('${usage.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${empty usage.assetImage ? "default.png" : usage.assetImage}'/>" 
+                                            <img src="<c:url value='${empty usage.assetImage ? "default.png" : usage.assetImage}'/>" 
                                                  alt="<c:out value='${usage.assetName}'/>" 
                                                  class="asset-image">
                                             <div class="asset-details">

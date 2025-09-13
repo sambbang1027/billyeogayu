@@ -14,103 +14,100 @@
     <div class="component">
 
         <div class="frame">
-            <!-- 컨테이너 래퍼 -->
-            <div class="content-wrapper">
-                <!-- 사이드바 -->
-                <div class="sidebar">
-                    <div class="sidebar-heading">
-                        <div class="sidebar-title">회원</div>
+            <!-- 사이드바 -->
+            <div class="sidebar">
+                <div class="sidebar-heading">
+                    <div class="sidebar-title">회원</div>
+                </div>
+                <div class="sidebar-menu">
+                    <div class="menu-item active">
+                        <a href="<c:url value='/login'/>" class="menu-link">
+                            <div class="menu-text">로그인</div>
+                        </a>
                     </div>
-                    <div class="sidebar-menu">
-                        <div class="menu-item active">
-                            <a href="<c:url value='/login'/>" class="menu-link">
-                                <div class="menu-text">로그인</div>
-                            </a>
-                        </div>
-                        <div class="menu-item">
-                            <a href="<c:url value='/verification'/>" class="menu-link">
-                                <div class="menu-text">회원가입</div>
-                            </a>
-                        </div>
-                        <div class="menu-item">
-                            <a href="<c:url value='/find-id'/>" class="menu-link">
-                                <div class="menu-text">아이디찾기</div>
-                            </a>
-                        </div>
-                        <div class="menu-item">
-                            <a href="<c:url value='/reset-password'/>" class="menu-link">
-                                <div class="menu-text">비밀번호찾기</div>
-                            </a>
-                        </div>
+                    <div class="menu-item">
+                        <a href="<c:url value='/verification'/>" class="menu-link">
+                            <div class="menu-text">회원가입</div>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a href="<c:url value='/find-id'/>" class="menu-link">
+                            <div class="menu-text">아이디찾기</div>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a href="<c:url value='/reset-password'/>" class="menu-link">
+                            <div class="menu-text">비밀번호찾기</div>
+                        </a>
                     </div>
                 </div>
+            </div>
 
-                <!-- 메인 컨텐츠 -->
-                <div class="main-content">
-                    <div class="page-title">로그인</div>
+            <!-- 메인 컨텐츠 -->
+            <div class="main-content">
+                <div class="page-title">로그인</div>
+                
+                <div class="login-container">
+                    <div class="login-title">회원 로그인</div>
                     
-                    <div class="login-container">
-                        <div class="login-title">회원 로그인</div>
-                        
-                        <!-- 에러 메시지 표시 -->
-                        <c:if test="${not empty error}">
-                            <div class="error-message">
-                                <c:choose>
-                                    <c:when test="${error == 'true'}">아이디 또는 비밀번호가 잘못되었습니다.</c:when>
-                                    <c:when test="${error == 'expired'}">세션이 만료되었습니다. 다시 로그인해주세요.</c:when>
-                                    <c:otherwise>로그인 중 오류가 발생했습니다.</c:otherwise>
-                                </c:choose>
-                            </div>
-                        </c:if>
-                        
-                        <!-- 성공 메시지 표시 -->
-                        <c:if test="${not empty message}">
-                            <div class="success-message">${message}</div>
-                        </c:if>
-
-                        <!-- 로그인 폼 -->
-                        <form id="loginForm" action="#" method="post" class="login-form">
-                            <div class="form-group">
-                                <input type="text" 
-                                       id="userid" 
-                                       name="userid" 
-                                       placeholder="아이디" 
-                                       class="form-input" 
-                                       value="${userid}"
-                                       required />
-                            </div>
-                            
-                            <div class="form-group">
-                                <input type="password" 
-                                       id="password" 
-                                       name="password" 
-                                       placeholder="비밀번호" 
-                                       class="form-input" 
-                                       required />
-                            </div>
-                            
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="remember" name="remember" class="checkbox" />
-                                <label for="remember" class="checkbox-label">로그인 상태 유지</label>
-                            </div>
-                            
-                            <button type="button" class="login-button" id="loginBtn">
-                                <span class="button-text">로그인</span>
-                                <span class="loading-spinner" style="display: none;">로그인 중...</span>
-                            </button>
-                            
-                            <!-- CSRF 토큰 (Spring Security 사용 시) -->
-                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                        </form>
-                        
-                        <!-- 링크 메뉴 -->
-                        <div class="link-menu">
-                            <a href="<c:url value='/verification'/>" class="link-item">회원가입</a>
-                            <div class="vertical-divider"></div>
-                            <a href="<c:url value='/find-id'/>" class="link-item">아이디 찾기</a>
-                            <div class="vertical-divider"></div>
-                            <a href="<c:url value='/reset-password'/>" class="link-item">비밀번호찾기</a>
+                    <!-- 에러 메시지 표시 -->
+                    <c:if test="${not empty error}">
+                        <div class="error-message">
+                            <c:choose>
+                                <c:when test="${error == 'true'}">아이디 또는 비밀번호가 잘못되었습니다.</c:when>
+                                <c:when test="${error == 'expired'}">세션이 만료되었습니다. 다시 로그인해주세요.</c:when>
+                                <c:otherwise>로그인 중 오류가 발생했습니다.</c:otherwise>
+                            </c:choose>
                         </div>
+                    </c:if>
+                    
+                    <!-- 성공 메시지 표시 -->
+                    <c:if test="${not empty message}">
+                        <div class="success-message">${message}</div>
+                    </c:if>
+
+                    <!-- 로그인 폼 -->
+                    <form id="loginForm" action="#" method="post" class="login-form">
+                        <div class="form-group">
+                            <input type="text" 
+                                   id="userid" 
+                                   name="userid" 
+                                   placeholder="아이디" 
+                                   class="form-input" 
+                                   value="${userid}"
+                                   required />
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="비밀번호" 
+                                   class="form-input" 
+                                   required />
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="saveId" name="saveId" class="checkbox" />
+                            <label for="saveId" class="checkbox-label">아이디 저장</label>
+                        </div>
+                        
+                        <button type="button" class="login-button" id="loginBtn">
+                            <span class="button-text">로그인</span>
+                            <span class="loading-spinner" style="display: none;">로그인 중...</span>
+                        </button>
+                        
+                        <!-- CSRF 토큰 (Spring Security 사용 시) -->
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    </form>
+                    
+                    <!-- 링크 메뉴 -->
+                    <div class="link-menu">
+                        <a href="<c:url value='/verification'/>" class="link-item">회원가입</a>
+                        <div class="vertical-divider"></div>
+                        <a href="<c:url value='/find-id'/>" class="link-item">아이디 찾기</a>
+                        <div class="vertical-divider"></div>
+                        <a href="<c:url value='/reset-password'/>" class="link-item">비밀번호찾기</a>
                     </div>
                 </div>
             </div>
@@ -129,6 +126,9 @@
     <!-- JavaScript -->
     <script>
         $(document).ready(function() {
+            // 페이지 로드 시 저장된 아이디 복원
+            loadSavedId();
+            
             // 로그인 버튼 클릭 처리
             $('#loginBtn').on('click', function(e) {
                 e.preventDefault();
@@ -142,6 +142,26 @@
                     handleLogin();
                 }
             });
+            
+            // 아이디 저장 기능
+            function loadSavedId() {
+                const savedId = localStorage.getItem('savedLoginId');
+                if (savedId) {
+                    $('#userid').val(savedId);
+                    $('#saveId').prop('checked', true);
+                }
+            }
+            
+            function saverId() {
+                const userid = $('#userid').val().trim();
+                const saveIdChecked = $('#saveId').is(':checked');
+                
+                if (saveIdChecked && userid) {
+                    localStorage.setItem('savedLoginId', userid);
+                } else {
+                    localStorage.removeItem('savedLoginId');
+                }
+            }
             
             function handleLogin() {
                 const userid = $('#userid').val().trim();
@@ -159,6 +179,9 @@
                     $('#password').focus();
                     return;
                 }
+                
+                // 아이디 저장 처리
+                saverId();
                 
                 // 로딩 상태 변경
                 const $loginBtn = $('#loginBtn');
@@ -252,4 +275,3 @@
     </script>
 </body>
 </html>
-                
