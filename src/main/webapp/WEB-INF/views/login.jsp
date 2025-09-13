@@ -15,7 +15,7 @@
         <!-- 헤더 -->
         <div class="header">
             <div class="header-content">
-                <img class="logo" src="<c:url value='/static/images/logo.png'/>" alt="빌려가유 로고" />
+                <img class="logo" src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유 로고" />
                 <div class="header-links">
                     <span class="header-link">회원가입</span>
                     <span class="header-link">로그인</span>
@@ -26,100 +26,103 @@
         </div>
 
         <div class="frame">
-            <!-- 사이드바 -->
-            <div class="sidebar">
-                <div class="sidebar-heading">
-                    <div class="sidebar-title">회원</div>
+            <!-- 컨테이너 래퍼 -->
+            <div class="content-wrapper">
+                <!-- 사이드바 -->
+                <div class="sidebar">
+                    <div class="sidebar-heading">
+                        <div class="sidebar-title">회원</div>
+                    </div>
+                    <div class="sidebar-menu">
+                        <div class="menu-item active">
+                            <a href="<c:url value='/login'/>" class="menu-link">
+                                <div class="menu-text">로그인</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="<c:url value='/verification'/>" class="menu-link">
+                                <div class="menu-text">회원가입</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="<c:url value='/find-id'/>" class="menu-link">
+                                <div class="menu-text">아이디찾기</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="<c:url value='/reset-password'/>" class="menu-link">
+                                <div class="menu-text">비밀번호 재설정</div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="sidebar-menu">
-                    <div class="menu-item active">
-                        <a href="<c:url value='/login'/>" class="menu-link">
-                            <div class="menu-text">로그인</div>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="<c:url value='/verification'/>" class="menu-link">
-                            <div class="menu-text">회원가입</div>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="<c:url value='/find-id'/>" class="menu-link">
-                            <div class="menu-text">아이디찾기</div>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="<c:url value='/reset-password'/>" class="menu-link">
-                            <div class="menu-text">비밀번호 재설정</div>
-                        </a>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 메인 컨텐츠 -->
-            <div class="main-content">
-                <div class="page-title">로그인</div>
-                
-                <div class="login-container">
-                    <div class="login-title">회원 로그인</div>
+                <!-- 메인 컨텐츠 -->
+                <div class="main-content">
+                    <div class="page-title">로그인</div>
                     
-                    <!-- 에러 메시지 표시 -->
-                    <c:if test="${not empty error}">
-                        <div class="error-message">
-                            <c:choose>
-                                <c:when test="${error == 'true'}">아이디 또는 비밀번호가 잘못되었습니다.</c:when>
-                                <c:when test="${error == 'expired'}">세션이 만료되었습니다. 다시 로그인해주세요.</c:when>
-                                <c:otherwise>로그인 중 오류가 발생했습니다.</c:otherwise>
-                            </c:choose>
-                        </div>
-                    </c:if>
-                    
-                    <!-- 성공 메시지 표시 -->
-                    <c:if test="${not empty message}">
-                        <div class="success-message">${message}</div>
-                    </c:if>
+                    <div class="login-container">
+                        <div class="login-title">회원 로그인</div>
+                        
+                        <!-- 에러 메시지 표시 -->
+                        <c:if test="${not empty error}">
+                            <div class="error-message">
+                                <c:choose>
+                                    <c:when test="${error == 'true'}">아이디 또는 비밀번호가 잘못되었습니다.</c:when>
+                                    <c:when test="${error == 'expired'}">세션이 만료되었습니다. 다시 로그인해주세요.</c:when>
+                                    <c:otherwise>로그인 중 오류가 발생했습니다.</c:otherwise>
+                                </c:choose>
+                            </div>
+                        </c:if>
+                        
+                        <!-- 성공 메시지 표시 -->
+                        <c:if test="${not empty message}">
+                            <div class="success-message">${message}</div>
+                        </c:if>
 
-                    <!-- 로그인 폼 -->
-                    <form id="loginForm" action="#" method="post" class="login-form">
-                        <div class="form-group">
-                            <input type="text" 
-                                   id="userid" 
-                                   name="userid" 
-                                   placeholder="아이디" 
-                                   class="form-input" 
-                                   value="${userid}"
-                                   required />
+                        <!-- 로그인 폼 -->
+                        <form id="loginForm" action="#" method="post" class="login-form">
+                            <div class="form-group">
+                                <input type="text" 
+                                       id="userid" 
+                                       name="userid" 
+                                       placeholder="아이디" 
+                                       class="form-input" 
+                                       value="${userid}"
+                                       required />
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="password" 
+                                       id="password" 
+                                       name="password" 
+                                       placeholder="비밀번호" 
+                                       class="form-input" 
+                                       required />
+                            </div>
+                            
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="remember" name="remember" class="checkbox" />
+                                <label for="remember" class="checkbox-label">로그인 상태 유지</label>
+                            </div>
+                            
+                            <button type="button" class="login-button" id="loginBtn">
+                                <span class="button-text">로그인</span>
+                                <span class="loading-spinner" style="display: none;">로그인 중...</span>
+                            </button>
+                            
+                            <!-- CSRF 토큰 (Spring Security 사용 시) -->
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                        </form>
+                        
+                        <!-- 링크 메뉴 -->
+                        <div class="link-menu">
+                            <a href="<c:url value='/verification'/>" class="link-item">회원가입</a>
+                            <div class="vertical-divider"></div>
+                            <a href="<c:url value='/find-id'/>" class="link-item">아이디 찾기</a>
+                            <div class="vertical-divider"></div>
+                            <a href="<c:url value='/reset-password'/>" class="link-item">비밀번호 재설정</a>
                         </div>
-                        
-                        <div class="form-group">
-                            <input type="password" 
-                                   id="password" 
-                                   name="password" 
-                                   placeholder="비밀번호" 
-                                   class="form-input" 
-                                   required />
-                        </div>
-                        
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="remember" name="remember" class="checkbox" />
-                            <label for="remember" class="checkbox-label">로그인 상태 유지</label>
-                        </div>
-                        
-                        <button type="button" class="login-button" id="loginBtn">
-                            <span class="button-text">로그인</span>
-                            <span class="loading-spinner" style="display: none;">로그인 중...</span>
-                        </button>
-                        
-                        <!-- CSRF 토큰 (Spring Security 사용 시) -->
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                    </form>
-                    
-                    <!-- 링크 메뉴 -->
-                    <div class="link-menu">
-                        <a href="<c:url value='/verification'/>" class="link-item">회원가입</a>
-                        <div class="vertical-divider"></div>
-                        <a href="<c:url value='/find-id'/>" class="link-item">아이디 찾기</a>
-                        <div class="vertical-divider"></div>
-                        <a href="<c:url value='/reset-password'/>" class="link-item">비밀번호 재설정</a>
                     </div>
                 </div>
             </div>
@@ -261,3 +264,4 @@
     </script>
 </body>
 </html>
+                

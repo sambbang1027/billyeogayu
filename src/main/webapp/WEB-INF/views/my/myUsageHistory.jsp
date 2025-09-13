@@ -16,9 +16,9 @@
     <!-- 헤더 -->
     <div class="header">
         <div class="header-content">
-            <img src="<c:url value='/static/images/logo.png'/>" alt="로고" class="logo">
+            <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="로고" class="logo">
             <div class="header-links">
-                <a href="<c:url value='/assets'/>" class="header-link">농기계 목록</a>
+                <a href="<c:url value='/resource/list'/>" class="header-link">농기계 목록</a>
                 <a href="<c:url value='/my/reservations'/>" class="header-link">내 예약</a>
                 <a href="<c:url value='/my/usage-history'/>" class="header-link">사용 내역</a>
                 <a href="<c:url value='/logout'/>" class="header-link">로그아웃</a>
@@ -129,10 +129,9 @@
                                      onclick="openUsageModal('${usage.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${usage.assetImage}'/>" 
+                                            <img src="<c:url value='/static/images/assets/${empty usage.assetImage ? "default.png" : usage.assetImage}'/>" 
                                                  alt="<c:out value='${usage.assetName}'/>" 
-                                                 class="asset-image"
-                                                 onerror="this.src='<c:url value='/static/images/assets/default.png'/>'">
+                                                 class="asset-image">
                                             <div class="asset-details">
                                                 <h3><c:out value="${usage.assetName}"/></h3>
                                                 <div class="asset-meta"><c:out value="${usage.assetCategory}"/> | <c:out value="${usage.assetCompany}"/></div>
@@ -251,10 +250,14 @@
         function displayUsageModal(data) {
             const modalBody = $('#modalBody');
             
+            // 이미지 경로 안전하게 설정
+            const imagePath = data.assetImage ? 
+                '<c:url value="/static/images/assets/"/>' + data.assetImage : 
+                '<c:url value="/static/images/assets/default.png"/>';
+            
             const modalContent = `
                 <div class="modal-asset-info">
-                    <img src="<c:url value='/static/images/assets/'/>` + data.assetImage + `" alt="` + data.assetName + `" class="modal-asset-image" 
-                         onerror="this.src='<c:url value='/static/images/assets/default.png'/>'">
+                    <img src="` + imagePath + `" alt="` + data.assetName + `" class="modal-asset-image">
                     <div class="modal-asset-details">
                         <h3>` + data.assetName + `</h3>
                         <div class="modal-asset-meta">` + data.assetCategory + ` | ` + data.assetCompany + `</div>

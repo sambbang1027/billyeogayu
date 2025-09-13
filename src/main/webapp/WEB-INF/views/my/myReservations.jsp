@@ -16,9 +16,9 @@
     <!-- 헤더 -->
     <div class="header">
         <div class="header-content">
-            <img src="<c:url value='/static/images/logo.png'/>" alt="로고" class="logo">
+            <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="로고" class="logo">
             <div class="header-links">
-                <a href="<c:url value='/assets'/>" class="header-link">농기계 목록</a>
+                <a href="<c:url value='/resource/list'/>" class="header-link">농기계 목록</a>
                 <a href="<c:url value='/my/reservations'/>" class="header-link">내 예약</a>
                 <a href="<c:url value='/my/usage-history'/>" class="header-link">사용 내역</a>
                 <a href="<c:url value='/logout'/>" class="header-link">로그아웃</a>

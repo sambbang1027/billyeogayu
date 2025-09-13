@@ -17,7 +17,7 @@
         <!-- 헤더 -->
         <div class="header">
             <div class="header-content">
-                <img class="logo" src="<c:url value='/static/images/logo.png'/>" alt="빌려가유 로고" />
+                <img class="logo" src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유 로고" />
                 <div class="header-links">
                     <span class="header-link">회원가입</span>
                     <span class="header-link">로그인</span>

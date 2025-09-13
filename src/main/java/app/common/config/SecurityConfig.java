@@ -67,7 +67,8 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/images/**"),
                     new AntPathRequestMatcher("/static/**"),
                     new AntPathRequestMatcher("/assets/**"),
-                    new AntPathRequestMatcher("/.well-known/**")
+                    new AntPathRequestMatcher("/.well-known/**"),
+                    new AntPathRequestMatcher("/resource/list") 
                 ).permitAll()
 
                 // 인증 없이 접근 가능한 로그인/회원가입 관련 페이지
@@ -112,9 +113,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     new AntPathRequestMatcher("/my/**"),             // 마이페이지
                     new AntPathRequestMatcher("/profile/**"),        // 프로필 관리
-                    new AntPathRequestMatcher("/reservation/**"),    // 예약 관리
-                    new AntPathRequestMatcher("/resource/**")        // 리소스 목록 및 관리
-                    // "/dashboard" 제거 - 관리자 전용으로 변경됨
+                    new AntPathRequestMatcher("/reservation/**")	 // 예약 관리
+
                 ).hasAnyRole("COMMON", "ADMIN")
 
                 // 사용자 전용 API (로그인 필요)
