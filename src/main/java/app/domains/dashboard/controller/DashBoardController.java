@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
@@ -48,5 +49,30 @@ public class DashBoardController {
     @ResponseBody
     public Map<String, Object> getUsageFilters() {
         return dashBoardService.getUsageChartFilters();
+    }
+    
+    @GetMapping("/usageData")
+    @ResponseBody
+    public Map<String, Object> getUsageData(
+        @RequestParam(value = "category", required = false) String category,
+        @RequestParam(value = "model", required = false) String model,
+        @RequestParam(value = "address", required = false) String address) {
+        
+        return dashBoardService.getUsageChartData(category, model, address);
+    }
+    
+    @GetMapping("/inspectionFilters")
+    @ResponseBody
+    public Map<String, Object> getInspectionFilters() {
+        return dashBoardService.getInspectionChartFilters();
+    }
+    
+    @GetMapping("/inspectionData")
+    @ResponseBody
+    public Map<String, Object> getInspectionData(
+        @RequestParam(value = "category", required = false) String category,
+        @RequestParam(value = "model", required = false) String model) {
+        
+        return dashBoardService.getInspectionChartData(category, model);
     }
 }

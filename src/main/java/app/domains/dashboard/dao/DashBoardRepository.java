@@ -2,7 +2,10 @@ package app.domains.dashboard.dao;
 
 import app.domains.dashboard.dto.CategoryDataDto;
 import app.domains.dashboard.dto.CategoryModelDto;
+import app.domains.dashboard.dto.UsageDataDto;
+import app.domains.dashboard.dto.InspectionDataDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
@@ -15,4 +18,13 @@ public interface DashBoardRepository {
     List<String> getAssetCategories();
     List<CategoryModelDto> getAssetModelsByCategory();
     List<String> getReservationAddresses();
+    
+    // 사용량 차트 데이터
+    List<UsageDataDto> getUsageDataByFilters(@Param("category") String category, 
+                                            @Param("model") String model, 
+                                            @Param("address") String address);
+    
+    // 점검 차트 데이터
+    List<InspectionDataDto> getInspectionDataByFilters(@Param("category") String category, 
+                                                      @Param("model") String model);
 }

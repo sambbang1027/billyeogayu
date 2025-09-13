@@ -3,6 +3,8 @@ package app.domains.dashboard.service;
 import app.domains.dashboard.dao.DashBoardRepository;
 import app.domains.dashboard.dto.CategoryDataDto;
 import app.domains.dashboard.dto.CategoryModelDto;
+import app.domains.dashboard.dto.UsageDataDto;
+import app.domains.dashboard.dto.InspectionDataDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -104,6 +106,72 @@ public class DashBoardServiceImpl implements DashBoardService {
         );
     }
 
+    @Override
+    public Map<String, Object> getUsageChartData(String category, String model, String address) {
+        List<UsageDataDto> usageDataList = dashBoardRepository.getUsageDataByFilters(category, model, address);
+        
+        // 2016~2025년 전체 범위에서 누락된 연도는 0으로 채우기
+        List<String> labels = new ArrayList<>();
+        List<Long> data = new ArrayList<>();
+        
+        for (int year = 2016; year <= 2025; year++) {
+            final int currentYear = year; // effectively final 변수로 만들기
+            labels.add(String.valueOf(year));
+            Optional<UsageDataDto> yearData = usageDataList.stream()
+                .filter(dto -> dto.getYear() == currentYear)
+                .findFirst();
+            data.add(yearData.map(UsageDataDto::getReservationCount).orElse(0L));
+        }
+        
+        return Map.of(
+            "labels", labels,
+            "data", data
+        );
+    }
+
+    @Override
+    public Map<String, Object> getInspectionChartFilters() {
+        // 사용량 차트와 동일한 카테고리-모델 데이터 사용
+        List<CategoryModelDto> categoryModels = dashBoardRepository.getAssetModelsByCategory();
+        
+        // 카테고리별로 모델 그룹화 (중복 제거)
+        Map<String, List<String>> categoryModelMap = categoryModels.stream()
+            .collect(Collectors.groupingBy(
+                CategoryModelDto::getCategory,
+                Collectors.mapping(CategoryModelDto::getModelName, 
+                    Collectors.collectingAndThen(Collectors.toSet(), ArrayList::new))
+            ));
+        
+        // 각 카테고리별 모델 리스트 정렬
+        categoryModelMap.values().forEach(Collections::sort);
+        
+        return Map.of(
+            "categoryModels", categoryModelMap
+        );
+    }
+
+    @Override
+    public Map<String, Object> getInspectionChartData(String category, String model) {
+        List<InspectionDataDto> inspectionDataList = dashBoardRepository.getInspectionDataByFilters(category, model);
+        
+        // 2016~2025년 전체 범위에서 누락된 연도는 0으로 채우기
+        List<String> labels = new ArrayList<>();
+        List<Long> data = new ArrayList<>();
+        
+        for (int year = 2016; year <= 2025; year++) {
+            final int currentYear = year; // effectively final 변수로 만들기
+            labels.add(String.valueOf(year));
+            Optional<InspectionDataDto> yearData = inspectionDataList.stream()
+                .filter(dto -> dto.getYear() == currentYear)
+                .findFirst();
+            data.add(yearData.map(InspectionDataDto::getInspectionCount).orElse(0L));
+        }
+        
+        return Map.of(
+            "labels", labels,
+            "data", data
+        );
+    }
 
     /**
      * DTO 리스트에서 카테고리별 카운트 데이터 추출
