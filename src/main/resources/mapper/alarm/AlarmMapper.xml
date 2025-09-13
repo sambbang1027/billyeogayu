@@ -28,8 +28,19 @@
     <select id="findAll" resultMap="alarmResultMap">
         SELECT alarm_id, asset_id, type, description, created_at, updated_at, deleted_at, is_deleted
         FROM alarm 
-        WHERE is_deleted = 'N'
         ORDER BY created_at DESC
+    </select>
+
+    <update id="markAsRead" parameterType="long">
+        UPDATE alarm 
+        SET is_deleted = 'Y', updated_at = SYSDATE
+        WHERE alarm_id = #{id}
+    </update>
+
+    <select id="getUnreadCount" resultType="int">
+        SELECT COUNT(*)
+        FROM alarm 
+        WHERE is_deleted = 'N'
     </select>
 
 </mapper>

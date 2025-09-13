@@ -23,4 +23,14 @@ public class AlarmServiceImpl implements AlarmService {
                 .map(AlarmResponseDto::from)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void markAsRead(Long alarmId) {
+        alarmRepository.markAsRead(alarmId);
+    }
+
+    @Override
+    public int getUnreadAlarmCount() {
+        return alarmRepository.getUnreadCount();
+    }
 }
