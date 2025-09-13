@@ -13,6 +13,7 @@ function getUser () {
 	  url: "/api/profile",
 	  type: "GET",
 	  success: function(res) {
+	//console.log('header ', res);
 	  const adminName = res.data.name;
 		$(".user-text-box").text(adminName);
    

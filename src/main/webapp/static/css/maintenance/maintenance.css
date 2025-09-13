@@ -86,6 +86,9 @@
   min-height : 140px;
   width: 100%;            
   box-sizing: border-box;   
+  outline: none;
+    border: 1px solid #dadada;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 .filter-list {
 	display : flex;
@@ -144,13 +147,21 @@
  	border: none;
  	box-shadow: none;
  	align-self : end;
- 	
+ 	    margin-bottom: 0.3rem;
 }
+
+.btn-download img{
+	width : 28px;
+	height : 28px;
+}
+
 
 /* ---------------- 테이블 ---------------- */
 .table-wrapper{
   background-color: #ffffff;
-  border-radius: 5px;  
+  border-radius: 0.5rem;  
+     border: 1px solid #dadada;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 .maintenance-table,
 .maintenance-table thead th,
@@ -161,18 +172,40 @@
 }
 
 .maintenance-table {
-  width: 95%;           /* 100% 말고 살짝 줄임 */
-  margin: 1rem auto;    /* 위아래 1rem, 좌우 자동 → 가운데 정렬 */
+  width: 100%;           
+   /*margin: 1rem auto;    위아래 1rem, 좌우 자동 → 가운데 정렬 */
   border-collapse: collapse;
+  border-radius : 0.5rem;
   overflow: hidden;     /* border-radius 적용 시 필요 */
   min-height : 200px;
-   line-height: 1.4; 
+   line-height: 1.6; 
 }
 
 .maintenance-table thead th {
   background-color: #F9FAFE; /* 연한 블루-그레이 */
   font-weight: bold;
 }
+
+
+th.sortable {
+  cursor: pointer;
+}
+th.sortable::after {
+  content: "⇅"; 
+  margin-left: 5px;
+  font-size: 0.75rem;
+  color: #aaa;
+}
+th.sortable[data-order="asc"]::after {
+  content: "▲";
+  color: #659f7c;
+}
+th.sortable[data-order="desc"]::after {
+  content: "▼";
+  color: #659f7c;
+}
+
+
 
 .maintenance-table tbody tr:nth-child(odd) {
   background-color: #ffffff; 

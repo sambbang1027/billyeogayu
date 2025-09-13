@@ -57,7 +57,18 @@
 						      		</if>
 						      </where>		 
 						      GROUP BY m.request_id, a.name, a.category, m.type, m.status, m.resolved_at, u.name, a.company
-						      ORDER BY m.request_id DESC
+							<choose>
+							    <when test="orderBy == 'maintDateAsc'">
+							        ORDER BY m.resolved_at ASC
+							    </when>
+							    <when test="orderBy == 'maintDateDesc'">
+							        ORDER BY m.resolved_at DESC
+							    </when>
+							    <otherwise>
+							        ORDER BY m.request_id DESC
+							    </otherwise>
+							</choose>
+
 				    ) t
 				    WHERE ROWNUM &lt;= #{endRow}
 				  )
@@ -92,11 +103,11 @@
 		</select>
 		
 		<select id="getAssetCategoryList" resultType="String">
-				SELECT DISTINCT category FROM asset
+					SELECT DISTINCT a.category FROM maintenance m JOIN asset a ON a.asset_id = m.asset_id
 		</select>
 		
 		<select id="getCompanyList" resultType="String">
-		SELECT DISTINCT company FROM asset
+		SELECT DISTINCT a.company FROM maintenance m JOIN asset a ON a.asset_id = m.asset_id
 		</select>
 		
 <select id="findForExport" resultType="app.domains.maintenance.model.Maintenance">

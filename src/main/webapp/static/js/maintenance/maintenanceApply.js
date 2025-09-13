@@ -22,8 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     noChoicesText: '선택할 항목이 없습니다',
     itemSelectText: '클릭해서 선택'
   });
-  
-  getUser ();
+  getAdminUser();
 });
 
 //드롭다운에 부품 리스트 넣어주기 
@@ -114,15 +113,15 @@ $(document).on("click", ".apply-btn-submit", function() {
 	})
 })
 
-function getUser () {
+function getAdminUser () {
 	$.ajax({
 	  url: "/api/profile",
 	  type: "GET",
 	  success: function(res) {
-	   console.log(res);
-	   adminId = res.data.userId;
-	   console.log('유저  : ' , adminId );
-	  },
+	//console.log('apply ', res);
+	  adminId = res.data.userId;
+
+   	  },
 	  error: function(xhr) {
 	    if(xhr.status === 401){
 	      alert("로그인이 필요합니다.");
@@ -134,4 +133,3 @@ function getUser () {
 	  }
 	});
 }
-

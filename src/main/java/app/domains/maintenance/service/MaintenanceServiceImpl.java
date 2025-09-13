@@ -31,7 +31,6 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 	// 리스트 조회 
 	@Override
 	public List<Maintenance> searchMaintList(MaintSearch maintSearch){
-
 		return maintenanceRepository.searchMaintList(maintSearch);
 	}
 

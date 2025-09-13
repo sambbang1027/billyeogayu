@@ -21,5 +21,7 @@ public class MaintSearch {
 		private String company;
 	    private int startRow;       // 페이지네이션 시작
 	    private int endRow;         // 페이지네이션 끝
+	    
+	    private String orderBy;  // 정렬 
 
 }
