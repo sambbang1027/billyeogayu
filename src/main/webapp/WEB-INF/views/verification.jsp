@@ -14,17 +14,7 @@
 </head>
 <body>
 	<div class="component">
-		<!-- 헤더 -->
-		<div class="header">
-			<div class="header-content">
-				<img class="logo" src="<c:url value='/assets/layout/user/logo.svg'/>"
-					alt="빌려가유 로고" />
-				<div class="header-links">
-					<span class="header-link">회원가입</span> <span class="header-link">로그인</span>
-					<span class="header-link">마이페이지</span> <span class="header-link">로그아웃</span>
-				</div>
-			</div>
-		</div>
+
 
 		<div class="frame">
 			<!-- 사이드바 -->
@@ -54,7 +44,7 @@
 						class="menu-item ${activePage == 'reset-password' ? 'active' : ''}">
 						<a href="<c:url value='/verification?purpose=reset-password'/>"
 							class="menu-link">
-							<div class="menu-text">비밀번호 재설정</div>
+							<div class="menu-text">비밀번호찾기</div>
 						</a>
 					</div>
 				</div>
@@ -508,7 +498,7 @@
                         break;
                     case 'reset-password':
                         message = '인증이 완료되었습니다!';
-                        buttonText = '비밀번호 재설정 계속하기';
+                        buttonText = '비밀번호 찾기 계속하기';
                         break;
                     case 'register':
                     default:

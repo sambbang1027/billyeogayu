@@ -14,12 +14,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import app.domains.users.auth.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableWebSecurity(debug=false)
+@Slf4j
 public class SecurityConfig {
 
     @Autowired
@@ -47,6 +52,54 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    // 커스텀 로그인 성공 핸들러
+    @Bean
+    public AuthenticationSuccessHandler customSuccessHandler() {
+        return (HttpServletRequest request, HttpServletResponse response, 
+                org.springframework.security.core.Authentication authentication) -> {
+            
+            String returnUrl = (String) request.getSession().getAttribute("returnUrl");
+            log.info("로그인 성공 - 사용자: {}, returnUrl: {}", authentication.getName(), returnUrl);
+            
+            // returnUrl이 있고 정적 리소스가 아닌 경우에만 해당 URL로 이동
+            if (returnUrl != null && !returnUrl.trim().isEmpty() && isValidReturnUrl(returnUrl)) {
+                request.getSession().removeAttribute("returnUrl");
+                log.info("저장된 returnUrl로 리다이렉트: {}", returnUrl);
+                response.sendRedirect(returnUrl);
+            } else {
+                // 기본적으로 resource/list 페이지로 이동
+                log.info("기본 페이지(resource/list)로 리다이렉트");
+                response.sendRedirect("/resource/list");
+            }
+        };
+    }
+
+    // 유효한 returnUrl인지 검증하는 메서드
+    private boolean isValidReturnUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return false;
+        }
+        
+        // 정적 리소스 파일 확장자들
+        String[] staticExtensions = {".png", ".jpg", ".jpeg", ".gif", ".css", ".js", ".ico", ".svg", ".woff", ".woff2", ".ttf"};
+        
+        String lowerUrl = url.toLowerCase();
+        for (String ext : staticExtensions) {
+            if (lowerUrl.endsWith(ext)) {
+                log.warn("정적 리소스 URL이므로 리다이렉트 제외: {}", url);
+                return false;
+            }
+        }
+        
+        // 외부 URL 차단 (상대 경로만 허용)
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            log.warn("외부 URL이므로 리다이렉트 제외: {}", url);
+            return false;
+        }
+        
+        return true;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -68,7 +121,19 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/static/**"),
                     new AntPathRequestMatcher("/assets/**"),
                     new AntPathRequestMatcher("/.well-known/**"),
-                    new AntPathRequestMatcher("/resource/list") 
+                    new AntPathRequestMatcher("/resource/list"),
+                    // 정적 리소스 확장자 패턴 추가
+                    new AntPathRequestMatcher("/**/*.png"),
+                    new AntPathRequestMatcher("/**/*.jpg"),
+                    new AntPathRequestMatcher("/**/*.jpeg"),
+                    new AntPathRequestMatcher("/**/*.gif"),
+                    new AntPathRequestMatcher("/**/*.css"),
+                    new AntPathRequestMatcher("/**/*.js"),
+                    new AntPathRequestMatcher("/**/*.ico"),
+                    new AntPathRequestMatcher("/**/*.svg"),
+                    new AntPathRequestMatcher("/**/*.woff"),
+                    new AntPathRequestMatcher("/**/*.woff2"),
+                    new AntPathRequestMatcher("/**/*.ttf")
                 ).permitAll()
 
                 // 인증 없이 접근 가능한 로그인/회원가입 관련 페이지
@@ -132,7 +197,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/perform_login")  // 폼 로그인 처리 URL 추가
-                .defaultSuccessUrl("/", true)
+                .successHandler(customSuccessHandler()) // 커스텀 성공 핸들러 사용
                 .failureHandler(customAuthenticationFailureHandler)
                 .permitAll()
             )
@@ -149,8 +214,10 @@ public class SecurityConfig {
                     // 권한 부족 시 403 페이지 또는 로그인 페이지로 리다이렉트
                     String requestedUrl = request.getRequestURI();
                     
-                    // 현재 요청 URL을 세션에 저장 (로그인 후 원래 페이지로 돌아가기 위함)
-                    request.getSession().setAttribute("returnUrl", requestedUrl);
+                    // 정적 리소스가 아닌 경우만 returnUrl로 저장
+                    if (isValidReturnUrl(requestedUrl)) {
+                        request.getSession().setAttribute("returnUrl", requestedUrl);
+                    }
                     
                     // Ajax 요청인 경우 JSON 응답
                     if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
@@ -159,20 +226,24 @@ public class SecurityConfig {
                         response.getWriter().write("{\"error\":\"접근 권한이 없습니다.\"}");
                     } else {
                         // 일반 요청인 경우 로그인 페이지로 리다이렉트
-                        response.sendRedirect("/login?error=access_denied&returnUrl=" + requestedUrl);
+                        response.sendRedirect("/login?error=access_denied");
                     }
                 })
                 .authenticationEntryPoint((request, response, authException) -> {
                     // 인증되지 않은 사용자의 접근 시
                     String requestedUrl = request.getRequestURI();
-                    request.getSession().setAttribute("returnUrl", requestedUrl);
+                    
+                    // 정적 리소스가 아닌 경우만 returnUrl로 저장
+                    if (isValidReturnUrl(requestedUrl)) {
+                        request.getSession().setAttribute("returnUrl", requestedUrl);
+                    }
                     
                     if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                         response.setStatus(401);
                         response.setContentType("application/json;charset=UTF-8");
                         response.getWriter().write("{\"error\":\"로그인이 필요합니다.\"}");
                     } else {
-                        response.sendRedirect("/login?returnUrl=" + requestedUrl);
+                        response.sendRedirect("/login");
                     }
                 })
             );

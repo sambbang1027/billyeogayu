@@ -5,24 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>빌려가유 - 비밀번호 재설정</title>
+    <title>빌려가유 - 비밀번호찾기</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/verification/style.css'/>">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
     <div class="component">
-        <!-- 헤더 -->
-        <div class="header">
-            <div class="header-content">
-                <img class="logo" src="<c:url value='/assets/layout/user/logo.svg'/>" alt="빌려가유 로고" />
-                <div class="header-links">
-                    <span class="header-link">회원가입</span>
-                    <span class="header-link">로그인</span>
-                    <span class="header-link">마이페이지</span>
-                    <span class="header-link">로그아웃</span>
-                </div>
-            </div>
-        </div>
 
         <div class="frame">
             <!-- 사이드바 -->
@@ -48,7 +36,7 @@
                     </div>
                     <div class="menu-item active">
                         <a href="<c:url value='/verification?purpose=reset-password'/>" class="menu-link">
-                            <div class="menu-text">비밀번호 재설정</div>
+                            <div class="menu-text">비밀번호찾기</div>
                         </a>
                     </div>
                 </div>
@@ -56,7 +44,7 @@
 
             <!-- 메인 컨텐츠 -->
             <div class="main-content">
-                <div class="page-title">비밀번호 재설정</div>
+                <div class="page-title">비밀번호찾기</div>
                 
                 <div class="register-container">
                     <div class="password-reset-container">
@@ -99,7 +87,7 @@
                                     이전
                                 </button>
                                 <button type="submit" class="modal-button" id="resetBtn">
-                                    비밀번호 재설정
+                                    비밀번호찾기
                                 </button>
                             </div>
                         </form>
@@ -113,7 +101,7 @@
                 <span class="breadcrumb-arrow">></span>
                 <span class="breadcrumb-item">회원</span>
                 <span class="breadcrumb-arrow">></span>
-                <span class="breadcrumb-item current">비밀번호 재설정</span>
+                <span class="breadcrumb-item current">비밀번호찾기</span>
             </div>
         </div>
     </div>

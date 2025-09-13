@@ -11,18 +11,7 @@
 </head>
 <body>
     <div class="component">
-        <!-- 헤더 -->
-        <div class="header">
-            <div class="header-content">
-                <img class="logo" src="<c:url value='/static/images/logo.png'/>" alt="빌려가유 로고" />
-                <div class="header-links">
-                    <span class="header-link">회원가입</span>
-                    <span class="header-link">로그인</span>
-                    <span class="header-link">마이페이지</span>
-                    <span class="header-link">로그아웃</span>
-                </div>
-            </div>
-        </div>
+
 
         <div class="frame">
             <!-- 사이드바 -->
@@ -48,7 +37,7 @@
                     </div>
                     <div class="menu-item">
                         <a href="<c:url value='/verification?purpose=reset-password'/>" class="menu-link">
-                            <div class="menu-text">비밀번호 재설정</div>
+                            <div class="menu-text">비밀번호찾기</div>
                         </a>
                     </div>
                 </div>
@@ -73,7 +62,7 @@
                         <!-- 버튼 그룹 -->
                         <div class="button-group">
                             <button type="button" class="modal-button secondary" onclick="location.href='<c:url value="/verification?purpose=reset-password"/>'">
-                                비밀번호 재설정
+                                비밀번호찾기
                             </button>
                             <button type="button" class="modal-button" onclick="location.href='<c:url value="/login"/>'">
                                 로그인하기
