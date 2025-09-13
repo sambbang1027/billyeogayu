@@ -13,7 +13,7 @@ public class MainController {
     /**
      * 메인 홈페이지 - 루트 경로와 /main 모두 처리
      */
-    @GetMapping("/")
+    @GetMapping("/a")
     public String home(Model model) {
         log.info("=== 메인 페이지 요청 ===");
         

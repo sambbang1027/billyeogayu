@@ -11,10 +11,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+
 import app.domains.users.dao.UsersRepository;
 import app.domains.users.model.Users;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
@@ -28,6 +31,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + loginId);
         }
+        // 디버깅 로그 추가
+        log.info("=== 로그인 사용자 정보 ===");
+        log.info("loginId: {}", user.getLoginId());
+        log.info("DB role: {}", user.getRole());
 
         // 사용자 권한 설정
         Collection<GrantedAuthority> authorities = new ArrayList<>();

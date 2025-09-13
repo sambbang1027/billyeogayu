@@ -79,7 +79,7 @@
                     </c:if>
 
                     <!-- 로그인 폼 -->
-                    <form id="loginForm" action="<c:url value='/login'/>" method="post" class="login-form">
+                    <form id="loginForm" action="#" method="post" class="login-form">
                         <div class="form-group">
                             <input type="text" 
                                    id="userid" 
@@ -104,7 +104,7 @@
                             <label for="remember" class="checkbox-label">로그인 상태 유지</label>
                         </div>
                         
-                        <button type="submit" class="login-button" id="loginBtn">
+                        <button type="button" class="login-button" id="loginBtn">
                             <span class="button-text">로그인</span>
                             <span class="loading-spinner" style="display: none;">로그인 중...</span>
                         </button>
@@ -138,10 +138,21 @@
     <!-- JavaScript -->
     <script>
         $(document).ready(function() {
-            // 로그인 폼 제출 처리
-            $('#loginForm').on('submit', function(e) {
+            // 로그인 버튼 클릭 처리
+            $('#loginBtn').on('click', function(e) {
                 e.preventDefault();
-                
+                handleLogin();
+            });
+            
+            // Enter 키 처리
+            $('.form-input').on('keypress', function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    handleLogin();
+                }
+            });
+            
+            function handleLogin() {
                 const userid = $('#userid').val().trim();
                 const password = $('#password').val().trim();
                 
@@ -167,70 +178,80 @@
                 $buttonText.hide();
                 $loadingSpinner.show();
                 
-             // AJAX 로그인 요청
+                // AJAX 로그인 요청
                 $.ajax({
-                   url: '<c:url value="/api/login"/>',
-                   type: 'POST',
-                   contentType: 'application/json',
-                   data: JSON.stringify({
-                       loginId: userid,
-                       password: password
-                   }),
-                   success: function(response) {
-                       if (response.success) {
-                           // 로그인 성공
-                           console.log('로그인 성공:', response);
-                           
-                           // sessionStorage에서 returnUrl 확인
-                           const returnUrl = sessionStorage.getItem('returnUrl');
-                           
-                           if (returnUrl) {
-                               // 저장된 URL이 있으면 해당 페이지로 이동
-                               sessionStorage.removeItem('returnUrl'); // 사용 후 제거
-                               console.log('저장된 returnUrl로 이동:', returnUrl);
-                               window.location.href = returnUrl;
-                           } else if (response.data && response.data.returnUrl) {
-                               // 서버에서 returnUrl이 온 경우
-                               console.log('서버 returnUrl로 이동:', response.data.returnUrl);
-                               window.location.href = response.data.returnUrl;
-                           } else {
-                               // 기본적으로 자원 목록 페이지로 이동
-                               alert('로그인되었습니다.');
-                               window.location.href = '<c:url value="/resource/list"/>';
-                           }
-                       } else {
-                           // 로그인 실패
-                           alert(response.message || '로그인에 실패했습니다.');
-                           resetLoginButton();
-                       }
-                   },
-                   error: function(xhr) {
-                       let errorMessage = '로그인 중 오류가 발생했습니다.';
 
-                       if (xhr.responseJSON && xhr.responseJSON.message) {
-                           errorMessage = xhr.responseJSON.message;
-                       } else if (xhr.status === 401) {
-                           errorMessage = '아이디 또는 비밀번호가 잘못되었습니다.';
-                       }
-
-                       alert(errorMessage);
-                       resetLoginButton();
-                   }
+                    url: '<c:url value="/api/login"/>',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        loginId: userid,
+                        password: password
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            // 로그인 성공
+                            console.log('로그인 성공:', response);
+                            
+                            // sessionStorage에서 returnUrl 확인
+                            const returnUrl = sessionStorage.getItem('returnUrl');
+                            
+                            if (returnUrl) {
+                                // 저장된 URL이 있으면 해당 페이지로 이동
+                                sessionStorage.removeItem('returnUrl'); // 사용 후 제거
+                                console.log('저장된 returnUrl로 이동:', returnUrl);
+                                window.location.href = returnUrl;
+                            } else if (response.data && response.data.returnUrl) {
+                                // 서버에서 returnUrl이 온 경우
+                                console.log('서버 returnUrl로 이동:', response.data.returnUrl);
+                                window.location.href = response.data.returnUrl;
+                            } else {
+                                // 사용자 권한에 따라 다른 페이지로 이동
+                                const authorities = response.data.authorities;
+                                console.log('사용자 권한:', authorities);
+                                
+                                // ADMIN 권한이 있는지 확인
+                                const isAdmin = authorities && authorities.some(auth => 
+                                    auth.authority === 'ROLE_ADMIN' || auth === 'ROLE_ADMIN'
+                                );
+                                
+                                if (isAdmin) {
+                                    console.log('관리자로 로그인 - admin/dashboard로 이동');
+                                    alert('관리자로 로그인되었습니다.');
+                                    window.location.href = '<c:url value="/admin/dashboard"/>';
+                                } else {
+                                    console.log('일반사용자로 로그인 - resource/list로 이동');
+                                    alert('로그인되었습니다.');
+                                    window.location.href = '<c:url value="/resource/list"/>';
+                                }
+                            }
+                        } else {
+                            // 로그인 실패
+                            alert(response.message || '로그인에 실패했습니다.');
+                            resetLoginButton();
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = '로그인 중 오류가 발생했습니다.';
+                        
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.status === 401) {
+                            errorMessage = '아이디 또는 비밀번호가 잘못되었습니다.';
+                        }
+                        
+                        alert(errorMessage);
+                        resetLoginButton();
+                    }
                 });
+                
                 function resetLoginButton() {
                     $loginBtn.prop('disabled', false);
                     $buttonText.show();
                     $loadingSpinner.hide();
                     $('#password').val(''); // 비밀번호 필드 초기화
                 }
-            });
-            
-            // Enter 키 처리
-            $('.form-input').on('keypress', function(e) {
-                if (e.which === 13) {
-                    $('#loginForm').submit();
-                }
-            });
+            }
             
             // 에러 메시지가 있으면 포커스
             if ($('.error-message').length > 0) {

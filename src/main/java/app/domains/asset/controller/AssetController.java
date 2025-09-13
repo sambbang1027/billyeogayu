@@ -27,6 +27,13 @@ import java.util.*;
 public class AssetController {
 
     private final AssetService assetService;
+    
+
+    @GetMapping
+    public String redirectToList() {
+        return "redirect:/admin/asset/list";
+    }
+    
 
     @GetMapping("/list")
     public String asset(@RequestParam(name = "assetStatus", required = false) String assetStatus,
