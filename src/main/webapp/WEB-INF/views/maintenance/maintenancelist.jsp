@@ -96,6 +96,7 @@
 			  <thead>
 			    <tr>
 			      <th>No</th>
+			      <th>종류</th>
 			      <th>모델명</th>
 			      <th>점검 일시</th>
 			      <th>점검 유형</th>

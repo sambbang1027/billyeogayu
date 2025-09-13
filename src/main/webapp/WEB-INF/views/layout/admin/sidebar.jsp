@@ -105,7 +105,7 @@
                     window.location.href = "<c:url value='/admin/maintenance'/>";
                 } else if ($(this).hasClass("reservation-container")) {
                     $(".reservation-img").attr("src", "<c:url value='/assets/layout/admin/reservation-select.svg'/>");
-                    window.location.href = "<c:url value='/admin/reservation'/>";
+                    window.location.href = "<c:url value='/admin/reservations'/>";
                 }
             });
         });

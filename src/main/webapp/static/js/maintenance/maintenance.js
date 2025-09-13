@@ -25,7 +25,7 @@ function loadList(page = 1){
 	const filters = getFilterValues();
 	console.log('서버에 필터링 보내는 중 ' , filters);
 	$.ajax({
-		url : "/maintenance/search",
+		url : "/admin/maintenance/search",
 		type : "GET",
 		data : {...filters, page : page}, //DTO 매핑
 		success : function(res){
@@ -81,6 +81,7 @@ function renderTable(list){
 		$tbody.append(`
 			<tr>
 					<td>${i + 1}</td>
+					<td>${row.assetKind}</td>
 					<td>${row.assetName}</td>
 					 <td>${row.maintDate && row.maintDate !== "null" ? row.maintDate : ""}</td>
 					<td>${typeHtml}</td>

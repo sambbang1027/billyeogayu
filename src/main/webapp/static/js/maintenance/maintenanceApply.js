@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function partList(assetId){
 
 	$.ajax({
-		url : "/maintenance/part-list/"+assetId ,
+		url : "/admin/maintenance/part-list/"+assetId ,
 		type : "GET",
 		success : function(res){
 			console.log("서버 응답:", res); // ✅ 확인 필수
@@ -85,12 +85,13 @@ $(document).on("click", ".apply-btn-submit", function() {
 		// 모달의 data 속성에서 assetId 가져오기
 		const assetId = $("#inspectionApplyModal").attr("data-asset-id");
 
-		console.log('자원 ID: ', assetId, '점검자 : ', resolverName, '정검 유형 : ', inspectionStatus, '항목 : ', JSON.stringify(data));
+		console.log('담당자: ',adminId, ' 자원 ID: ', assetId, ' 점검자 : ', resolverName, 
+							'정검 유형 : ', inspectionStatus, '항목 : ', JSON.stringify(data));
 		
 		
 		// 서버 전송 
 	$.ajax({
-		url : "/maintenance/apply",
+		url : "/admin/maintenance/apply",
 		type : "POST",
 		contentType : "application/json; charset=UTF-8",
 		data : JSON.stringify({
