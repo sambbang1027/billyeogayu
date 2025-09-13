@@ -44,7 +44,7 @@ function initChart(id, factory) {
 function loadCategoryData() {
     console.log("Loading category data via AJAX...");
     
-    fetch('/dashboard/categoryData')
+    fetch('/admin/dashboard/categoryData')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -69,7 +69,7 @@ function loadDistributionData() {
     // 스켈레톤 로딩 표시
     showSkeletonLoading("distributionChart");
     
-    fetch('/dashboard/distributionData')
+    fetch('/admin/dashboard/distributionData')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -86,6 +86,123 @@ function loadDistributionData() {
             hideSkeletonLoading("distributionChart");
             showErrorMessage("distributionChart", "데이터를 불러오는데 실패했습니다.");
         });
+}
+
+// AJAX로 사용량 차트 필터 데이터 로드
+function loadUsageFilters() {
+    console.log("Loading usage filters via AJAX...");
+    
+    fetch('/admin/dashboard/usageFilters')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(filterData => {
+            console.log('Usage filters loaded:', filterData);
+            renderUsageFilters(filterData);
+        })
+        .catch(error => {
+            console.error('Error loading usage filters:', error);
+        });
+}
+
+// 사용량 차트 필터 렌더링
+function renderUsageFilters(filterData) {
+    const usageFilters = document.querySelector('.asset-usage .chart-filters');
+    if (!usageFilters) return;
+    
+    const categoryModels = filterData.categoryModels;
+    const addresses = filterData.addresses;
+    
+    // 드롭다운 HTML 생성
+    usageFilters.innerHTML = `
+        <div class="filter-dropdown">
+            <select id="categoryFilter" class="filter-select">
+                <option value="">전체 카테고리</option>
+                ${Object.keys(categoryModels).map(cat => 
+                    `<option value="${cat}">${cat}</option>`
+                ).join('')}
+            </select>
+        </div>
+        <div class="filter-dropdown">
+            <select id="modelFilter" class="filter-select">
+                <option value="">전체 모델</option>
+            </select>
+        </div>
+        <div class="filter-dropdown">
+            <select id="addressFilter" class="filter-select">
+                <option value="">전체 지역</option>
+                ${addresses.map(addr => 
+                    `<option value="${addr}">${addr}</option>`
+                ).join('')}
+            </select>
+        </div>
+    `;
+    
+    // 카테고리-모델 연동 설정
+    setupCategoryModelFilter(categoryModels);
+    setupUsageFilterEvents();
+}
+
+// 카테고리별 모델 필터 연동
+function setupCategoryModelFilter(categoryModels) {
+    const categoryFilter = document.getElementById('categoryFilter');
+    const modelFilter = document.getElementById('modelFilter');
+    
+    if (!categoryFilter || !modelFilter) return;
+    
+    categoryFilter.addEventListener('change', function() {
+        const selectedCategory = this.value;
+        
+        // 선택된 카테고리에 해당하는 모델들만 표시
+        if (selectedCategory && categoryModels[selectedCategory]) {
+            const models = categoryModels[selectedCategory];
+            modelFilter.innerHTML = '<option value="">전체 모델</option>' +
+                models.map(model => `<option value="${model}">${model}</option>`).join('');
+        } else {
+            // 전체 카테고리 선택 시 모든 모델 표시
+            const allModels = Object.values(categoryModels).flat();
+            modelFilter.innerHTML = '<option value="">전체 모델</option>' +
+                allModels.map(model => `<option value="${model}">${model}</option>`).join('');
+        }
+        
+        // 모델 필터 초기화
+        modelFilter.value = '';
+        
+        // 차트 데이터 로드
+        loadUsageChartData();
+    });
+}
+
+// 사용량 차트 필터 이벤트 설정
+function setupUsageFilterEvents() {
+    const categoryFilter = document.getElementById('categoryFilter');
+    const modelFilter = document.getElementById('modelFilter');
+    const addressFilter = document.getElementById('addressFilter');
+    
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', loadUsageChartData);
+    }
+    if (modelFilter) {
+        modelFilter.addEventListener('change', loadUsageChartData);
+    }
+    if (addressFilter) {
+        addressFilter.addEventListener('change', loadUsageChartData);
+    }
+}
+
+// 사용량 차트 데이터 로드 (필터 적용)
+function loadUsageChartData() {
+    const category = document.getElementById('categoryFilter')?.value || '';
+    const model = document.getElementById('modelFilter')?.value || '';
+    const address = document.getElementById('addressFilter')?.value || '';
+    
+    console.log('Loading usage chart data with filters:', { category, model, address });
+    
+    // TODO: 실제 사용량 데이터 로드 로직 구현
+    // fetch('/admin/dashboard/usageData', { ... })
 }
 
 // 기본 차트 데이터 (에러 시 사용)
@@ -149,7 +266,7 @@ function showErrorMessage(chartId, message) {
     
     // 에러 메시지 그리기
     ctx.fillStyle = '#666';
-    ctx.font = '14px Arial';
+    ctx.font = '14px Arial';l
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(message, canvas.width / 2, canvas.height / 2);
@@ -258,6 +375,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // AJAX로 분포 데이터 로드 후 차트 생성
     loadDistributionData();
+    
+    // AJAX로 사용량 차트 필터 로드
+    loadUsageFilters();
 
     initChart(
         "usageChart",

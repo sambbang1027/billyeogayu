@@ -21,4 +21,10 @@ public interface DashBoardService {
      * 카테고리별 총 자산 수 (파이 차트용)
      */
     Map<String, Object> getAssetDistributionData();
+    
+    /**
+     * 사용량 차트 필터 데이터
+     * 카테고리, 모델명, 예약 지역 목록
+     */
+    Map<String, Object> getUsageChartFilters();
 }

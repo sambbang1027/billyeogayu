@@ -66,10 +66,7 @@
             <div class="asset-usage">
                 <h2 class="section-title">자원 종류별 사용량</h2>
                 <div class="chart-filters">
-                    <button class="filter-btn active">트랙터</button>
-                    <button class="filter-btn">TRAC-123</button>
-                    <button class="filter-btn">연도별</button>
-                    <button class="filter-btn">지역별</button>
+                    <!-- 동적으로 생성됨 -->
                 </div>
                 <div class="chart-container">
                     <canvas id="usageChart"></canvas>

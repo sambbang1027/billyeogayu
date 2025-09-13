@@ -43,4 +43,10 @@ public class DashBoardController {
     public Map<String, Object> getDistributionData() {
         return dashBoardService.getAssetDistributionData();
     }
+    
+    @GetMapping("/usageFilters")
+    @ResponseBody
+    public Map<String, Object> getUsageFilters() {
+        return dashBoardService.getUsageChartFilters();
+    }
 }

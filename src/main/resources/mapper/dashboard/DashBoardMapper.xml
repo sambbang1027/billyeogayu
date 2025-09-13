@@ -7,27 +7,65 @@
 
     <select id="getTotalAssetCount" resultType="long">
         SELECT COUNT(asset_id) 
-        FROM asset 
+        FROM ASSET 
         WHERE is_deleted = 'N'
     </select>
     
     <select id="getAssetCountByStatus" parameterType="string" resultType="long">
         SELECT COUNT(asset_id) 
-        FROM asset 
+        FROM ASSET 
         WHERE status = #{status} 
           AND is_deleted = 'N'
     </select>
     
     <select id="getAssetCountByCategory" resultType="app.domains.dashboard.dto.CategoryDataDto">
         SELECT 
-            category,
+            CASE 
+                WHEN category = 'TRACTOR' THEN '트랙터'
+                WHEN category = 'COMBINE' THEN '콤바인'
+                WHEN category = 'RICE_PLANT' THEN '이앙기'
+                WHEN category = 'TRANSPORT' THEN '운반차'
+                WHEN category = 'LOADER' THEN '로더'
+                ELSE category
+            END as category,
             COUNT(*) as totalCount,
             COUNT(CASE WHEN status = 'MAINTENANCE_REQUIRED' THEN 1 END) as maintenanceRequiredCount
-        FROM asset 
+        FROM ASSET 
         WHERE is_deleted = 'N' 
-          AND category IN ('TRACTOR', 'COMBINE', 'RICE_PLANT', 'TRANSPORT', 'LOADER')
+          AND category IN ('트랙터', '콤바인', '이앙기', '운반차', '로더')
         GROUP BY category
         ORDER BY COUNT(*) DESC
+    </select>
+    
+    <!-- 사용량 차트 필터 데이터 조회 -->
+    <select id="getAssetCategories" resultType="string">
+        SELECT DISTINCT category 
+        FROM ASSET 
+        WHERE is_deleted = 'N' 
+        ORDER BY category
+    </select>
+    
+    <select id="getAssetModelsByCategory" resultType="app.domains.dashboard.dto.CategoryModelDto">
+        SELECT category, modelName, modelCount
+        FROM (
+            SELECT 
+                category,
+                name as modelName,
+                COUNT(*) as modelCount,
+                ROW_NUMBER() OVER (PARTITION BY category ORDER BY COUNT(*) DESC) as rn
+            FROM ASSET 
+            WHERE is_deleted = 'N' 
+              AND category IN ('트랙터', '콤바인', '이앙기', '운반차', '로더')
+            GROUP BY category, name
+        )
+        WHERE rn &lt; 8
+        ORDER BY category, modelCount DESC
+    </select>
+    
+    <select id="getReservationAddresses" resultType="string">
+        SELECT DISTINCT address 
+        FROM RESERVATION 
+        ORDER BY address
     </select>
 
 </mapper>
