@@ -156,7 +156,7 @@
         LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
         WHERE r.USER_ID = #{userId}
         AND a.IS_DELETED = 'N'
-        AND r.STATUS = 'APPROVED'
+        AND r.STATUS IN ('APPROVED', 'COMPLETED')
         AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
         AND (
             r.COMPLETED_AT IS NOT NULL 
@@ -195,7 +195,7 @@
         LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
         WHERE r.USER_ID = #{userId}
         AND a.IS_DELETED = 'N'
-        AND r.STATUS = 'APPROVED'
+        AND r.STATUS IN ('APPROVED', 'COMPLETED')
         AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
         AND (
             r.COMPLETED_AT IS NOT NULL 
@@ -274,33 +274,27 @@
         AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N')
     </update>
 
-    <!-- 내 사용 통계 조회 -->
+    <!-- 내 사용 통계 조회 - 수정됨 -->
     <select id="selectMyUsageStatistics" resultType="map">
         SELECT 
-            COUNT(*) as totalUsageCount,
-            COUNT(CASE WHEN COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount,
-            COUNT(CASE WHEN START_TIME &lt;= SYSDATE AND END_TIME &gt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as activeCount,
-            COUNT(CASE WHEN END_TIME &lt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as overdueCount,
-            NVL(SUM(USAGE_DURATION), 0) as totalUsageMinutes,
-            NVL(AVG(USAGE_DURATION), 0) as avgUsageMinutes
+            COUNT(CASE WHEN STATUS IN ('APPROVED', 'COMPLETED') THEN 1 END) as totalUsageCount,
+            COUNT(CASE WHEN STATUS = 'COMPLETED' OR COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount,
+            COUNT(CASE WHEN STATUS = 'APPROVED' AND START_TIME &lt;= SYSDATE AND END_TIME &gt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as activeCount,
+            COUNT(CASE WHEN STATUS = 'APPROVED' AND END_TIME &lt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as overdueCount,
+            NVL(SUM(CASE WHEN USAGE_DURATION IS NOT NULL THEN USAGE_DURATION ELSE 0 END), 0) as totalUsageMinutes,
+            NVL(AVG(CASE WHEN USAGE_DURATION IS NOT NULL THEN USAGE_DURATION ELSE NULL END), 0) as avgUsageMinutes
         FROM RESERVATION
         WHERE USER_ID = #{userId}
-        AND STATUS = 'APPROVED'
-        AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N')
-        AND (
-            COMPLETED_AT IS NOT NULL 
-            OR START_TIME &lt;= SYSDATE
-        )
     </select>
 
-    <!-- 예약 건수 조회 (상태별) -->
+    <!-- 예약 건수 조회 (상태별) - 수정됨 -->
     <select id="selectReservationCountByStatus" resultType="map">
         SELECT 
             COUNT(*) as totalCount,
-            COUNT(CASE WHEN STATUS = 'PENDING' AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N') THEN 1 END) as pendingCount,
-            COUNT(CASE WHEN STATUS = 'APPROVED' AND (IS_REJECTED IS NULL OR IS_REJECTED = 'N') THEN 1 END) as approvedCount,
-            COUNT(CASE WHEN IS_REJECTED = 'Y' THEN 1 END) as rejectedCount,
-            COUNT(CASE WHEN STATUS = 'APPROVED' AND COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount
+            COUNT(CASE WHEN STATUS = 'PENDING' THEN 1 END) as pendingCount,
+            COUNT(CASE WHEN STATUS = 'APPROVED' THEN 1 END) as approvedCount,
+            COUNT(CASE WHEN STATUS = 'REJECTED' THEN 1 END) as rejectedCount,
+            COUNT(CASE WHEN STATUS = 'COMPLETED' THEN 1 END) as completedCount
         FROM RESERVATION
         WHERE USER_ID = #{userId}
     </select>
@@ -317,7 +311,7 @@
         FROM RESERVATION r
         JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
         WHERE r.USER_ID = #{userId}
-        AND r.STATUS = 'APPROVED'
+        AND r.STATUS IN ('APPROVED', 'COMPLETED')
         AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
         AND r.START_TIME &lt;= SYSDATE
         AND a.IS_DELETED = 'N'

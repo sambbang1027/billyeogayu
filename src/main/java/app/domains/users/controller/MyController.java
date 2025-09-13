@@ -133,6 +133,14 @@ public class MyController {
             // 예약 현황 요약
             Map<String, Object> reservationSummary = myService.getReservationSummary(currentUser.getUserId());
             
+            // ✅ 사용 통계도 추가 (JSP에서 usageStatistics도 표시하므로)
+            Map<String, Object> usageStatistics = myService.getMyUsageStatistics(currentUser.getUserId());
+            
+            // 🔍 디버깅 로그 추가
+            log.info("=== 통계 데이터 디버깅 ===");
+            log.info("reservationSummary: {}", reservationSummary);
+            log.info("usageStatistics: {}", usageStatistics);
+            
             log.info("조회된 예약 건수: {}", reservations != null ? reservations.size() : 0);
             
             // 🔍 각 예약의 사용자 ID 확인
@@ -155,6 +163,7 @@ public class MyController {
             model.addAttribute("user", currentUser);
             model.addAttribute("reservations", reservations);
             model.addAttribute("reservationSummary", reservationSummary);
+            model.addAttribute("usageStatistics", usageStatistics); // ✅ 추가
             model.addAttribute("currentStatus", status);
             model.addAttribute("currentStartDate", startDate);
             model.addAttribute("currentEndDate", endDate);
@@ -280,9 +289,18 @@ public class MyController {
             // 사용 통계
             Map<String, Object> usageStatistics = myService.getMyUsageStatistics(currentUser.getUserId());
             
+            // ✅ 예약 현황 요약도 추가 (JSP에서 reservationSummary도 표시하므로)
+            Map<String, Object> reservationSummary = myService.getReservationSummary(currentUser.getUserId());
+            
+            // 🔍 디버깅 로그 추가
+            log.info("=== 통계 데이터 디버깅 ===");
+            log.info("usageStatistics: {}", usageStatistics);
+            log.info("reservationSummary: {}", reservationSummary);
+            
             model.addAttribute("user", currentUser);
             model.addAttribute("usageHistory", usageHistory);
             model.addAttribute("usageStatistics", usageStatistics);
+            model.addAttribute("reservationSummary", reservationSummary); // ✅ 추가
             model.addAttribute("currentStartDate", startDate);
             model.addAttribute("currentEndDate", endDate);
             model.addAttribute("currentCategory", category);

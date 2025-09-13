@@ -40,29 +40,30 @@
                     <a href="<c:url value='/my/usage-history'/>" class="nav-link">사용 내역 보기</a>
                 </div>
 
-                <!-- 예약 현황 요약 -->
-                <c:if test="${not empty reservationSummary}">
-                    <div class="summary-card">
-                        <div class="summary-grid">
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.totalCount != null ? reservationSummary.totalCount : 0}"/></h4>
-                                <small>전체 예약</small>
-                            </div>
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.pendingCount != null ? reservationSummary.pendingCount : 0}"/></h4>
-                                <small>승인 대기</small>
-                            </div>
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.approvedCount != null ? reservationSummary.approvedCount : 0}"/></h4>
-                                <small>승인됨</small>
-                            </div>
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.completedCount != null ? reservationSummary.completedCount : 0}"/></h4>
-                                <small>완료됨</small>
-                            </div>
-                        </div>
-                    </div>
-                </c:if>
+
+				<!-- 예약 현황 요약 -->
+				<c:if test="${not empty reservationSummary}">
+				    <div class="summary-card">
+				        <div class="summary-grid">
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.TOTALCOUNT != null ? reservationSummary.TOTALCOUNT : 0}"/></h4>
+				                <small>전체 예약</small>
+				            </div>
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.PENDINGCOUNT != null ? reservationSummary.PENDINGCOUNT : 0}"/></h4>
+				                <small>승인 대기</small>
+				            </div>
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.APPROVEDCOUNT != null ? reservationSummary.APPROVEDCOUNT : 0}"/></h4>
+				                <small>승인됨</small>
+				            </div>
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.COMPLETEDCOUNT != null ? reservationSummary.COMPLETEDCOUNT : 0}"/></h4>
+				                <small>완료됨</small>
+				            </div>
+				        </div>
+				    </div>
+				</c:if>
 
                 <!-- 필터링 -->
                 <div class="filter-card">
@@ -119,7 +120,7 @@
                                      onclick="openReservationModal('${reservation.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${empty reservation.assetImage ? "default.png" : reservation.assetImage}'/>" 
+                                            <img src="<c:url value='${empty reservation.assetImage ? "default.png" : reservation.assetImage}'/>" 
                                                  alt="<c:out value='${reservation.assetName}'/>" 
                                                  class="asset-image">
                                             <div class="asset-details">
