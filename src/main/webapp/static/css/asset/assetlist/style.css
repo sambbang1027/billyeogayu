@@ -641,7 +641,8 @@
 .modal-company-container,
 .modal-model-container,
 .modal-lifecycle-container,
-.modal-image-container {
+.modal-image-container,
+.modal-owner-container{
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
