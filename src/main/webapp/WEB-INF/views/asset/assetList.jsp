@@ -141,6 +141,7 @@
                     <th>종류</th>
                     <th>제조사</th>
                     <th>모델명</th>
+                    <th>소유자</th>
                     <th>사용시간</th>
                     <th>위치</th>
                     <th>점검 예정일</th>
@@ -156,6 +157,14 @@
                         <td>${asset.category}</td>
                         <td>${asset.company}</td>
                         <td>${asset.modelName}</td>
+                            <td>
+                              <c:choose>
+                                <c:when test="${not empty asset.owner}">
+                                  <c:out value="${asset.owner}"/>
+                                </c:when>
+                                <c:otherwise>농촌진흥청</c:otherwise>
+                              </c:choose>
+                            </td>
                         <td>${asset.usageTime}시간</td>
                         <td>${asset.location}</td>
                         <td>
@@ -313,6 +322,8 @@
 </div>
 
 
+<jsp:include page="/WEB-INF/views/asset/assetModal.jsp"/>
+록
 
 <!-- 자산등록 모달 -->
 <div class="modal" id="assetRegisterModal">
@@ -344,6 +355,11 @@
                             <label>점검주기</label>
                             <input class="modal-input" placeholder="ex) 1일, 1개월, 1년" />
                         </div>
+
+                          <div class="modal-owner-container">
+                            <label>소유자</label>
+                            <input class="modal-input" placeholder="ex) 홍길동" />
+                          </div>
 
                         <div class="modal-image-container">
                             <div class="modal-image-box">
@@ -416,6 +432,10 @@
                     <div class="detail-info-box">
                         <label>제조사</label>
                         <div data-field="company"></div>
+                    </div>
+                    <div class="detail-info-box">
+                      <label>소유자</label>
+                      <div data-field="owner"></div>
                     </div>
                     <div class="detail-info-box">
                         <label>사용기간</label>
@@ -756,83 +776,171 @@ function parseDurationToHours(s) {
 (function registerSubmitWiring() {
   const submitBtn = document.querySelector('#assetRegisterModal .confirm-btn');
 
+  // 간단한 에러 표시/해제 유틸
+  function clearErrors() {
+    document.querySelectorAll('#assetRegisterModal .is-invalid').forEach(el=>{
+      el.classList.remove('is-invalid');
+      el.removeAttribute('aria-invalid');
+      el.removeAttribute('title');
+    });
+  }
+  function markError(el, msg) {
+    if (!el) return;
+    el.classList.add('is-invalid');
+    el.setAttribute('aria-invalid', 'true');
+    if (msg) el.title = msg;
+  }
+  function focusScroll(el){
+    try { el?.focus(); el?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){}
+  }
+
   submitBtn.addEventListener('click', async (e) => {
     e.preventDefault();
+    clearErrors();
 
-    try {
-      const category = document.querySelector('#assetRegisterModal .modal-category-container .modal-input')?.value?.trim();
-      const company = document.querySelector('#assetRegisterModal .modal-company-container .modal-input')?.value?.trim();
-      const modelName = document.querySelector('#assetRegisterModal .modal-model-container .modal-input')?.value?.trim();
+    // 필드 참조
+    const categoryEl = document.querySelector('#assetRegisterModal .modal-category-container .modal-input');
+    const companyEl  = document.querySelector('#assetRegisterModal .modal-company-container .modal-input');
+    const modelEl    = document.querySelector('#assetRegisterModal .modal-model-container .modal-input');
+    const cycleEl    = document.querySelector('#assetRegisterModal .asset-info-bottom-container .modal-lifecycle-container .modal-input');
+    const imgUrlEl   = document.getElementById('assetImageUrl');
+    const ownerEl = document.querySelector('#assetRegisterModal .modal-owner-container .modal-input');
+    const category  = categoryEl?.value?.trim();
+    const company   = companyEl?.value?.trim();
+    const modelName = modelEl?.value?.trim();
+    const cycleStr  = cycleEl?.value?.trim();
+    const imageUrl  = imgUrlEl?.value?.trim();
 
-      if (!category || !company || !modelName) {
-        alert('종류, 제조사, 모델명은 필수 입력 항목입니다.');
-        return;
+    // ===== 유효성 검사(전부 필수) =====
+    let firstInvalid = null;
+
+    if (!category){ markError(categoryEl, '종류는 필수입니다.'); firstInvalid = firstInvalid || categoryEl; }
+    if (!company){  markError(companyEl,  '제조사는 필수입니다.'); firstInvalid = firstInvalid || companyEl; }
+    if (!modelName){markError(modelEl,    '모델명은 필수입니다.'); firstInvalid = firstInvalid || modelEl; }
+
+    if (!cycleStr){
+      markError(cycleEl, '점검주기는 필수입니다. 예: 1개월, 30일, 720시간');
+      firstInvalid = firstInvalid || cycleEl;
+    }
+    const maintenance = cycleStr ? parseDurationToHours(cycleStr) : 0;
+    if (maintenance <= 0){
+      markError(cycleEl, '점검주기는 0보다 커야 합니다.');
+      firstInvalid = firstInvalid || cycleEl;
+    }
+
+    if (!imageUrl){
+      const nameInp = document.getElementById('assetImageName');
+      markError(nameInp, '사진 첨부는 필수입니다.');
+      firstInvalid = firstInvalid || nameInp;
+    }
+
+    // 부품(최소 1개, 각 행 이름/주기 모두 필수)
+    const rows = document.querySelectorAll('#partList .modal-part-info-container');
+    if (!rows.length){
+      // row가 없다면 기본 1개 추가
+      document.getElementById('addPartBtn')?.click();
+    }
+    const validParts = [];
+    rows.forEach(row=>{
+      const nameEl  = row.querySelector('.modal-part-input');
+      const cycEl   = row.querySelector('.modal-part-lifecycle-input');
+      const nameVal = nameEl?.value?.trim();
+      const cycStr  = cycEl?.value?.trim();
+      const cycH    = cycStr ? parseDurationToHours(cycStr) : 0;
+
+      if (!nameVal){ markError(nameEl, '부품 종류는 필수입니다.'); firstInvalid = firstInvalid || nameEl; }
+      if (!cycStr){  markError(cycEl,  '부품 점검주기는 필수입니다.'); firstInvalid = firstInvalid || cycEl; }
+      if (cycStr && cycH <= 0){ markError(cycEl, '부품 점검주기는 0보다 커야 합니다.'); firstInvalid = firstInvalid || cycEl; }
+
+      if (nameVal && cycH > 0){
+        validParts.push({ partName: nameVal, maintenanceCycle: cycH, partStatus: 'AVAILABLE' });
       }
+    });
 
-      const assetData = {
+    // 에러가 있으면 중단
+    if (firstInvalid){
+      focusScroll(firstInvalid);
+      showAssetError('모두 항목이 필수 입력입니다.');
+      return;
+    }
+    if (validParts.length === 0){
+      showAssetError('부품을 최소 1개 이상 정확히 입력해 주세요.');
+      return;
+    }
+
+    // 서버 전송 payload
+    const payload = {
+      asset: {
         category,
         company,
         modelName,
-        assetStatus: 'AVAILABLE'
-      };
+        owner: ownerEl?.value?.trim(),
+        assetStatus: 'AVAILABLE',
+        imagePath: imageUrl,
+        maintenanceCycle: maintenance
+      },
+      parts: validParts
+    };
 
-      const imageUrl = document.getElementById('assetImageUrl')?.value?.trim();
-      if (imageUrl) assetData.imagePath = imageUrl;
 
-      const cycleStr = document.querySelector('#assetRegisterModal .asset-info-bottom-container .modal-lifecycle-container .modal-input')?.value?.trim();
-      if (cycleStr) {
-        const maintenance = parseDurationToHours(cycleStr);
-        if (maintenance > 0) assetData.maintenanceCycle = maintenance;
-      }
+// 확인 모달
+let isSubmitting = false;
 
-      const partRows = document.querySelectorAll('#partList .modal-part-info-container');
-      const validParts = [];
-      partRows.forEach((row) => {
-        const partName = row.querySelector('.modal-part-input')?.value?.trim();
-        const cycleStr = row.querySelector('.modal-part-lifecycle-input')?.value?.trim();
+assetModal.confirm({
+  title: "자산 등록",
+  message: "입력한 정보로 등록하시겠습니까?",
+  okText: "등록",
+  cancelText: "취소",
+  onOk: async () => {
+    if (isSubmitting) return false;
+    isSubmitting = true;
 
-        if (partName && partName.length > 0) {
-          const part = {
-            partName,
-            partStatus: 'AVAILABLE'
-          };
+    try {
+      // (중복 파트 제거 – ORA-00001 방지)
+      payload.parts = Array.from(
+        new Map(payload.parts.map(p => [String(p.partName || '').trim(), p])).values()
+      );
 
-          if (cycleStr && cycleStr.length > 0) {
-            const cycleHours = parseDurationToHours(cycleStr);
-            if (cycleHours > 0) part.maintenanceCycle = cycleHours;
-          }
-          validParts.push(part);
-        }
-      });
-
-      const payload = {
-        asset: assetData,
-        parts: validParts
-      };
+      const headers = { 'Content-Type': 'application/json' };
+      try { Object.assign(headers, typeof getCsrfHeaders === 'function' ? getCsrfHeaders() : {}); } catch(_) {}
 
       const res = await fetch('<c:url value="/admin/asset/register"/>', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(document.querySelector('meta[name="_csrf_header"]')
-            ? { [document.querySelector('meta[name="_csrf_header"]').getAttribute('content')]:
-                document.querySelector('meta[name="_csrf"]').getAttribute('content') }
-            : {})
-        },
+        headers,
+        credentials: 'same-origin',
         body: JSON.stringify(payload)
       });
+      if (!res.ok) {
+        const msg = (await res.text()).trim();
+        throw new Error(msg || ('등록 실패 (HTTP ' + res.status + ')'));
+      }
 
-      if (!res.ok) throw new Error(await res.text() || '등록 실패');
+      // ===== 성공: 모달/오버레이 정리 =====
+      try { assetModal.close?.(); } catch (_) {}
+      const regModal = document.getElementById('assetRegisterModal');
+      if (regModal) regModal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      document.body.style.paddingRight = '';
 
-      window.location.href = '<c:url value="/admin/asset/list"/>';
+      // ===== 안내 후 하드 리로드 =====
+      window.location.replace(window.location.pathname + window.location.search);
 
-    } catch (error) {
-      console.error('Registration failed:', error);
-      alert('등록 중 오류가 발생했습니다: ' + error.message);
+      return true;
+    } catch (err) {
+      try { assetModal.close?.(); } catch (_) {}
+      (typeof showAssetError === 'function' ? showAssetError : alert)('등록 중 오류: ' + err.message);
+      return false;
+    } finally {
+      isSubmitting = false;
     }
+  }
+});
+
+
+
+
   });
 })();
-
 
 
 
@@ -918,6 +1026,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setField("[data-field='category']", asset?.category);
       setField("[data-field='model']", asset?.modelName);
       setField("[data-field='company']", asset?.company);
+      setField("[data-field='owner']", asset?.owner ? asset.owner : "농촌진흥청");
       setField("[data-field='usageTime']", asset?.usageTime);
       setField("[data-field='maintenanceCycle']", formatHoursToYMDH(asset?.maintenanceCycle));
       setField("[data-field='expectedDate']", formatYmdDot(asset?.expectedMaintenanceDate));
@@ -1199,118 +1308,140 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("수정 조회 중 오류가 발생했습니다.");
     }
 
-    editModal.dataset.assetId = assetId;
+editModal.dataset.assetId = assetId;
 
- {
-   const oldBtn = editModal.querySelector(".edit-modal-edit-btn");
-   const submitBtn = oldBtn.cloneNode(true);
-   oldBtn.parentNode.replaceChild(submitBtn, oldBtn);
+// 별도 스코프(중복 바인딩 방지용)
+{
+  const oldBtn = editModal.querySelector(".edit-modal-edit-btn");
+  const submitBtn = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(submitBtn, oldBtn);
 
-   submitBtn.addEventListener("click", async (e) => {
-     e.preventDefault();
+  submitBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
 
-     try {
-       const aid = editModal.dataset.assetId || assetId;
+    try {
+      const aid = editModal.dataset.assetId || assetId;
 
-       const res = await fetch("<c:url value='/admin/asset/detail/'/>" + aid, { method: "GET" });
-       if (!res.ok) throw new Error("서버 오류 " + res.status);
-       const { asset, parts } = await res.json();
+      const res = await fetch("<c:url value='/admin/asset/detail/'/>" + aid, { method: "GET" });
+      if (!res.ok) throw new Error("서버 오류 " + res.status);
+      const { asset, parts } = await res.json();
 
-       const origAssetCycle = Number(asset?.maintenanceCycle ?? 0);
-       const origCount      = Array.isArray(parts) ? parts.length : 0;
+      const origAssetCycle = Number(asset?.maintenanceCycle ?? 0);
+      const origCount      = Array.isArray(parts) ? parts.length : 0;
 
-       let assetCycleChanged = false;
-       let partCyclesChanged = false;
-       let imageChanged = false;
+      let assetCycleChanged = false;
+      let partCyclesChanged = false;
+      let imageChanged = false;
 
-       const origImagePath = asset?.imagePath || "";
+      const origImagePath = asset?.imagePath || "";
+      const mergedParts = Array.isArray(parts) ? [...parts] : [];
 
+      // 자산 점검주기 변경 반영
+      const assetCycleInput = editModal.querySelector("[data-edit-input='maintenanceCycle']");
+      const assetCycleStr   = assetCycleInput?.value?.trim();
+      if (assetCycleStr) {
+        const h = parseDurationToHours(assetCycleStr);
+        if (h > 0) {
+          if (origAssetCycle !== h) assetCycleChanged = true;
+          asset.maintenanceCycle = h;
+        }
+      }
 
-       const mergedParts = Array.isArray(parts) ? [...parts] : [];
+      // 기존 파트 주기 변경 반영
+      const existingRows = editModal.querySelectorAll(".edit-part-info-container");
+      existingRows.forEach((row, idx) => {
+        const inp = row.querySelector("input.edit-part-input");
+        const val = inp?.value?.trim();
+        if (!val) return;
 
-       const assetCycleInput = editModal.querySelector("[data-edit-input='maintenanceCycle']");
-       const assetCycleStr   = assetCycleInput?.value?.trim();
-       if (assetCycleStr) {
-         const h = parseDurationToHours(assetCycleStr);
-         if (h > 0) {
-           if (origAssetCycle !== h) assetCycleChanged = true;
-           asset.maintenanceCycle = h;
-         }
-       }
+        const h = parseDurationToHours(val);
+        if (h > 0 && mergedParts[idx]) {
+          const before = Number(mergedParts[idx].maintenanceCycle ?? 0);
+          if (before !== h) partCyclesChanged = true;
+          mergedParts[idx].maintenanceCycle = h;
+        }
+      });
 
-       const existingRows = editModal.querySelectorAll(".edit-part-info-container");
-       existingRows.forEach((row, idx) => {
-         const inp = row.querySelector("input.edit-part-input");
-         const val = inp?.value?.trim();
-         if (!val) return;
+      // 새 파트 추가 반영
+      const newPartRows = editModal.querySelectorAll(".modal-part-info-container");
+      newPartRows.forEach(row => {
+        const nameEl  = row.querySelector(".modal-part-input");
+        const cycleEl = row.querySelector(".modal-part-lifecycle-input");
+        const partName = nameEl?.value?.trim();
+        const cycleStr = cycleEl?.value?.trim();
+        if (!partName) return;
 
-         const h = parseDurationToHours(val);
-         if (h > 0 && mergedParts[idx]) {
-           const before = Number(mergedParts[idx].maintenanceCycle ?? 0);
-           if (before !== h) partCyclesChanged = true;
-           mergedParts[idx].maintenanceCycle = h;
-         }
-       });
+        const p = { partName, partStatus: "AVAILABLE", assetId: aid };
+        if (cycleStr) {
+          const h = parseDurationToHours(cycleStr);
+          if (h > 0) p.maintenanceCycle = h;
+        }
+        mergedParts.push(p);
+      });
 
-       const newPartRows = editModal.querySelectorAll(".modal-part-info-container");
-       newPartRows.forEach(row => {
-         const nameEl  = row.querySelector(".modal-part-input");
-         const cycleEl = row.querySelector(".modal-part-lifecycle-input");
-         const partName = nameEl?.value?.trim();
-         const cycleStr = cycleEl?.value?.trim();
+      const partCountChanged = mergedParts.length !== origCount;
 
-         if (!partName) return;
+      // 이미지 변경 반영
+      const newImageUrl = document.getElementById("editImageUrl")?.value?.trim();
+      if (newImageUrl && newImageUrl !== origImagePath) {
+        asset.imagePath = newImageUrl;
+        imageChanged = true;
+      }
 
-         const p = { partName, partStatus: "AVAILABLE" };
-         p.assetId = aid;
-         if (cycleStr) {
-           const h = parseDurationToHours(cycleStr);
-           if (h > 0) p.maintenanceCycle = h;
-         }
-         mergedParts.push(p);
-       });
+      const payload = {
+        asset,
+        parts: mergedParts,
+        assetCycleChanged,
+        partCyclesChanged,
+        partCountChanged,
+        imageChanged
+      };
 
-       const partCountChanged = mergedParts.length !== origCount;
+      const anyChange = assetCycleChanged || partCyclesChanged || partCountChanged || imageChanged;
+      if (!anyChange) {
+        assetModal.alert({ title: '자산 수정', message: '변경된 내용이 없습니다.' });
+        return;
+      }
 
-       const newImageUrl = document.getElementById("editImageUrl")?.value?.trim();
+      assetModal.confirm({
+        title: '자산 수정',
+        message: '변경사항을 저장하시겠습니까?',
+        okText: '저장',
+        cancelText: '취소',
+        onOk: async () => {
+          try {
+            // CSRF 헤더 안전 병합
+            const headers = { 'Content-Type': 'application/json' };
+            try { Object.assign(headers, typeof getCsrfHeaders === 'function' ? getCsrfHeaders() : {}); } catch (_) {}
 
-       if (newImageUrl && newImageUrl !== origImagePath) {
-         asset.imagePath = newImageUrl;
-         imageChanged = true;
-       }
+            const postRes = await fetch('<c:url value="/admin/asset/update"/>', {
+              method: 'POST',
+              headers,
+              credentials: 'same-origin',
+              body: JSON.stringify(payload)
+            });
+            if (!postRes.ok) throw new Error(await postRes.text() || '수정 실패');
 
-       const payload = {
-         asset,
-         parts: mergedParts,
-         assetCycleChanged,
-         partCyclesChanged,
-         partCountChanged,
-         imageChanged
-       };
+            // 성공: 모달 닫고 하드 리로드
+            try { assetModal.close?.(); } catch (_) {}
+            if (editModal) editModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+            window.location.replace(window.location.pathname + window.location.search);
+            return true;
+          } catch (err) {
+            showAssetError('수정 중 오류가 발생했습니다: ' + err.message);
+            return false;
+          }
+        }
+      });
+    } catch (err) {
+      showAssetError('수정 준비 중 오류가 발생했습니다: ' + err.message);
+    }
+  });
+} // ← 스코프 블록 닫힘
+} // ← openEditModal 함수 닫힘
 
-       const postRes = await fetch("<c:url value='/admin/asset/update'/>", {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-           ...(document.querySelector('meta[name="_csrf_header"]')
-             ? { [document.querySelector('meta[name="_csrf_header"]').getAttribute('content')]:
-                 document.querySelector('meta[name="_csrf"]').getAttribute('content') }
-             : {})
-         },
-         body: JSON.stringify(payload)
-       });
-
-       if (!postRes.ok) throw new Error(await postRes.text() || "수정 실패");
-       alert("수정되었습니다.");
-       location.reload();
-
-     } catch (err) {
-       console.error(err);
-       //alert("수정 중 오류가 발생했습니다: " + err.message);
-     }
-   });
- }
-}
 
   tbody.addEventListener("click", (e) => {
     const editBtn   = e.target.closest("button.edit-asset-btn");
@@ -1499,4 +1630,176 @@ function formatHoursToYMDH(value) {
   return parts.length ? parts.join(" ") : "0시간";
 }
 
+(function wireDeleteConfirm(){
+  const table = document.querySelector('.asset-table');
+  if (!table) return;
+
+  table.addEventListener('click', (e) => {
+    const submitBtn = e.target.closest('form[action^="/admin/asset/delete/"] button[type="submit"]');
+    if (!submitBtn) return;
+
+    e.preventDefault();
+
+    const form = submitBtn.closest('form');
+    const row  = submitBtn.closest('tr');
+    const assetId   = row?.getAttribute('data-id');
+    const modelName = row?.querySelector('td:nth-child(4)')?.textContent?.trim(); // 모델명 컬럼
+
+    assetModal.confirm({
+      title: '자산 삭제',
+      message: '정말로 \'' + (modelName || ("ID " + assetId)) + '\' 자산을 삭제하시겠습니까?',
+      okText: '삭제',
+      cancelText: '취소',
+      bgClose: false,
+      onOk: () => {
+        // 방법 A) 원래 폼 그대로 제출
+        form.submit();
+
+        // 방법 B) fetch로 제출 후 새로고침 (서버가 리다이렉트 대신 JSON/문자열 반환할 때)
+        // const params = new URLSearchParams(new FormData(form));
+        // fetch(form.action, {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getCsrfHeaders() },
+        //   body: params
+        // }).then(res => {
+        //   if (!res.ok) throw new Error('삭제 실패');
+        //   location.reload();
+        // }).catch(err => showAssetError(err.message));
+      }
+    });
+  });
+})();
+
+(function wirePartDeleteConfirm(){
+  document.addEventListener('click', (e) => {
+    const submitBtn = e.target.closest('.delete-part-form button[type="submit"]');
+    if (!submitBtn) return;
+
+    e.preventDefault();
+    const form = submitBtn.closest('form');
+
+    assetModal.confirm({
+      title: '부품 삭제',
+      message: '해당 부품을 삭제하시겠습니까?',
+      okText: '삭제',
+      cancelText: '취소',
+      bgClose: false,
+      onOk: () => {
+        // 필요 시 fetch로도 가능
+        form.submit();
+      }
+    });
+  });
+})();
+
+(function(){
+  const ICON_DOWN = "<c:url value='/assets/asset/down.svg'/>";
+  const ICON_UP   = "<c:url value='/assets/asset/up.svg'/>";
+
+  const SELECTOR = ".asset-container select.search-select, .asset-container select.filter-search-select";
+
+  function enhanceOne(select){
+    if (!select || select.dataset.enhanced) return;
+    select.dataset.enhanced = "1";
+
+    const wrap = document.createElement("div");
+    wrap.className = "custom-dropdown";
+
+    const box = document.createElement("div");
+    box.className = "dropdown-box";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dropdown-toggle";
+
+    const label = document.createElement("span");
+    label.className = "search-dropdown-label";
+
+    const chev = document.createElement("img");
+    chev.className = "chev";
+    chev.alt = "";
+    chev.src = ICON_DOWN;
+
+    const cur = select.options[select.selectedIndex] || select.options[0];
+    label.textContent = cur ? cur.text : "선택";
+    label.dataset.value = cur ? String(cur.value) : "";
+
+    btn.append(label, chev);
+
+    const menu = document.createElement("ul");
+    menu.className = "dropdown-menu search-dropdown-menu";
+
+    Array.from(select.options).forEach(opt=>{
+      const li = document.createElement("li");
+      li.textContent = opt.text;
+      li.dataset.value = String(opt.value);
+      if (opt.value === label.dataset.value) li.classList.add("active");
+      li.addEventListener("click", ()=>{
+        label.textContent = opt.text;
+        label.dataset.value = String(opt.value);
+
+        // 원본 select 동기화 + change 발생 (필터/검색 로직 그대로 실행됨)
+        select.value = opt.value;
+        select.dispatchEvent(new Event("change", { bubbles:true }));
+
+        menu.querySelectorAll("li").forEach(n => n.classList.toggle("active", n.dataset.value===String(opt.value)));
+        $(menu).hide();
+        $(btn).removeClass("active");
+        chev.src = ICON_DOWN;
+      });
+      menu.appendChild(li);
+      btn.setAttribute("aria-expanded", "false");  // 메뉴 닫힘 반영
+    });
+
+    // 원본 select는 숨김
+    select.classList.add("sr-only");
+    select.tabIndex = -1;
+
+    // DOM 배치
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+    wrap.appendChild(box);
+    box.appendChild(btn);
+    box.appendChild(menu);
+  }
+
+  function enhanceAll(){
+    document.querySelectorAll(SELECTOR).forEach(enhanceOne);
+
+    // 열기/닫기(바깥 클릭 닫기)는 공통 유틸 사용
+    initDropdown(".asset-container", ".dropdown-toggle", ".dropdown-menu");
+
+    $(document).on("click", ".asset-container .dropdown-toggle", function(){
+      const open = $(this).siblings(".dropdown-menu").is(":visible");
+      // 클릭 순간의 보임상태(open)를 읽어 반대로 셋팅
+      this.setAttribute("aria-expanded", String(!open));
+    });
+
+    // 외부에서 select 값 바꾸면 라벨/활성 상태 동기화
+    document.querySelectorAll(SELECTOR).forEach(sel=>{
+      sel.addEventListener("change", ()=>{
+        const wrap = sel.closest(".custom-dropdown");
+        if (!wrap) return;
+        const label = wrap.querySelector(".search-dropdown-label");
+        const menu  = wrap.querySelector(".dropdown-menu");
+        const opt   = sel.options[sel.selectedIndex];
+        if (label && opt){
+          label.textContent = opt.text;
+          label.dataset.value = String(opt.value);
+        }
+        if (menu){
+          menu.querySelectorAll("li").forEach(n => n.classList.toggle("active", n.dataset.value===String(sel.value)));
+        }
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", enhanceAll);
+  } else {
+    enhanceAll();
+  }
+})();
 </script>
+
+

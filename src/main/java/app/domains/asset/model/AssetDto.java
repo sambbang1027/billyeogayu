@@ -33,6 +33,7 @@ public class AssetDto {
     private LocalDateTime deletedAt;
     private String isDeleted;
     private String location;
+    private String owner;
 
     // 변환된 날짜 문자열 Getter
     public String getExpectedMaintenanceDateFormatted() {

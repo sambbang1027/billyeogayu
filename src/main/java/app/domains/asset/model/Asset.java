@@ -32,4 +32,5 @@ public class Asset {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime deletedAt;
     private String isDeleted;
+    private String owner;
 }

@@ -198,7 +198,8 @@ public class AssetController {
         int totalPages = Math.max(1, (int)Math.ceil(totalCount / (double)chunkSize));
 
         DownloadCSV.send(resp, "자원리스트.csv", csv -> {
-            csv.header("No","종류","제조사","모델명","부품","위치","점검 예정일","상태");
+            // UI 순서와 동일: 종류, 제조사, 모델명, 소유자, 사용시간, 위치, 점검 예정일, 상태
+            csv.header("No","종류","제조사","모델명","소유자","사용시간","위치","점검 예정일","상태");
 
             int seq = 0;
             for (int page = 1; page <= totalPages; page++) {
@@ -211,21 +212,21 @@ public class AssetController {
 
                 for (AssetDto a : list) {
                     seq++;
-                    String no    = String.valueOf(seq);
-                    String kind  = nz(a.getCategory());
-                    String comp  = nz(a.getCompany());
-                    String model = nz(a.getModelName());
-                    String part  = nz(a.getUsageTime());
-                    String loc   = nz(a.getLocation());
-                    String exp   = fmtDate(a.getExpectedMaintenanceDate());
-                    String stat  = mapStatusLabel(nz(a.getAssetStatus()));
+                    String no     = String.valueOf(seq);
+                    String kind   = nz(a.getCategory());
+                    String comp   = nz(a.getCompany());
+                    String model  = nz(a.getModelName());
+                    String owner  = nz(a.getOwner()).isBlank() ? "농촌진흥청" : nz(a.getOwner());
 
-                    csv.row(no, kind, comp, model, part, loc, exp, stat);
+                    String usage  = nz(a.getUsageTime());
+                    String loc    = nz(a.getLocation());
+                    String exp    = fmtDate(a.getExpectedMaintenanceDate());
+                    String stat   = mapStatusLabel(nz(a.getAssetStatus()));
+
+                    csv.row(no, kind, comp, model, owner, usage, loc, exp, stat);
                 }
 
-                try {
-                    csv.flush();
-                } catch (Exception ignore) {}
+                try { csv.flush(); } catch (Exception ignore) {}
             }
         });
     }
