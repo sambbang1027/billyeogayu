@@ -31,7 +31,7 @@ public class AlarmServiceImpl implements AlarmService {
      */
     @Override
     public List<AlarmResponse> findAll() {
-        List<Alarm> alarms = alarmRepository.findAll();
+        List<Alarm> alarms = alarmRepository.findAllUnread();
         return alarms.stream()
                 .map(AlarmResponse::from)
                 .collect(Collectors.toList());

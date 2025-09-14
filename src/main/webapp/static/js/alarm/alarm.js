@@ -95,7 +95,7 @@ function renderAlarms(alarms) {
                 <img src="/assets/layout/admin/alarm-detail.svg" alt="알람"/>
             </div>
             <div class="alarm-body">
-                <div class="alarm-message">[${getAlarmTypeDescription(alarm.type)}] ${alarm.description}</div>
+                <div class="alarm-message">${alarm.description}</div>
                 <div class="alarm-date">${formatDate(alarm.createdAt)}</div>
             </div>
             ${readButton}
@@ -182,24 +182,25 @@ function markAlarmAsRead(alarmId) {
             throw new Error('Network response was not ok');
         }
         
-        // 해당 알람 아이템을 읽음 상태로 변경
+        // 해당 알람 아이템을 DOM에서 완전히 제거
         const alarmItem = document.querySelector(`[data-alarm-id="${alarmId}"]`).closest('.alarm-item');
         if (alarmItem) {
-            alarmItem.classList.add('read');
-            alarmItem.querySelector('.alarm-message').style.color = '#888';
-            alarmItem.querySelector('.alarm-date').style.color = '#888';
+            alarmItem.remove();
             
-            // 읽음 버튼 제거
-            const readButton = alarmItem.querySelector('.read-button');
-            if (readButton) {
-                readButton.remove();
+            // 알람 리스트가 비었는지 확인
+            const alarmList = document.querySelector('.alarm-list');
+            const remainingAlarms = alarmList.querySelectorAll('.alarm-item');
+            
+            if (remainingAlarms.length === 0) {
+                // 모든 알람이 읽혔을 때 빈 상태 메시지 표시
+                alarmList.innerHTML = '<li class="alarm-item"><div class="alarm-message">모든 알람을 확인했습니다.</div></li>';
             }
         }
         
         // 읽지 않은 알람 개수 업데이트
         loadUnreadCount();
         
-        console.log(`Alarm ${alarmId} marked as read`);
+        console.log(`Alarm ${alarmId} marked as read and removed from UI`);
     })
     .catch(error => {
         console.error('Error marking alarm as read:', error);

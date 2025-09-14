@@ -60,14 +60,7 @@
 .alarm-item:last-child {
     border-bottom: none;
 }
-.alarm-item.read {
-    opacity: 0.6;
-    background-color: #f9f9f9;
-}
-.alarm-item.read .alarm-message,
-.alarm-item.read .alarm-date {
-    color: #888;
-}
+/* .read 클래스 스타일 제거 - 더 이상 필요 없음 */
 .alarm-icon {
     flex: 0 0 36px;
     display: flex;
@@ -88,6 +81,17 @@
     font-size: 14px;
     color: #333;
     margin-bottom: 4px;
+}
+
+/* 빈 상태 메시지 스타일 */
+.alarm-list:empty::after {
+    content: "모든 알람을 확인했습니다.";
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    display: block;
 }
 .alarm-date {
     font-size: 12px;
