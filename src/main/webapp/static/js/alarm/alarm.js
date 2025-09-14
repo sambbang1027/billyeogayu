@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 알람 데이터 로딩
     loadAlarms();
     
+    // 읽지 않은 알람 개수 로딩
+    loadUnreadCount();
+    
     // 이벤트 위임 방식으로 동적 요소 처리
     document.addEventListener("click", (e) => {
         // 알람 버튼 클릭 시 모달 열기
@@ -30,6 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target.id === "alarmModal") {
             e.target.style.display = "none";
             console.log("Alarm modal closed by background click");
+        }
+        
+        // 읽음 버튼 클릭 시 알람 읽음 처리
+        if (e.target.classList.contains("read-button")) {
+            const alarmId = e.target.getAttribute("data-alarm-id");
+            markAlarmAsRead(alarmId);
         }
     });
     
@@ -77,17 +86,21 @@ function renderAlarms(alarms) {
         return;
     }
     
-    alarmList.innerHTML = alarms.map(alarm => 
-        `<li class="alarm-item">
+    alarmList.innerHTML = alarms.map(alarm => {
+        const isRead = alarm.isDeleted === 'Y';
+        const readButton = isRead ? '' : `<button class="read-button" data-alarm-id="${alarm.id}">읽음</button>`;
+        
+        return `<li class="alarm-item ${isRead ? 'read' : ''}">
             <div class="alarm-icon">
                 <img src="/assets/layout/admin/alarm-detail.svg" alt="알람"/>
             </div>
             <div class="alarm-body">
-                <div class="alarm-message">[${getAlarmTypeDescription(alarm.type)}] ${alarm.description}</div>
+                <div class="alarm-message">${alarm.description}</div>
                 <div class="alarm-date">${formatDate(alarm.createdAt)}</div>
             </div>
-        </li>`
-    ).join('');
+            ${readButton}
+        </li>`;
+    }).join('');
 }
 
 // 알람 타입 설명 가져오기
@@ -123,4 +136,73 @@ function renderEmptyAlarms() {
     if (alarmList) {
         alarmList.innerHTML = '<li class="alarm-item"><div class="alarm-message">알람을 불러올 수 없습니다.</div></li>';
     }
+}
+
+// 읽지 않은 알람 개수 로딩
+function loadUnreadCount() {
+    fetch('/alarms/unread-count')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(count => {
+            updateUnreadCount(count);
+        })
+        .catch(error => {
+            console.error('Error loading unread count:', error);
+            updateUnreadCount(0);
+        });
+}
+
+// 읽지 않은 알람 개수 업데이트
+function updateUnreadCount(count) {
+    const alarmCountElement = document.querySelector('.alarm-count');
+    if (alarmCountElement) {
+        if (count > 0) {
+            alarmCountElement.textContent = count;
+            alarmCountElement.classList.remove('hidden');
+        } else {
+            alarmCountElement.classList.add('hidden');
+        }
+    }
+}
+
+// 알람 읽음 처리
+function markAlarmAsRead(alarmId) {
+    fetch(`/alarms/${alarmId}/read`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        // 해당 알람 아이템을 DOM에서 완전히 제거
+        const alarmItem = document.querySelector(`[data-alarm-id="${alarmId}"]`).closest('.alarm-item');
+        if (alarmItem) {
+            alarmItem.remove();
+            
+            // 알람 리스트가 비었는지 확인
+            const alarmList = document.querySelector('.alarm-list');
+            const remainingAlarms = alarmList.querySelectorAll('.alarm-item');
+            
+            if (remainingAlarms.length === 0) {
+                // 모든 알람이 읽혔을 때 빈 상태 메시지 표시
+                alarmList.innerHTML = '<li class="alarm-item"><div class="alarm-message">모든 알람을 확인했습니다.</div></li>';
+            }
+        }
+        
+        // 읽지 않은 알람 개수 업데이트
+        loadUnreadCount();
+        
+        console.log(`Alarm ${alarmId} marked as read and removed from UI`);
+    })
+    .catch(error => {
+        console.error('Error marking alarm as read:', error);
+    });
 }

@@ -105,7 +105,7 @@ public class AssetServiceImpl implements AssetService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateAsset(AssetPartsUpdateDto dto) {
         Asset asset = dto.getAsset();
         List<Part> parts = dto.getParts();

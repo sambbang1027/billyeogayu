@@ -59,13 +59,25 @@
     </logger>
 
     <!-- MyBatis Logger -->
-    <logger name="org.mybatis" level="DEBUG" additivity="false">
+    <logger name="org.mybatis" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+    
+    <!-- MyBatis Spring Integration Logger (SqlSessionUtils 등) -->
+    <logger name="org.mybatis.spring" level="WARN" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </logger>
     
     <!-- HikariCP Logger -->
-    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+    <logger name="com.zaxxer.hikari" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+    
+    <!-- Application Alarm Package Logger -->
+    <logger name="app.domains.alarm" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </logger>

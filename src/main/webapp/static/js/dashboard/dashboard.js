@@ -573,11 +573,11 @@ function updateInspectionChart(inspectionData) {
     }
 }
 
-// 필터 버튼(현재 주석이지만, 안전하게 closest 범위 확장)
-document.querySelectorAll(".filter-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-        const section = this.closest(".first-chart-section, .second-chart-section") || document;
-        section.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-        this.classList.add("active");
+    // 필터 버튼(현재 주석이지만, 안전하게 closest 범위 확장)
+    document.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+            const section = this.closest(".first-chart-section, .second-chart-section") || document;
+            section.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
     });
 });
