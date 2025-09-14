@@ -71,8 +71,10 @@ function openModal(modal, requestId, mode){
 				$(".inspection-value.assetName").text(res.assetName);
 				
 				// 점검자 
-				$(".inspection-value.inspector").text(res.resolverName)
+				$(".inspection-value.inspector").text(res.resolverName);
 				
+				// 소유주
+				$(".inspection-value.owner").text(res.owner? res.owner : "농촌진흥청");
 				// 부품 목록 
 				let tags = "";
 				if(res.parts){

@@ -1099,7 +1099,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	    
 	    const modal = document.querySelector(".detail-modal");
 	    const modelName = asset.modelName;
-	    console.log("선택된 자산:", assetId, modelName);
+	    const owner =  asset?.owner ? asset.owner : "농촌진흥청";
+	  
 	    
 	    // 기존 상세 모달을 먼저 닫기
 	    closeModal(detailModal);
@@ -1111,7 +1112,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	    inspectionModal.attr("data-asset-id", assetId); // data 속성에 저장
 	    
 	    $(".apply-input.asset").val(modelName);
-
+		$(".apply-input.owner").val(owner);
 	    
 	    
 	    if (typeof partList === 'function') {

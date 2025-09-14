@@ -22,6 +22,10 @@
             <label class="apply-label">점검자</label>
             <input type="text" class="apply-input" placeholder="점검자 이름 입력">
           </div>
+          <div class="apply-row">
+            <label class="apply-label">소유자</label>
+            <input type="text" class="apply-input owner" value="" readonly >
+          </div>
         </div>
       </div>
 
