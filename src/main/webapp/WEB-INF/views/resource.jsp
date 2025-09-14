@@ -10,6 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>빌려가유 - 농기계 목록</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/resource/list.css'/>">
+    <!-- 공통 모달(confirm/ alert) -->
+    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
 </head>
 <body>
     <!-- 헤더 -->
@@ -178,8 +180,12 @@
         </c:if>
     </section>
 
+    <!-- 공통 모달 JSP include -->
+    <jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 
     <script>
     $(function(){
@@ -207,10 +213,13 @@
             console.log('로그인 상태:', loggedIn);
             
             if(!loggedIn){
-                if(confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')){
-                    sessionStorage.setItem('returnUrl', '<c:url value="/reservation/apply"/>?assetId=' + id);
-                    window.location.href = '<c:url value="/login"/>';
-                }
+                showConfirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?',
+                    () => {
+                        sessionStorage.setItem('returnUrl', '<c:url value="/reservation/apply"/>?assetId=' + id);
+                        window.location.href = '<c:url value="/login"/>';
+                    },
+                    () => console.log('로그인 취소')
+                );
                 return;
             }
             

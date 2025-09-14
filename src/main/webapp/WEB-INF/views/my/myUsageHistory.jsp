@@ -10,7 +10,11 @@
     <title>내 사용 내역</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/login/style.css'/>">
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/my/myUsageHistory.css'/>">
+    
+    <!-- 공통 모달 CSS/JS -->
+    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 </head>
 <body>
     <!-- 헤더 -->
@@ -41,7 +45,6 @@
                 </div>
 
                 <!-- 사용 통계 -->
-				<!-- 사용 통계 -->
 				<c:if test="${not empty usageStatistics}">
 				    <div class="stats-card">
 				        <div class="stats-grid">
@@ -58,7 +61,6 @@
 				                <small>사용 중</small>
 				            </div>
 				            <div class="stats-item">
-				                <!-- 시간 포맷팅은 서비스에서 처리된 값 사용 -->
 				                <h4><c:out value="${usageStatistics.totalUsageFormatted != null ? usageStatistics.totalUsageFormatted : '0분'}"/></h4>
 				                <small>총 사용 시간</small>
 				            </div>
@@ -96,22 +98,14 @@
                                 <option value="기타" ${currentCategory == '기타' ? 'selected' : ''}>기타</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn-search">검색</button>
-                        </div>
+                        <button type="submit" class="btn-primary">조회</button>
                     </form>
                 </div>
 
                 <!-- 사용 내역 목록 -->
-                <div class="usage-grid">
+                <div class="usage-list">
                     <c:choose>
-                        <c:when test="${empty usageHistory}">
-                            <div class="empty-state">
-                                <h3>사용 내역이 없습니다</h3>
-                                <p>농기계를 사용한 후 내역을 확인하실 수 있습니다.</p>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
+                        <c:when test="${not empty usageHistory}">
                             <c:forEach var="usage" items="${usageHistory}">
                                 <div class="usage-card" 
                                      data-usage-id="${usage.reservationId}"
@@ -120,12 +114,12 @@
                                          "assetName": "<c:out value='${usage.assetName}'/>",
                                          "assetCategory": "<c:out value='${usage.assetCategory}'/>",
                                          "assetCompany": "<c:out value='${usage.assetCompany}'/>",
-                                         "assetImage": "${usage.assetImage}",
-                                         "status": "<c:out value='${usage.statusText}'/>",
+                                         "assetImage": "<c:out value='${usage.assetImage}'/>",
                                          "startTime": "<fmt:formatDate value='${usage.startTime}' pattern='yyyy-MM-dd HH:mm'/>",
                                          "endTime": "<fmt:formatDate value='${usage.endTime}' pattern='yyyy-MM-dd HH:mm'/>",
                                          "purpose": "<c:out value='${usage.purpose}'/>",
-                                         "address": "<c:out value='${usage.fullAddress}'/>",
+                                         "address": "<c:out value='${usage.address}'/>",
+                                         "status": "<c:out value='${usage.usageStatusText}'/>",
                                          "usageDuration": "<c:out value='${usage.formattedUsageDuration}'/>",
                                          "actualUsageTime": "<c:out value='${usage.actualUsageTime}'/>",
                                          "adminName": "<c:out value='${usage.adminName}'/>",
@@ -177,32 +171,21 @@
                                                         <span class="duration-highlight"><c:out value="${usage.formattedUsageDuration}"/></span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="duration-highlight">-</span>
+                                                        <span class="duration-unavailable">미기록</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </span>
                                         </div>
-                                        <div class="info-item">
-                                            <span class="info-label">사용 장소</span>
-                                            <span class="info-value"><c:out value="${usage.fullAddress}"/></span>
-                                        </div>
-                                        <c:if test="${not empty usage.adminName}">
-                                            <div class="info-item">
-                                                <span class="info-label">담당자</span>
-                                                <span class="info-value"><c:out value="${usage.adminName}"/></span>
-                                            </div>
-                                        </c:if>
-                                        <c:if test="${usage.completed and not empty usage.returnedAt}">
-                                            <div class="info-item">
-                                                <span class="info-label">반납일</span>
-                                                <span class="info-value">
-                                                    <fmt:formatDate value="${usage.returnedAt}" pattern="yyyy-MM-dd HH:mm"/>
-                                                </span>
-                                            </div>
-                                        </c:if>
                                     </div>
                                 </div>
                             </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="empty-state">
+                                <h3>사용 내역이 없습니다</h3>
+                                <p>아직 사용 완료된 내역이 없습니다.</p>
+                                <a href="<c:url value='/resource/list'/>" class="btn-primary">농기계 예약하러 가기</a>
+                            </div>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -211,7 +194,7 @@
     </div>
 
     <!-- 사용 내역 상세 모달 -->
-    <div id="usageModal" class="modal">
+    <div id="usageModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">사용 내역 상세 정보</h2>
@@ -225,6 +208,9 @@
             </div>
         </div>
     </div>
+
+    <!-- 공통 모달 include -->
+    <jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
 
     <script>
         /**
@@ -241,13 +227,19 @@
             
             // 페이지에서 해당 사용 내역 데이터 찾기
             const usageCard = $(`.usage-card[data-usage-id="${reservationId}"]`);
-            const usageData = usageCard.data('usage');
+            const usageDataStr = usageCard.attr('data-usage');
             
-            if (usageData) {
-                displayUsageModal(usageData);
-                $('#usageModal').show();
+            if (usageDataStr) {
+                try {
+                    const usageData = JSON.parse(usageDataStr);
+                    displayUsageModal(usageData);
+                    $('#usageModal').show();
+                } catch (e) {
+                    console.error('JSON 파싱 오류:', e);
+                    showAlert('사용 내역 정보를 불러오는 중 오류가 발생했습니다.');
+                }
             } else {
-                alert('사용 내역 정보를 찾을 수 없습니다.');
+                showAlert('사용 내역 정보를 찾을 수 없습니다.');
             }
         }
 
@@ -264,56 +256,56 @@
             
             const modalContent = `
                 <div class="modal-asset-info">
-                    <img src="` + imagePath + `" alt="` + data.assetName + `" class="modal-asset-image">
+                    <img src="${imagePath}" alt="${data.assetName}" class="modal-asset-image">
                     <div class="modal-asset-details">
-                        <h3>` + data.assetName + `</h3>
-                        <div class="modal-asset-meta">` + data.assetCategory + ` | ` + data.assetCompany + `</div>
-                        <span class="usage-status modal-status">` + data.status + `</span>
+                        <h3>${data.assetName}</h3>
+                        <div class="modal-asset-meta">${data.assetCategory} | ${data.assetCompany}</div>
+                        <span class="usage-status modal-status">${data.status}</span>
                     </div>
                 </div>
                 
                 <div class="modal-duration">
-                    <div>총 사용 시간: ` + (data.usageDuration || '미기록') + `</div>
+                    <div>총 사용 시간: ${data.usageDuration || '미기록'}</div>
                 </div>
                 
                 <div class="modal-info-grid">
                     <div class="modal-info-item">
                         <div class="modal-info-label">예약 기간</div>
-                        <div class="modal-info-value">` + data.startTime + `<br>~ ` + data.endTime + `</div>
+                        <div class="modal-info-value">${data.startTime}<br>~ ${data.endTime}</div>
                     </div>
                     <div class="modal-info-item">
                         <div class="modal-info-label">실제 사용 시간</div>
-                        <div class="modal-info-value">` + (data.actualUsageTime || '-') + `</div>
+                        <div class="modal-info-value">${data.actualUsageTime || '-'}</div>
                     </div>
                     <div class="modal-info-item">
                         <div class="modal-info-label">사용 목적</div>
-                        <div class="modal-info-value">` + data.purpose + `</div>
+                        <div class="modal-info-value">${data.purpose}</div>
                     </div>
                     <div class="modal-info-item">
                         <div class="modal-info-label">사용 장소</div>
-                        <div class="modal-info-value">` + data.address + `</div>
+                        <div class="modal-info-value">${data.address}</div>
                     </div>
-                    ` + (data.adminName ? `
+                    ${data.adminName ? `
                     <div class="modal-info-item">
                         <div class="modal-info-label">담당자</div>
-                        <div class="modal-info-value">` + data.adminName + `</div>
+                        <div class="modal-info-value">${data.adminName}</div>
                     </div>
-                    ` : '') + `
-                    ` + (data.completedAt ? `
+                    ` : ''}
+                    ${data.completedAt ? `
                     <div class="modal-info-item">
                         <div class="modal-info-label">사용 완료일</div>
-                        <div class="modal-info-value">` + data.completedAt + `</div>
+                        <div class="modal-info-value">${data.completedAt}</div>
                     </div>
-                    ` : '') + `
-                    ` + (data.returnedAt ? `
+                    ` : ''}
+                    ${data.returnedAt ? `
                     <div class="modal-info-item">
                         <div class="modal-info-label">반납일</div>
-                        <div class="modal-info-value">` + data.returnedAt + `</div>
+                        <div class="modal-info-value">${data.returnedAt}</div>
                     </div>
-                    ` : '') + `
+                    ` : ''}
                     <div class="modal-info-item">
                         <div class="modal-info-label">예약 신청일</div>
-                        <div class="modal-info-value">` + data.createdAt + `</div>
+                        <div class="modal-info-value">${data.createdAt}</div>
                     </div>
                 </div>
             `;
@@ -329,53 +321,19 @@
             currentUsageId = null;
         }
 
-        /**
-         * 문서 로드 완료 후 이벤트 바인딩
-         */
-        $(document).ready(function() {
-            // 모달 외부 클릭시 닫기
-            $(window).click(function(event) {
-                if (event.target.id === 'usageModal') {
-                    closeUsageModal();
-                }
+        // 공통 모달 테스트용 함수들 (개발/테스트용)
+        function testAlert() {
+            showAlert("사용 내역이 업데이트되었습니다.", () => {
+                console.log("알림 확인됨");
             });
-            
-            // ESC 키로 모달 닫기
-            $(document).keydown(function(event) {
-                if (event.keyCode === 27) { // ESC key
-                    closeUsageModal();
-                }
-            });
-            
-            // 필터 폼 자동 제출 (선택사항)
-            $('.form-select').change(function() {
-                // 자동으로 폼 제출하고 싶다면 주석 해제
-                // $(this).closest('form').submit();
-            });
-            
-            // 통계 카드 애니메이션
-            $('.stats-item h4').each(function() {
-                const $this = $(this);
-                const countTo = parseInt($this.text());
-                
-                if (!isNaN(countTo)) {
-                    $this.text('0');
-                    
-                    $({ countNum: 0 }).animate({
-                        countNum: countTo
-                    }, {
-                        duration: 1000,
-                        easing: 'swing',
-                        step: function() {
-                            $this.text(Math.floor(this.countNum));
-                        },
-                        complete: function() {
-                            $this.text(countTo);
-                        }
-                    });
-                }
-            });
-        });
+        }
+
+        function testConfirm() {
+            showConfirm("이 사용 내역을 삭제하시겠습니까?",
+                () => console.log("삭제 확인"),
+                () => console.log("삭제 취소")
+            );
+        }
     </script>
 </body>
 </html>

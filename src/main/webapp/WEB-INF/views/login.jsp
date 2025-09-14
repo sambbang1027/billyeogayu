@@ -8,7 +8,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>빌려가유 - 로그인</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/login/style.css'/>">
+    
+    <!-- 공통 모달 CSS/JS -->
+    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 </head>                                     
 <body>
     <div class="component">
@@ -50,21 +54,7 @@
                 <div class="login-container">
                     <div class="login-title">회원 로그인</div>
                     
-                    <!-- 에러 메시지 표시 -->
-                    <c:if test="${not empty error}">
-                        <div class="error-message">
-                            <c:choose>
-                                <c:when test="${error == 'true'}">아이디 또는 비밀번호가 잘못되었습니다.</c:when>
-                                <c:when test="${error == 'expired'}">세션이 만료되었습니다. 다시 로그인해주세요.</c:when>
-                                <c:otherwise>로그인 중 오류가 발생했습니다.</c:otherwise>
-                            </c:choose>
-                        </div>
-                    </c:if>
-                    
-                    <!-- 성공 메시지 표시 -->
-                    <c:if test="${not empty message}">
-                        <div class="success-message">${message}</div>
-                    </c:if>
+                    <!-- 기존 에러/성공 메시지는 제거 - 공통 모달로 표시 -->
 
                     <!-- 로그인 폼 -->
                     <form id="loginForm" action="#" method="post" class="login-form">
@@ -123,9 +113,30 @@
         </div>
     </div>
 
+    <!-- 공통 모달 include -->
+    <jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
+
     <!-- JavaScript -->
     <script>
         $(document).ready(function() {
+            // 페이지 로드 시 에러/성공 메시지 표시 (공통 모달 사용)
+            <c:if test="${not empty error}">
+                let errorMessage = '로그인 중 오류가 발생했습니다.';
+                <c:choose>
+                    <c:when test="${error == 'true'}">
+                        errorMessage = '아이디 또는 비밀번호가 잘못되었습니다.';
+                    </c:when>
+                    <c:when test="${error == 'expired'}">
+                        errorMessage = '세션이 만료되었습니다. 다시 로그인해주세요.';
+                    </c:when>
+                </c:choose>
+                showAlert(errorMessage);
+            </c:if>
+            
+            <c:if test="${not empty message}">
+                showAlert('${message}');
+            </c:if>
+            
             // 페이지 로드 시 저장된 아이디 복원
             loadSavedId();
             
@@ -167,16 +178,14 @@
                 const userid = $('#userid').val().trim();
                 const password = $('#password').val().trim();
                 
-                // 유효성 검사
+                // 유효성 검사 - 공통 모달 사용
                 if (!userid) {
-                    alert('아이디를 입력해주세요.');
-                    $('#userid').focus();
+                    showAlert('아이디를 입력해주세요.', () => $('#userid').focus());
                     return;
                 }
                 
                 if (!password) {
-                    alert('비밀번호를 입력해주세요.');
-                    $('#password').focus();
+                    showAlert('비밀번호를 입력해주세요.', () => $('#password').focus());
                     return;
                 }
                 
@@ -194,7 +203,6 @@
                 
                 // AJAX 로그인 요청
                 $.ajax({
-
                     url: '<c:url value="/api/login"/>',
                     type: 'POST',
                     contentType: 'application/json',
@@ -231,17 +239,19 @@
                                 
                                 if (isAdmin) {
                                     console.log('관리자로 로그인 - admin/dashboard로 이동');
-                                    alert('관리자로 로그인되었습니다.');
-                                    window.location.href = '<c:url value="/admin/dashboard"/>';
+                                    showAlert('관리자로 로그인되었습니다.', () => {
+                                        window.location.href = '<c:url value="/admin/dashboard"/>';
+                                    });
                                 } else {
                                     console.log('일반사용자로 로그인 - resource/list로 이동');
-                                    alert('로그인되었습니다.');
-                                    window.location.href = '<c:url value="/resource/list"/>';
+                                    showAlert('로그인되었습니다.', () => {
+                                        window.location.href = '<c:url value="/resource/list"/>';
+                                    });
                                 }
                             }
                         } else {
-                            // 로그인 실패
-                            alert(response.message || '로그인에 실패했습니다.');
+                            // 로그인 실패 - 공통 모달 사용
+                            showAlert(response.message || '로그인에 실패했습니다.');
                             resetLoginButton();
                         }
                     },
@@ -254,7 +264,8 @@
                             errorMessage = '아이디 또는 비밀번호가 잘못되었습니다.';
                         }
                         
-                        alert(errorMessage);
+                        // 공통 모달 사용
+                        showAlert(errorMessage);
                         resetLoginButton();
                     }
                 });
@@ -267,10 +278,10 @@
                 }
             }
             
-            // 에러 메시지가 있으면 포커스
-            if ($('.error-message').length > 0) {
-                $('#userid').focus();
-            }
+            // 에러 메시지가 있으면 포커스 (기존 로직 유지하되 모달 표시 후)
+            <c:if test="${not empty error}">
+                setTimeout(() => $('#userid').focus(), 100);
+            </c:if>
         });
     </script>
 </body>

@@ -10,12 +10,13 @@
 <title>빌려가유 - 회원가입</title>
 <link rel="stylesheet"
 	href="<c:url value='/static/css/layout/user/verification/style.css'/>">
+<!-- 공통 모달(confirm/ alert) -->
+<link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 </head>
 <body>
 	<div class="component">
-
-
 		<div class="frame">
 			<!-- 사이드바 -->
 			<div class="sidebar">
@@ -238,6 +239,9 @@
 		</div>
 	</div>
 
+	<!-- 공통 모달 JSP include -->
+	<jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
+
 	<!-- JavaScript -->
 	<script>
         $(document).ready(function() {
@@ -299,7 +303,7 @@
             $('#verifyBtn').on('click', function() {
                 const code = $('#verificationCode').val().trim();
                 if (!code) {
-                    alert('인증번호를 입력해주세요.');
+                    showAlert('인증번호를 입력해주세요.');
                     return;
                 }
                 
@@ -365,7 +369,7 @@
             $('#phoneVerifyBtn').on('click', function() {
                 const code = $('#phoneVerificationCode').val().trim();
                 if (!code) {
-                    alert('인증번호를 입력해주세요.');
+                    showAlert('인증번호를 입력해주세요.');
                     return;
                 }
                 
@@ -406,7 +410,6 @@
             });
 
             // 인증 완료 처리 함수
-
 			function handleAuthComplete(userData) {
 			    console.log('인증 완료 처리 시작:', userData);
 			    
@@ -471,17 +474,17 @@
 			                        
 			                    default:
 			                        console.log('알 수 없는 purpose:', userData.purpose);
-			                        alert('처리 중 오류가 발생했습니다.');
+			                        showAlert('처리 중 오류가 발생했습니다.');
 			                        break;
 			                }
 			            } else {
-			                alert(response.message || '처리 중 오류가 발생했습니다.');
+			                showAlert(response.message || '처리 중 오류가 발생했습니다.');
 			            }
 			        },
 			        error: function(xhr, status, error) {
 			            console.error('API 호출 오류:', xhr, status, error);
 			            console.error('응답 텍스트:', xhr.responseText);
-			            alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+			            showAlert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
 			        }
 			    });
 			}
@@ -537,26 +540,22 @@
             // ===== 이메일 유효성 검사 함수 =====
             function validateEmailForm(userName, birthDate, email) {
                 if (!userName) {
-                    alert('이름을 입력해주세요.');
-                    $('#userName').focus();
+                    showAlert('이름을 입력해주세요.', () => $('#userName').focus());
                     return false;
                 }
 
                 if (!birthDate || birthDate.length !== 8) {
-                    alert('생년월일 8자리를 정확히 입력해주세요.');
-                    $('#birthDate').focus();
+                    showAlert('생년월일 8자리를 정확히 입력해주세요.', () => $('#birthDate').focus());
                     return false;
                 }
 
                 if (!isValidBirthDate(birthDate)) {
-                    alert('올바른 생년월일을 입력해주세요.');
-                    $('#birthDate').focus();
+                    showAlert('올바른 생년월일을 입력해주세요.', () => $('#birthDate').focus());
                     return false;
                 }
 
                 if (!email || !isValidEmail(email)) {
-                    alert('올바른 이메일 주소를 입력해주세요.');
-                    $('#email').focus();
+                    showAlert('올바른 이메일 주소를 입력해주세요.', () => $('#email').focus());
                     return false;
                 }
 
@@ -566,26 +565,22 @@
             // ===== 휴대폰 유효성 검사 함수 =====
             function validatePhoneForm(userName, birthDate, phoneNumber) {
                 if (!userName) {
-                    alert('이름을 입력해주세요.');
-                    $('#phoneUserName').focus();
+                    showAlert('이름을 입력해주세요.', () => $('#phoneUserName').focus());
                     return false;
                 }
 
                 if (!birthDate || birthDate.length !== 8) {
-                    alert('생년월일 8자리를 정확히 입력해주세요.');
-                    $('#phoneBirthDate').focus();
+                    showAlert('생년월일 8자리를 정확히 입력해주세요.', () => $('#phoneBirthDate').focus());
                     return false;
                 }
 
                 if (!isValidBirthDate(birthDate)) {
-                    alert('올바른 생년월일을 입력해주세요.');
-                    $('#phoneBirthDate').focus();
+                    showAlert('올바른 생년월일을 입력해주세요.', () => $('#phoneBirthDate').focus());
                     return false;
                 }
 
                 if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
-                    alert('올바른 휴대폰 번호를 입력해주세요.');
-                    $('#phoneNumber').focus();
+                    showAlert('올바른 휴대폰 번호를 입력해주세요.', () => $('#phoneNumber').focus());
                     return false;
                 }
 
@@ -641,11 +636,11 @@
                             showEmailStep('verificationStep');
                             startEmailTimer();
                         } else {
-                            alert(response.message || '인증번호 발송에 실패했습니다.');
+                            showAlert(response.message || '인증번호 발송에 실패했습니다.');
                         }
                     },
                     error: function() {
-                        alert('인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                        showAlert('인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
                     },
                     complete: function() {
                         $('#sendCodeBtn').prop('disabled', false).text('이메일 인증 요청');
@@ -669,12 +664,13 @@
                             clearEmailTimer();
                             showEmailStep('successStep');
                         } else {
-                            alert(response.message || '인증번호가 일치하지 않습니다.');
-                            $('#verificationCode').val('').focus();
+                            showAlert(response.message || '인증번호가 일치하지 않습니다.', () => {
+                                $('#verificationCode').val('').focus();
+                            });
                         }
                     },
                     error: function() {
-                        alert('인증번호 확인에 실패했습니다. 다시 시도해주세요.');
+                        showAlert('인증번호 확인에 실패했습니다. 다시 시도해주세요.');
                     },
                     complete: function() {
                         $('#verifyBtn').prop('disabled', false).text('인증확인');
@@ -692,15 +688,16 @@
                     data: { email: email },
                     success: function(response) {
                         if (response.success) {
-                            alert('인증번호가 재발송되었습니다.');
-                            remainingTime = 180;
-                            startEmailTimer();
+                            showAlert('인증번호가 재발송되었습니다.', () => {
+                                remainingTime = 180;
+                                startEmailTimer();
+                            });
                         } else {
-                            alert(response.message || '재발송에 실패했습니다.');
+                            showAlert(response.message || '재발송에 실패했습니다.');
                         }
                     },
                     error: function() {
-                        alert('재발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                        showAlert('재발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
                     },
                     complete: function() {
                         $('#resendBtn').prop('disabled', false).text('재전송');
@@ -724,11 +721,11 @@
                             showPhoneStep('phoneVerificationStep');
                             startPhoneTimer();
                         } else {
-                            alert(response.message || '인증번호 발송에 실패했습니다.');
+                            showAlert(response.message || '인증번호 발송에 실패했습니다.');
                         }
                     },
                     error: function() {
-                        alert('인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                        showAlert('인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
                     },
                     complete: function() {
                         $('#sendSmsBtn').prop('disabled', false).text('휴대폰 인증 요청');
@@ -752,12 +749,13 @@
                             clearPhoneTimer();
                             showPhoneStep('phoneSuccessStep');
                         } else {
-                            alert(response.message || '인증번호가 일치하지 않습니다.');
-                            $('#phoneVerificationCode').val('').focus();
+                            showAlert(response.message || '인증번호가 일치하지 않습니다.', () => {
+                                $('#phoneVerificationCode').val('').focus();
+                            });
                         }
                     },
                     error: function() {
-                        alert('인증번호 확인에 실패했습니다. 다시 시도해주세요.');
+                        showAlert('인증번호 확인에 실패했습니다. 다시 시도해주세요.');
                     },
                     complete: function() {
                         $('#phoneVerifyBtn').prop('disabled', false).text('인증확인');
@@ -775,15 +773,16 @@
                     data: { phoneNumber: phoneNumber },
                     success: function(response) {
                         if (response.success) {
-                            alert('인증번호가 재발송되었습니다.');
-                            phoneRemainingTime = 180;
-                            startPhoneTimer();
+                            showAlert('인증번호가 재발송되었습니다.', () => {
+                                phoneRemainingTime = 180;
+                                startPhoneTimer();
+                            });
                         } else {
-                            alert(response.message || '재발송에 실패했습니다.');
+                            showAlert(response.message || '재발송에 실패했습니다.');
                         }
                     },
                     error: function() {
-                        alert('재발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                        showAlert('재발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
                     },
                     complete: function() {
                         $('#phoneResendBtn').prop('disabled', false).text('재전송');
@@ -802,7 +801,7 @@
                     
                     if (remainingTime <= 0) {
                         clearEmailTimer();
-                        alert('인증시간이 만료되었습니다. 재발송을 클릭해주세요.');
+                        showAlert('인증시간이 만료되었습니다. 재발송을 클릭해주세요.');
                         $('#verifyBtn').prop('disabled', true);
                     }
                 }, 1000);
@@ -837,7 +836,7 @@
                     
                     if (phoneRemainingTime <= 0) {
                         clearPhoneTimer();
-                        alert('인증시간이 만료되었습니다. 재발송을 클릭해주세요.');
+                        showAlert('인증시간이 만료되었습니다. 재발송을 클릭해주세요.');
                         $('#phoneVerifyBtn').prop('disabled', true);
                     }
                 }, 1000);

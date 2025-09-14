@@ -8,7 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>빌려가유 - 회원정보 입력</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/register-info/style.css'/>">
+    
+    <!-- 공통 모달 CSS/JS -->
+    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
+    
     <!-- 다음 주소 API -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
@@ -166,7 +171,6 @@
                                 <div class="agreement-all">
                                     <label class="checkbox-label">
                                         <input type="checkbox" id="agreeAll">
-                                        
                                         <span class="checkbox-text">전체 동의</span>
                                     </label>
                                 </div>
@@ -175,7 +179,6 @@
                                     <div class="agreement-item">
                                         <label class="checkbox-label">
                                             <input type="checkbox" class="required-agree" id="agreeTerms" required>
-                                            
                                             <span class="checkbox-text">[필수] 이용약관 동의</span>
                                         </label>
                                         <button type="button" class="view-btn" data-modal="terms">보기</button>
@@ -192,7 +195,6 @@
                                     <div class="agreement-item">
                                         <label class="checkbox-label">
                                             <input type="checkbox" id="agreeMarketing">
-                                            
                                             <span class="checkbox-text">[선택] 마케팅 정보 수신 동의</span>
                                         </label>
                                         <button type="button" class="view-btn" data-modal="marketing">보기</button>
@@ -238,6 +240,9 @@
         </div>
     </div>
 
+    <!-- 공통 모달 include -->
+    <jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
+
     <!-- JavaScript -->
     <script>
         $(document).ready(function() {
@@ -252,8 +257,9 @@
             function loadVerificationData() {
                 const data = localStorage.getItem('registrationData');
                 if (!data) {
-                    alert('인증 정보가 없습니다. 본인 확인부터 다시 진행해주세요.');
-                    window.location.href = '<c:url value="/verification"/>';
+                    showAlert('인증 정보가 없습니다. 본인 확인부터 다시 진행해주세요.', () => {
+                        window.location.href = '<c:url value="/verification"/>';
+                    });
                     return;
                 }
 
@@ -276,8 +282,9 @@
                         $('#emailGroup').show(); // 이메일 입력 필요
                     }
                 } catch (e) {
-                    alert('인증 정보 형식이 올바르지 않습니다. 다시 인증해주세요.');
-                    window.location.href = '<c:url value="/verification"/>';
+                    showAlert('인증 정보 형식이 올바르지 않습니다. 다시 인증해주세요.', () => {
+                        window.location.href = '<c:url value="/verification"/>';
+                    });
                 }
             }
 
@@ -360,26 +367,30 @@
                 closeTermsModal();
             });
 
-            // 이전 버튼
+            // 이전 버튼 - 공통 모달 적용
             $('#backBtn').on('click', function() {
-                if (confirm('이전 단계로 돌아가시겠습니까? 입력한 정보는 저장되지 않습니다.')) {
-                    window.location.href = '<c:url value="/verificarion"/>';
-                }
+                showConfirm('이전 단계로 돌아가시겠습니까? 입력한 정보는 저장되지 않습니다.',
+                    () => {
+                        window.location.href = '<c:url value="/verification"/>';
+                    },
+                    () => {
+                        console.log('이전 단계 이동 취소');
+                    }
+                );
             });
 
             // 폼 제출
             $('#registerForm').on('submit', function(e) {
-			    e.preventDefault();
-			    console.log('폼 제출 이벤트 발생');
-			    
-			    if (validateForm()) {
-			        console.log('유효성 검사 통과');
-			        submitRegistration();
-			    } else {
-			        console.log('유효성 검사 실패');
-			    }
-			});
-
+                e.preventDefault();
+                console.log('폼 제출 이벤트 발생');
+                
+                if (validateForm()) {
+                    console.log('유효성 검사 통과');
+                    submitRegistration();
+                } else {
+                    console.log('유효성 검사 실패');
+                }
+            });
 
             // 실시간 유효성 검사
             $('#loginId').on('input', function() {
@@ -522,7 +533,7 @@
                 strengthText.text('비밀번호 강도: ' + status);
             }
 
-            // 아이디 중복 확인 API
+            // 아이디 중복 확인 API - 공통 모달 적용
             function checkIdDuplication(loginId) {
                 $('#checkIdBtn').prop('disabled', true).text('확인 중...');
                 
@@ -541,7 +552,7 @@
                         }
                     },
                     error: function() {
-                        showValidationMessage('loginIdMsg', '아이디 중복 확인에 실패했습니다.', 'error');
+                        showAlert('아이디 중복 확인에 실패했습니다.');
                         isIdChecked = false;
                     },
                     complete: function() {
@@ -550,198 +561,188 @@
                 });
             }
 
-            // 폼 전체 유효성 검사
-			function validateForm() {
-			    console.log('=== 유효성 검사 시작 ===');
-			    let isValid = true;
-			    let firstErrorField = null;
-			    
-			    // 모든 오류 스타일 초기화
-			    $('.form-group').removeClass('error');
-			    
-			    // 아이디 중복 확인 여부
-			    console.log('1. 아이디 중복 확인 상태:', isIdChecked);
-			    if (!isIdChecked) {
-			        console.log('❌ 아이디 중복 확인 실패');
-			        showValidationMessage('loginIdMsg', '아이디 중복 확인을 해주세요.', 'error');
-			        $('#loginId').closest('.form-group').addClass('error');
-			        if (!firstErrorField) firstErrorField = '#loginId';
-			        isValid = false;
-			    } else {
-			        console.log('✅ 아이디 중복 확인 통과');
-			    }
-			    
-			    // 비밀번호 검사
-			    const password = $('#password').val();
-			    console.log('2. 비밀번호 값:', password);
-			    if (!validatePassword(password)) {
-			        console.log('❌ 비밀번호 검증 실패');
-			        $('#password').closest('.form-group').addClass('error');
-			        if (!firstErrorField) firstErrorField = '#password';
-			        isValid = false;
-			    } else {
-			        console.log('✅ 비밀번호 검증 통과');
-			    }
-			    
-			    // 비밀번호 확인 검사
-			    const passwordConfirm = $('#passwordConfirm').val();
-			    console.log('3. 비밀번호 확인 값:', passwordConfirm);
-			    if (!validatePasswordConfirm(password, passwordConfirm)) {
-			        console.log('❌ 비밀번호 확인 검증 실패');
-			        $('#passwordConfirm').closest('.form-group').addClass('error');
-			        if (!firstErrorField) firstErrorField = '#passwordConfirm';
-			        isValid = false;
-			    } else {
-			        console.log('✅ 비밀번호 확인 검증 통과');
-			    }
-			    
-			    // 이메일 검사 (휴대폰 인증인 경우)
-			    if ($('#emailGroup').is(':visible')) {
-			        const email = $('#email').val().trim();
-			        console.log('4. 이메일 값:', email, '(이메일 그룹 표시됨)');
-			        if (!email || !validateEmail(email)) {
-			            console.log('❌ 이메일 검증 실패');
-			            $('#email').closest('.form-group').addClass('error');
-			            if (!firstErrorField) firstErrorField = '#email';
-			            isValid = false;
-			        } else {
-			            console.log('✅ 이메일 검증 통과');
-			        }
-			    } else {
-			        console.log('4. 이메일 그룹 숨겨짐 - 검사 건너뜀');
-			    }
-			    
-			    // 휴대폰 검사 (이메일 인증인 경우)
-			    if ($('#phoneGroup').is(':visible')) {
-			        const phoneNumber = $('#phoneNumber').val().trim();
-			        console.log('5. 휴대폰 값:', phoneNumber, '(휴대폰 그룹 표시됨)');
-			        if (!phoneNumber || !validatePhoneNumber(phoneNumber)) {
-			            console.log('❌ 휴대폰 검증 실패');
-			            $('#phoneNumber').closest('.form-group').addClass('error');
-			            if (!firstErrorField) firstErrorField = '#phoneNumber';
-			            isValid = false;
-			        } else {
-			            console.log('✅ 휴대폰 검증 통과');
-			        }
-			    } else {
-			        console.log('5. 휴대폰 그룹 숨겨짐 - 검사 건너뜀');
-			    }
-			    
-			    // 주소 검사
-			    const postcode = $('#postcode').val();
-			    const roadAddress = $('#roadAddress').val();
-			    console.log('6. 주소 - 우편번호:', postcode, ', 도로명주소:', roadAddress);
-			    if (!postcode || !roadAddress) {
-			        console.log('❌ 주소 검증 실패');
-			        showValidationMessage('addressMsg', '주소를 입력해주세요.', 'error');
-			        $('#postcode').closest('.form-group').addClass('error');
-			        if (!firstErrorField) firstErrorField = '#postcode';
-			        isValid = false;
-			    } else {
-			        console.log('✅ 주소 검증 통과');
-			    }
-			    
-			    // 필수 약관 동의 검사
-			    const agreeTerms = $('#agreeTerms').is(':checked');
-			    const agreePrivacy = $('#agreePrivacy').is(':checked');
-			    console.log('7. 약관 동의 - 이용약관:', agreeTerms, ', 개인정보:', agreePrivacy);
-			    if (!agreeTerms || !agreePrivacy) {
-			        console.log('❌ 약관 동의 검증 실패');
-			        alert('필수 약관에 동의해주세요.');
-			        $('.agreement-container').addClass('error');
-			        if (!firstErrorField) firstErrorField = '.agreement-container';
-			        isValid = false;
-			    } else {
-			        console.log('✅ 약관 동의 검증 통과');
-			    }
-			    
-			    // 첫 번째 오류 필드로 스크롤
-			    if (!isValid && firstErrorField) {
-			        scrollToErrorField(firstErrorField);
-			    }
-			    
-			    console.log('=== 최종 유효성 검사 결과:', isValid, '===');
-			    return isValid;
-			}
-			
-			// 오류 필드로 스크롤하는 함수
-			function scrollToErrorField(fieldSelector) {
-			    const $field = $(fieldSelector);
-			    if ($field.length) {
-			        // 부드러운 스크롤
-			        $('html, body').animate({
-			            scrollTop: $field.offset().top - 100 // 상단에서 100px 여유
-			        }, 500, function() {
-			            // 스크롤 완료 후 필드에 포커스
-			            $field.focus();
-			        });
-			    }
-			}
-            // 회원가입 제출
-			function submitRegistration() {
-			    const formData = {
-			            loginId: $('#loginId').val().trim(),
-			            password: $('#password').val(),
-			            name: registrationData.userName,
-			            birth: formatBirthForServer(registrationData.birthDate), 
-			            address: $('#roadAddress').val() + ($("#detailAddress").val() ? ' ' + $("#detailAddress").val() : ''),
-			            role: 'COMMON'
-			        };
-			
-			   
-			    // 이메일/휴대폰 정보 추가
-			    if (registrationData.email) {
-			        formData.email = registrationData.email;
-			        formData.phoneNumber = $('#phoneNumber').val().trim();
-			    } else {
-			        formData.email = $('#email').val().trim();
-			        formData.phoneNumber = registrationData.phoneNumber;
-			    }
+            // 폼 전체 유효성 검사 - 공통 모달 적용
+            function validateForm() {
+                console.log('=== 유효성 검사 시작 ===');
+                let isValid = true;
+                let firstErrorField = null;
+                
+                // 모든 오류 스타일 초기화
+                $('.form-group').removeClass('error');
+                
+                // 아이디 중복 확인 여부
+                console.log('1. 아이디 중복 확인 상태:', isIdChecked);
+                if (!isIdChecked) {
+                    console.log('❌ 아이디 중복 확인 실패');
+                    showAlert('아이디 중복 확인을 해주세요.');
+                    $('#loginId').closest('.form-group').addClass('error');
+                    if (!firstErrorField) firstErrorField = '#loginId';
+                    isValid = false;
+                } else {
+                    console.log('✅ 아이디 중복 확인 통과');
+                }
+                
+                // 비밀번호 검사
+                const password = $('#password').val();
+                console.log('2. 비밀번호 값:', password);
+                if (!validatePassword(password)) {
+                    console.log('❌ 비밀번호 검증 실패');
+                    $('#password').closest('.form-group').addClass('error');
+                    if (!firstErrorField) firstErrorField = '#password';
+                    isValid = false;
+                } else {
+                    console.log('✅ 비밀번호 검증 통과');
+                }
+                
+                // 비밀번호 확인 검사
+                const passwordConfirm = $('#passwordConfirm').val();
+                console.log('3. 비밀번호 확인 값:', passwordConfirm);
+                if (!validatePasswordConfirm(password, passwordConfirm)) {
+                    console.log('❌ 비밀번호 확인 검증 실패');
+                    $('#passwordConfirm').closest('.form-group').addClass('error');
+                    if (!firstErrorField) firstErrorField = '#passwordConfirm';
+                    isValid = false;
+                } else {
+                    console.log('✅ 비밀번호 확인 검증 통과');
+                }
+                
+                // 이메일 검사 (휴대폰 인증인 경우)
+                if ($('#emailGroup').is(':visible')) {
+                    const email = $('#email').val().trim();
+                    console.log('4. 이메일 값:', email, '(이메일 그룹 표시됨)');
+                    if (!email || !validateEmail(email)) {
+                        console.log('❌ 이메일 검증 실패');
+                        $('#email').closest('.form-group').addClass('error');
+                        if (!firstErrorField) firstErrorField = '#email';
+                        isValid = false;
+                    } else {
+                        console.log('✅ 이메일 검증 통과');
+                    }
+                } else {
+                    console.log('4. 이메일 그룹 숨겨짐 - 검사 건너뜀');
+                }
+                
+                // 휴대폰 검사 (이메일 인증인 경우)
+                if ($('#phoneGroup').is(':visible')) {
+                    const phoneNumber = $('#phoneNumber').val().trim();
+                    console.log('5. 휴대폰 값:', phoneNumber, '(휴대폰 그룹 표시됨)');
+                    if (!phoneNumber || !validatePhoneNumber(phoneNumber)) {
+                        console.log('❌ 휴대폰 검증 실패');
+                        $('#phoneNumber').closest('.form-group').addClass('error');
+                        if (!firstErrorField) firstErrorField = '#phoneNumber';
+                        isValid = false;
+                    } else {
+                        console.log('✅ 휴대폰 검증 통과');
+                    }
+                } else {
+                    console.log('5. 휴대폰 그룹 숨겨짐 - 검사 건너뜀');
+                }
+                
+                // 주소 검사
+                const postcode = $('#postcode').val();
+                const roadAddress = $('#roadAddress').val();
+                console.log('6. 주소 - 우편번호:', postcode, ', 도로명주소:', roadAddress);
+                if (!postcode || !roadAddress) {
+                    console.log('❌ 주소 검증 실패');
+                    showAlert('주소를 입력해주세요.');
+                    $('#postcode').closest('.form-group').addClass('error');
+                    if (!firstErrorField) firstErrorField = '#postcode';
+                    isValid = false;
+                } else {
+                    console.log('✅ 주소 검증 통과');
+                }
+                
+                // 필수 약관 동의 검사
+                const agreeTerms = $('#agreeTerms').is(':checked');
+                const agreePrivacy = $('#agreePrivacy').is(':checked');
+                console.log('7. 약관 동의 - 이용약관:', agreeTerms, ', 개인정보:', agreePrivacy);
+                if (!agreeTerms || !agreePrivacy) {
+                    console.log('❌ 약관 동의 검증 실패');
+                    showAlert('필수 약관에 동의해주세요.');
+                    $('.agreement-container').addClass('error');
+                    if (!firstErrorField) firstErrorField = '.agreement-container';
+                    isValid = false;
+                } else {
+                    console.log('✅ 약관 동의 검증 통과');
+                }
+                
+                // 첫 번째 오류 필드로 스크롤
+                if (!isValid && firstErrorField) {
+                    scrollToErrorField(firstErrorField);
+                }
+                
+                console.log('=== 최종 유효성 검사 결과:', isValid, '===');
+                return isValid;
+            }
+            
+            // 오류 필드로 스크롤하는 함수
+            function scrollToErrorField(fieldSelector) {
+                const $field = $(fieldSelector);
+                if ($field.length) {
+                    // 부드러운 스크롤
+                    $('html, body').animate({
+                        scrollTop: $field.offset().top - 100 // 상단에서 100px 여유
+                    }, 500, function() {
+                        // 스크롤 완료 후 필드에 포커스
+                        $field.focus();
+                    });
+                }
+            }
 
-			
-			    $('#submitBtn').prop('disabled', true).text('가입 중...');
-			
-			    $.ajax({
-			        url: '<c:url value="/api/register"/>',
-			        method: 'POST',
-			        contentType: 'application/json',
-			        data: JSON.stringify(formData),
-			        success: function(response) {
-			            if (response.success) {
-			                // localStorage 정리
-			                localStorage.removeItem('registrationData');
-			
-			                alert('회원가입이 완료되었습니다!');
-			                window.location.href = '<c:url value="/login?success=true"/>';
-			            } else {
-			                alert(response.message || '회원가입에 실패했습니다.');
-			            }
-			        },
-			        error: function(xhr, status, error) {
-			            console.error('회원가입 오류:', error);
-			            let errorMessage = '회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
-			            
-			            if (xhr.responseJSON && xhr.responseJSON.message) {
-			                errorMessage = xhr.responseJSON.message;
-			            }
-			            
-			            alert(errorMessage);
-			        },
-			        complete: function() {
-			        	$('#submitBtn').on('click', function(e) {
-			        	    e.preventDefault();
-			        	    console.log('가입하기 버튼 클릭');
-			        	    
-			        	    if (validateForm()) {
-			        	        console.log('유효성 검사 통과');
-			        	        submitRegistration();
-			        	    } else {
-			        	        console.log('유효성 검사 실패');
-			        	    }
-			        	});
-			        }
-			    });
-			}
+            // 회원가입 제출 - 공통 모달 적용
+            function submitRegistration() {
+                const formData = {
+                    loginId: $('#loginId').val().trim(),
+                    password: $('#password').val(),
+                    name: registrationData.userName,
+                    birth: formatBirthForServer(registrationData.birthDate), 
+                    address: $('#roadAddress').val() + ($("#detailAddress").val() ? ' ' + $("#detailAddress").val() : ''),
+                    role: 'COMMON'
+                };
+
+                // 이메일/휴대폰 정보 추가
+                if (registrationData.email) {
+                    formData.email = registrationData.email;
+                    formData.phoneNumber = $('#phoneNumber').val().trim();
+                } else {
+                    formData.email = $('#email').val().trim();
+                    formData.phoneNumber = registrationData.phoneNumber;
+                }
+
+                $('#submitBtn').prop('disabled', true).text('가입 중...');
+
+                $.ajax({
+                    url: '<c:url value="/api/register"/>',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        if (response.success) {
+                            // localStorage 정리
+                            localStorage.removeItem('registrationData');
+
+                            showAlert('회원가입이 완료되었습니다!', () => {
+                                window.location.href = '<c:url value="/login?success=true"/>';
+                            });
+                        } else {
+                            showAlert(response.message || '회원가입에 실패했습니다.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('회원가입 오류:', error);
+                        let errorMessage = '회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+                        
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        
+                        showAlert(errorMessage);
+                    },
+                    complete: function() {
+                        $('#submitBtn').prop('disabled', false).text('가입하기');
+                    }
+                });
+            }
 
             // 약관 모달 표시
             function showTermsModal(type) {
@@ -803,7 +804,7 @@
                 return phoneNumber;
             }
             
-         	// 날짜 형식 변환 함수 추가
+            // 날짜 형식 변환 함수 추가
             function formatBirthForServer(birthDate) {
                 if (birthDate && birthDate.length === 8) {
                     // "19980411" -> "1998-04-11"
