@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>빌려가유 - 농기계 공유 플랫폼</title>
-    <link rel="stylesheet" href="<c:url value='/static/css/main/style.css'/>">
+    <link rel="stylesheet" href="<c:url value='/static/css/layout/main/style.css'/>">
 </head>
 <body>
     <div class="container">
@@ -64,25 +64,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3 class="feature-title">간편한 검색</h3>
-                <p class="feature-desc">필요한 농기계를 쉽고 빠르게 찾아보세요</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📅</div>
-                <h3 class="feature-title">날짜 예약</h3>
-                <p class="feature-desc">원하는 날짜로 직접예약하고 사용하세요</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <h3 class="feature-title">경제적 이용</h3>
-                <p class="feature-desc">구매 대신 대여로 비용을 절약하세요</p>
-            </div>
-        </div>
-    </div>
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
