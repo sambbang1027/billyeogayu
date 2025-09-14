@@ -1,10 +1,10 @@
 package app.domains.alarm.service;
 
-import app.domains.alarm.dto.AlarmResponseDto;
+import app.domains.alarm.dto.AlarmResponse;
 import java.util.List;
 
 public interface AlarmService {
-    List<AlarmResponseDto> findAll();
+    List<AlarmResponse> findAll();
 
     void markAsRead(Long alarmId);
 

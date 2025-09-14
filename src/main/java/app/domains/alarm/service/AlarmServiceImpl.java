@@ -1,7 +1,7 @@
 package app.domains.alarm.service;
 
 import app.domains.alarm.dao.AlarmRepository;
-import app.domains.alarm.dto.AlarmResponseDto;
+import app.domains.alarm.dto.AlarmResponse;
 import app.domains.alarm.dto.AssetMaintenanceAlarm;
 import app.domains.alarm.dto.MaintenanceLeavedAlarm;
 import app.domains.alarm.dto.PartReplaceAlarm;
@@ -30,10 +30,10 @@ public class AlarmServiceImpl implements AlarmService {
      * 알람 API 메서드
      */
     @Override
-    public List<AlarmResponseDto> findAll() {
+    public List<AlarmResponse> findAll() {
         List<Alarm> alarms = alarmRepository.findAll();
         return alarms.stream()
-                .map(AlarmResponseDto::from)
+                .map(AlarmResponse::from)
                 .collect(Collectors.toList());
     }
 

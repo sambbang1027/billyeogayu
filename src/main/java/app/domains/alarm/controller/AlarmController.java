@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import app.domains.alarm.dto.AlarmResponseDto;
+import app.domains.alarm.dto.AlarmResponse;
 import app.domains.alarm.service.AlarmService;
 
 @Controller
@@ -20,7 +20,7 @@ public class AlarmController {
 
     @GetMapping("/alarms")
     @ResponseBody
-    public List<AlarmResponseDto> getAlarms() {
+    public List<AlarmResponse> getAlarms() {
         return alarmService.findAll();
     }
 
