@@ -22,5 +22,5 @@ public class MaintDetail {
 	private String description;
 	private String note;
 	private String resolvedAt;
-	
+	private String owner;
 }

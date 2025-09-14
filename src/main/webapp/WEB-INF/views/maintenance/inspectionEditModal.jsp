@@ -9,33 +9,39 @@
       <h2>점검 기록 수정</h2>
     </div>
 
-    <div class="inspection-modal-body">
+       <div class="inspection-modal-body">
 		<div class="inspection-info">
-		  <!-- 왼쪽 -->
-		  <div>
-		    <div class="inspection-row">
-		      <span class="inspection-label">점검일시</span>
-		      <span class="inspection-value date"></span>
+		  <!-- 상단 -->
+	
+		  	<div class="inspection-row">
+		      <span class="inspection-label">점검유형</span>
+		      <span class="inspection-value type"></span>
 		    </div>
+		    <div class="inspection-row">
+		    	<span class="inspection-label">점검자</span>
+		      	<span class="inspection-value inspector"></span>
+		    </div>
+		  </div>
+
+		  <!-- 하단  -->
+		  <div class="inspection-info">
 		    <div class="inspection-row">
 		      <span class="inspection-label">자원종류</span>
 		      <span class="inspection-value assetType"></span>
 		    </div>
-		  </div>
-		
-		  <!-- 오른쪽 -->
-		  <div>
 		    <div class="inspection-row">
-		      <span class="inspection-label">점검자</span>
+		      <span class="inspection-label">모델명</span>
 		      <span class="inspection-value assetName"></span>
 		    </div>
+		  </div>
+	
+	 <div class="inspection-info">
 		    <div class="inspection-row">
-		      <span class="inspection-label">점검유형</span>
-		      <span class="inspection-value type">정기 점검</span>
+		      <span class="inspection-label">소유주</span>
+		      <span class="inspection-value owner"></span>
 		    </div>
 		  </div>
-		</div>
-		
+		  
 		<div class="inspection-row column">
 		  <span class="inspection-label">점검항목</span>
 		  <div class="inspection-tags">
