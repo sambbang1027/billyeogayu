@@ -19,6 +19,11 @@ public interface DashBoardRepository {
     List<CategoryModelDto> getAssetModelsByCategory();
     List<String> getReservationAddresses();
     
+    /**
+     * 예약 지역별 상위 7개 도시 조회 (예약 수 기준 내림차순)
+     */
+    List<String> getTopCitiesByReservationCount();
+    
     // 사용량 차트 데이터
     List<UsageDataDto> getUsageDataByFilters(@Param("category") String category, 
                                             @Param("model") String model, 

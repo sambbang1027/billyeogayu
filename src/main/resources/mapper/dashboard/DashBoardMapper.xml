@@ -68,6 +68,15 @@
         ORDER BY address
     </select>
     
+    <!-- 예약 지역별 상위 7개 도시 조회 -->
+    <select id="getTopCitiesByReservationCount" resultType="string">
+        SELECT ADDRESS_CITY
+        FROM RESERVATION 
+        GROUP BY ADDRESS_CITY
+        ORDER BY COUNT(*) DESC
+        FETCH FIRST 7 ROWS ONLY
+    </select>
+    
     <select id="getUsageDataByFilters" resultType="app.domains.dashboard.dto.UsageDataDto">
         SELECT 
             EXTRACT(YEAR FROM r.completed_at) as year,
@@ -84,7 +93,7 @@
             AND a.name = #{model}
           </if>
           <if test="address != null and address != ''">
-            AND r.address_state = #{address}
+            AND r.address_city = #{address}
           </if>
         GROUP BY EXTRACT(YEAR FROM r.completed_at)
         ORDER BY year
