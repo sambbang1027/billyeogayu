@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.domains.alarm.dao.AlarmRepository">
+
+    <!-- 정기점검 알람 대상 자산 조회 -->
+    <select id="getAssetsForMaintenanceAlarm" resultType="app.domains.alarm.dto.AssetMaintenanceAlarm">
+        SELECT 
+            a.asset_id as assetId,
+            a.name as name,
+            a.category as category
+        FROM asset a
+        WHERE a.expected_maintenance_date &lt;= SYSDATE + INTERVAL '5' DAY
+        AND a.status IN ('AVAILABLE', 'USING')
+        AND a.is_deleted = 'N'
+        AND NOT EXISTS (
+            SELECT 1 FROM alarm al 
+            WHERE al.asset_id = a.asset_id 
+            AND al.type = 'ASSET_REGULAR_MAINTENANCE' 
+            AND al.is_deleted = 'N'
+            AND TO_CHAR(al.created_at, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+        )
+    </select>
+
+    <!-- 자산 상태를 MAINTENANCE_REQUIRED로 업데이트 -->
+    <update id="updateAssetStatusToMaintenanceRequired" parameterType="long">
+        UPDATE asset 
+        SET status = 'MAINTENANCE_REQUIRED', updated_at = SYSDATE
+        WHERE asset_id = #{assetId}
+        AND is_deleted = 'N'
+    </update>
+
+
+    <!-- 교체 알람 대상 부품 조회 -->
+    <select id="getPartsForReplaceAlarm" resultType="app.domains.alarm.dto.PartReplaceAlarm">
+        SELECT
+            p.part_id as partId,
+            p.name as name,
+            p.asset_id as assetId
+        FROM part p
+        WHERE p.expected_maintenance_date &lt;= SYSDATE + INTERVAL '5' DAY
+          AND p.status = 'AVAILABLE'
+          AND p.is_deleted = 'N'
+          AND NOT EXISTS (
+            SELECT 1 FROM alarm al
+            WHERE al.asset_id = p.asset_id
+              AND al.type = 'PART_REGULAR_REPLACE'
+              AND al.is_deleted = 'N'
+              AND TO_CHAR(al.created_at, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+        )
+    </select>
+
+    <!-- 부품 상태를 UNAVAILABLE로 업데이트 -->
+    <update id="updatePartStatusToUnavailable" parameterType="long">
+        UPDATE part
+        SET status = 'UNAVAILABLE', updated_at = SYSDATE
+        WHERE part_id = #{partId}
+          AND is_deleted = 'N'
+    </update>
+
+
+
+    <!-- 연체 알람 대상 예약 조회 -->
+    <select id="getReservationsForOverdueAlarm" resultType="app.domains.alarm.dto.ReservationOverdueAlarm">
+        SELECT
+            r.reservation_id as reservationId,
+            r.asset_id as assetId
+        FROM reservation r
+        WHERE r.end_time &lt;= SYSDATE - INTERVAL '20' DAY
+          AND r.status = 'APPROVED'
+          AND NOT EXISTS (
+            SELECT 1 FROM alarm al
+            WHERE al.asset_id = r.asset_id
+              AND al.type = 'RESERVATION_OVERDUE'
+              AND al.is_deleted = 'N'
+              AND al.description LIKE '%' || r.reservation_id || '%'
+        )
+    </select>
+
+
+    <!-- 방치 알람 대상 점검 조회 -->
+    <select id="getMaintenancesForLeavedAlarm" resultType="app.domains.alarm.dto.MaintenanceLeavedAlarm">
+        SELECT
+            m.maintenance_id as maintenanceId,
+            m.asset_id as assetId,
+            a.name as assetName,
+            a.category as assetCategory
+        FROM maintenance m
+                 JOIN asset a ON m.asset_id = a.asset_id
+        WHERE m.created_at &lt;= SYSDATE - INTERVAL '30' DAY
+          AND m.status = 'IN_PROGRESS'
+          AND m.is_deleted = 'N'
+          AND a.is_deleted = 'N'
+          AND NOT EXISTS (
+            SELECT 1 FROM alarm al
+            WHERE al.asset_id = m.asset_id
+              AND al.type = 'ASSET_MAINTENANCE_LEAVED'
+              AND al.is_deleted = 'N'
+              AND al.description LIKE '%' || m.maintenance_id || '%'
+        )
+    </select>
+
+</mapper>
