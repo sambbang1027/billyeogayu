@@ -1,6 +1,7 @@
 package app.domains.alarm.scheduler;
 
 import app.domains.alarm.service.AlarmService;
+import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -16,18 +17,13 @@ import org.springframework.stereotype.Component;
 public class AlarmScheduler {
     @Autowired
     private AlarmService alarmService;
-
-    public AlarmScheduler() {
-        System.out.println("==================AlarmScheduler Bean created!");
-    }
     
     /**
      * 1분마다 실행되는 알람 스케줄러
      */
     @Scheduled(fixedRate = 60000) // 1분 = 60,000ms
     public void runAlarmScheduler() {
-        System.out.println("Running alarm scheduler===========================");
-        log.info("[ALARM_SCHEDULER] Started at {}", java.time.LocalDateTime.now());
+        log.info("[ALARM_SCHEDULER] Started at {}", LocalDateTime.now());
         
         try {
             // 4개 알람 체크를 병렬로 실행
@@ -36,7 +32,7 @@ public class AlarmScheduler {
             checkReservationOverdue();
             checkMaintenanceLeaved();
             
-            log.info("[ALARM_SCHEDULER] Completed at {}", java.time.LocalDateTime.now());
+            log.info("[ALARM_SCHEDULER] Completed at {}", LocalDateTime.now());
         } catch (Exception e) {
             log.error("[ALARM_SCHEDULER] Error occurred during execution", e);
         }
@@ -44,13 +40,12 @@ public class AlarmScheduler {
     
     @Async
     public void checkAssetMaintenance() {
-        System.out.println("=========Checking asset maintenance...");
         try {
             boolean isAlarmGenerated = alarmService.createAssetMaintenanceAlarms();
             if (isAlarmGenerated) {
-                log.info("[알람 - 자산 정기점검] alarms created and asset status updated");
+                log.info("[ALARM_SCHEDULER - 자산 정기점검 도래] alarms generated, status updated");
             } else {
-                log.debug("[알람 - 자산 정기점검] No assets require maintenance alarm");
+                log.info("[ALARM_SCHEDULER - 자산 정기점검 도래] No assets requires alarm");
             }
         } catch (Exception e) {
             log.error("[ALARM_SCHEDULER] AssetMaintenance check failed", e);
@@ -59,13 +54,12 @@ public class AlarmScheduler {
     
     @Async
     public void checkPartReplace() {
-        System.out.println("========Checking part replace...");
         try {
             boolean isAlarmGenerated = alarmService.createPartReplaceAlarms();
             if (isAlarmGenerated) {
-                log.info("[알람 - 부품 교체] alarms created and part status updated");
+                log.info("[ALARM_SCHEDULER - 부품 교체 도래] alarm generated, status updated");
             } else {
-                log.debug("[알람 - 부품 교체] No parts require replace alarm");
+                log.info("[ALARM_SCHEDULER - 부품 교체 도래] No data requires alarm");
             }
         } catch (Exception e) {
             log.error("[ALARM_SCHEDULER] PartReplace check failed", e);
@@ -74,13 +68,12 @@ public class AlarmScheduler {
     
     @Async
     public void checkReservationOverdue() {
-        System.out.println("========Checking reservation overdue...");
         try {
             boolean isAlarmGenerated = alarmService.createReservationOverdueAlarms();
             if (isAlarmGenerated) {
-                log.info("[알람 - 예약 연체] alarms created");
+                log.info("[ALARM_SCHEDULER - 예약 연체] alarms generated");
             } else {
-                log.debug("[알람 - 예약 연체] No reservations require overdue alarm");
+                log.info("[ALARM_SCHEDULER - 예약 연체] No data requires alarm");
             }
         } catch (Exception e) {
             log.error("[ALARM_SCHEDULER] ReservationOverdue check failed", e);
@@ -89,13 +82,12 @@ public class AlarmScheduler {
     
     @Async
     public void checkMaintenanceLeaved() {
-        System.out.println("========Checking maintenance leaved...");
         try {
             boolean isAlarmGenerated = alarmService.createMaintenanceLeavedAlarms();
             if (isAlarmGenerated) {
-                log.info("[알람 - 점검 방치] alarms created");
+                log.info("[ALARM_SCHEDULER - 점검 방치] alarms generated");
             } else {
-                log.debug("[알람 - 점검 방치] No maintenances require leaved alarm");
+                log.info("[ALARM_SCHEDULER - 점검 방치] No data requires alarm");
             }
         } catch (Exception e) {
             log.error("[ALARM_SCHEDULER] MaintenanceLeaved check failed", e);
