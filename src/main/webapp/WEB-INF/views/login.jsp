@@ -12,18 +12,6 @@
 </head>                                     
 <body>
     <div class="component">
-        <!-- 헤더 -->
-        <div class="header">
-            <div class="header-content">
-                <img class="logo" src="<c:url value='/static/images/logo.png'/>" alt="빌려가유 로고" />
-                <div class="header-links">
-                    <span class="header-link">회원가입</span>
-                    <span class="header-link">로그인</span>
-                    <span class="header-link">마이페이지</span>
-                    <span class="header-link">로그아웃</span>
-                </div>
-            </div>
-        </div>
 
         <div class="frame">
             <!-- 사이드바 -->
@@ -49,7 +37,7 @@
                     </div>
                     <div class="menu-item">
                         <a href="<c:url value='/reset-password'/>" class="menu-link">
-                            <div class="menu-text">비밀번호 재설정</div>
+                            <div class="menu-text">비밀번호찾기</div>
                         </a>
                     </div>
                 </div>
@@ -100,8 +88,8 @@
                         </div>
                         
                         <div class="checkbox-group">
-                            <input type="checkbox" id="remember" name="remember" class="checkbox" />
-                            <label for="remember" class="checkbox-label">로그인 상태 유지</label>
+                            <input type="checkbox" id="saveId" name="saveId" class="checkbox" />
+                            <label for="saveId" class="checkbox-label">아이디 저장</label>
                         </div>
                         
                         <button type="button" class="login-button" id="loginBtn">
@@ -119,7 +107,7 @@
                         <div class="vertical-divider"></div>
                         <a href="<c:url value='/find-id'/>" class="link-item">아이디 찾기</a>
                         <div class="vertical-divider"></div>
-                        <a href="<c:url value='/reset-password'/>" class="link-item">비밀번호 재설정</a>
+                        <a href="<c:url value='/reset-password'/>" class="link-item">비밀번호찾기</a>
                     </div>
                 </div>
             </div>
@@ -138,6 +126,9 @@
     <!-- JavaScript -->
     <script>
         $(document).ready(function() {
+            // 페이지 로드 시 저장된 아이디 복원
+            loadSavedId();
+            
             // 로그인 버튼 클릭 처리
             $('#loginBtn').on('click', function(e) {
                 e.preventDefault();
@@ -151,6 +142,26 @@
                     handleLogin();
                 }
             });
+            
+            // 아이디 저장 기능
+            function loadSavedId() {
+                const savedId = localStorage.getItem('savedLoginId');
+                if (savedId) {
+                    $('#userid').val(savedId);
+                    $('#saveId').prop('checked', true);
+                }
+            }
+            
+            function saverId() {
+                const userid = $('#userid').val().trim();
+                const saveIdChecked = $('#saveId').is(':checked');
+                
+                if (saveIdChecked && userid) {
+                    localStorage.setItem('savedLoginId', userid);
+                } else {
+                    localStorage.removeItem('savedLoginId');
+                }
+            }
             
             function handleLogin() {
                 const userid = $('#userid').val().trim();
@@ -168,6 +179,9 @@
                     $('#password').focus();
                     return;
                 }
+                
+                // 아이디 저장 처리
+                saverId();
                 
                 // 로딩 상태 변경
                 const $loginBtn = $('#loginBtn');

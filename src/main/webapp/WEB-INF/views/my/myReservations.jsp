@@ -16,12 +16,17 @@
     <!-- 헤더 -->
     <div class="header">
         <div class="header-content">
-            <img src="<c:url value='/static/images/logo.png'/>" alt="로고" class="logo">
+            <a href="<c:url value='/resource/list'/>" class="logo-link">
+                <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="로고" class="logo">
+            </a>
             <div class="header-links">
-                <a href="<c:url value='/assets'/>" class="header-link">농기계 목록</a>
+                <a href="<c:url value='/resource/list'/>" class="header-link">농기계 목록</a>
                 <a href="<c:url value='/my/reservations'/>" class="header-link">내 예약</a>
                 <a href="<c:url value='/my/usage-history'/>" class="header-link">사용 내역</a>
-                <a href="<c:url value='/logout'/>" class="header-link">로그아웃</a>
+                <form action="<c:url value='/logout'/>" method="post" style="display: inline;" id="logoutForm">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <button type="submit" class="header-link logout-btn">로그아웃</button>
+                </form>
             </div>
         </div>
     </div>
@@ -35,29 +40,30 @@
                     <a href="<c:url value='/my/usage-history'/>" class="nav-link">사용 내역 보기</a>
                 </div>
 
-                <!-- 예약 현황 요약 -->
-                <c:if test="${not empty reservationSummary}">
-                    <div class="summary-card">
-                        <div class="summary-grid">
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.totalCount != null ? reservationSummary.totalCount : 0}"/></h4>
-                                <small>전체 예약</small>
-                            </div>
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.pendingCount != null ? reservationSummary.pendingCount : 0}"/></h4>
-                                <small>승인 대기</small>
-                            </div>
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.approvedCount != null ? reservationSummary.approvedCount : 0}"/></h4>
-                                <small>승인됨</small>
-                            </div>
-                            <div class="summary-item">
-                                <h4><c:out value="${reservationSummary.completedCount != null ? reservationSummary.completedCount : 0}"/></h4>
-                                <small>완료됨</small>
-                            </div>
-                        </div>
-                    </div>
-                </c:if>
+
+				<!-- 예약 현황 요약 -->
+				<c:if test="${not empty reservationSummary}">
+				    <div class="summary-card">
+				        <div class="summary-grid">
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.TOTALCOUNT != null ? reservationSummary.TOTALCOUNT : 0}"/></h4>
+				                <small>전체 예약</small>
+				            </div>
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.PENDINGCOUNT != null ? reservationSummary.PENDINGCOUNT : 0}"/></h4>
+				                <small>승인 대기</small>
+				            </div>
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.APPROVEDCOUNT != null ? reservationSummary.APPROVEDCOUNT : 0}"/></h4>
+				                <small>승인됨</small>
+				            </div>
+				            <div class="summary-item">
+				                <h4><c:out value="${reservationSummary.COMPLETEDCOUNT != null ? reservationSummary.COMPLETEDCOUNT : 0}"/></h4>
+				                <small>완료됨</small>
+				            </div>
+				        </div>
+				    </div>
+				</c:if>
 
                 <!-- 필터링 -->
                 <div class="filter-card">
@@ -114,7 +120,8 @@
                                      onclick="openReservationModal('${reservation.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${empty reservation.assetImage ? "default.png" : reservation.assetImage}'/>" 
+                                            <img src="<c:url value='${empty reservation.assetImage ? 
+                                            "/static/images/assets/default.png" : reservation.assetImage}'/>" 
                                                  alt="<c:out value='${reservation.assetName}'/>" 
                                                  class="asset-image">
                                             <div class="asset-details">
@@ -241,8 +248,10 @@
 
             // 이미지 경로 설정
             const imagePath = reservation.assetImage ? 
-                '<c:url value="/static/images/assets/"/>' + reservation.assetImage : 
+                 reservation.assetImage : 
                 '<c:url value="/static/images/assets/default.png"/>';
+                
+
 
             // 날짜 포맷팅 함수
             function formatDateTime(dateStr) {

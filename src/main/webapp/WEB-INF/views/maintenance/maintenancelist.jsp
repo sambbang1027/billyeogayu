@@ -98,7 +98,7 @@
 			      <th>No</th>
 			      <th>종류</th>
 			      <th>모델명</th>
-			      <th>점검 일시</th>
+				  <th class="sortable" data-sort="maintDate" data-order="desc">점검 일시</th>
 			      <th>점검 유형</th>
 			      <th>점검 상태</th>
 			      <th>담당자</th>

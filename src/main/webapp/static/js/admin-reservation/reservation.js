@@ -165,21 +165,28 @@ function renderRvPagination(currentPage, totalPage){
     `);
   }
 
-  // 번호
-  for (let i = 1; i <= totalPage; i++) {
+  // === 페이지 번호 범위 계산 (5개 단위) ===
+  const pageGroupSize = 5; // 한 그룹에 보여줄 페이지 개수
+  const groupStart = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+  let groupEnd = groupStart + pageGroupSize - 1;
+  if (groupEnd > totalPage) groupEnd = totalPage;
+
+  // 번호 버튼 출력
+  for (let i = groupStart; i <= groupEnd; i++) {
     $pagination.append(`
-      <a href="#" class="rv-page ${i === currentPage ? "active" : ""}" data-page="${i}">${i}</a>
+      <a href="#" class="page ${i === currentPage ? "active" : ""}" data-page="${i}">${i}</a>
     `);
   }
 
-  // 다음
+  // 다음 화살표
   if (currentPage < totalPage) {
     $pagination.append(`
-      <a href="#" class="rv-arrow rv-next" data-page="${currentPage + 1}">
+      <a href="#" class="arrow next" data-page="${currentPage + 1}">
         <img src="/assets/asset/right.svg" alt="다음">
       </a>
     `);
   }
+
 
   // 페이지 버튼 이벤트 바인딩
   $pagination.find("a").on("click", function (e) {
@@ -187,3 +194,7 @@ function renderRvPagination(currentPage, totalPage){
     loadRvList($(this).data("page"));
   });
 }
+
+
+
+

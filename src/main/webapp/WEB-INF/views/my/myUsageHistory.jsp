@@ -16,12 +16,17 @@
     <!-- 헤더 -->
     <div class="header">
         <div class="header-content">
-            <img src="<c:url value='/static/images/logo.png'/>" alt="로고" class="logo">
+            <a href="<c:url value='/resource/list'/>" class="logo-link">
+                <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="로고" class="logo">
+            </a>
             <div class="header-links">
-                <a href="<c:url value='/assets'/>" class="header-link">농기계 목록</a>
+                <a href="<c:url value='/resource/list'/>" class="header-link">농기계 목록</a>
                 <a href="<c:url value='/my/reservations'/>" class="header-link">내 예약</a>
                 <a href="<c:url value='/my/usage-history'/>" class="header-link">사용 내역</a>
-                <a href="<c:url value='/logout'/>" class="header-link">로그아웃</a>
+                <form action="<c:url value='/logout'/>" method="post" style="display: inline;" id="logoutForm">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <button type="submit" class="header-link logout-btn">로그아웃</button>
+                </form>
             </div>
         </div>
     </div>
@@ -36,28 +41,30 @@
                 </div>
 
                 <!-- 사용 통계 -->
-                <c:if test="${not empty usageStatistics}">
-                    <div class="stats-card">
-                        <div class="stats-grid">
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.totalUsageCount != null ? usageStatistics.totalUsageCount : 0}"/></h4>
-                                <small>총 사용 횟수</small>
-                            </div>
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.completedCount != null ? usageStatistics.completedCount : 0}"/></h4>
-                                <small>완료된 사용</small>
-                            </div>
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.activeCount != null ? usageStatistics.activeCount : 0}"/></h4>
-                                <small>사용 중</small>
-                            </div>
-                            <div class="stats-item">
-                                <h4><c:out value="${usageStatistics.totalUsageFormatted != null ? usageStatistics.totalUsageFormatted : '0분'}"/></h4>
-                                <small>총 사용 시간</small>
-                            </div>
-                        </div>
-                    </div>
-                </c:if>
+				<!-- 사용 통계 -->
+				<c:if test="${not empty usageStatistics}">
+				    <div class="stats-card">
+				        <div class="stats-grid">
+				            <div class="stats-item">
+				                <h4><c:out value="${usageStatistics.TOTALUSAGECOUNT != null ? usageStatistics.TOTALUSAGECOUNT : 0}"/></h4>
+				                <small>총 사용 횟수</small>
+				            </div>
+				            <div class="stats-item">
+				                <h4><c:out value="${usageStatistics.COMPLETEDCOUNT != null ? usageStatistics.COMPLETEDCOUNT : 0}"/></h4>
+				                <small>완료된 사용</small>
+				            </div>
+				            <div class="stats-item">
+				                <h4><c:out value="${usageStatistics.ACTIVECOUNT != null ? usageStatistics.ACTIVECOUNT : 0}"/></h4>
+				                <small>사용 중</small>
+				            </div>
+				            <div class="stats-item">
+				                <!-- 시간 포맷팅은 서비스에서 처리된 값 사용 -->
+				                <h4><c:out value="${usageStatistics.totalUsageFormatted != null ? usageStatistics.totalUsageFormatted : '0분'}"/></h4>
+				                <small>총 사용 시간</small>
+				            </div>
+				        </div>
+				    </div>
+				</c:if>
 
                 <!-- 필터링 -->
                 <div class="filter-card">
@@ -129,10 +136,9 @@
                                      onclick="openUsageModal('${usage.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='/static/images/assets/${usage.assetImage}'/>" 
+                                            <img src="<c:url value='${empty usage.assetImage ? "default.png" : usage.assetImage}'/>" 
                                                  alt="<c:out value='${usage.assetName}'/>" 
-                                                 class="asset-image"
-                                                 onerror="this.src='<c:url value='/static/images/assets/default.png'/>'">
+                                                 class="asset-image">
                                             <div class="asset-details">
                                                 <h3><c:out value="${usage.assetName}"/></h3>
                                                 <div class="asset-meta"><c:out value="${usage.assetCategory}"/> | <c:out value="${usage.assetCompany}"/></div>
@@ -251,10 +257,14 @@
         function displayUsageModal(data) {
             const modalBody = $('#modalBody');
             
+            // 이미지 경로 안전하게 설정
+            const imagePath = data.assetImage ? 
+                '<c:url value="/static/images/assets/"/>' + data.assetImage : 
+                '<c:url value="/static/images/assets/default.png"/>';
+            
             const modalContent = `
                 <div class="modal-asset-info">
-                    <img src="<c:url value='/static/images/assets/'/>` + data.assetImage + `" alt="` + data.assetName + `" class="modal-asset-image" 
-                         onerror="this.src='<c:url value='/static/images/assets/default.png'/>'">
+                    <img src="` + imagePath + `" alt="` + data.assetName + `" class="modal-asset-image">
                     <div class="modal-asset-details">
                         <h3>` + data.assetName + `</h3>
                         <div class="modal-asset-meta">` + data.assetCategory + ` | ` + data.assetCompany + `</div>

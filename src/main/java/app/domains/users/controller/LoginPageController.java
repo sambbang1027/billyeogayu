@@ -124,8 +124,8 @@ public class LoginPageController {
                 model.addAttribute("activePage", "find-id");
                 break;
             case "reset-password":
-                model.addAttribute("pageTitle", "비밀번호 재설정");
-                model.addAttribute("pageDescription", "본인 확인을 통해 비밀번호를 재설정하실 수 있습니다.");
+                model.addAttribute("pageTitle", "비밀번호 찾기");
+                model.addAttribute("pageDescription", "본인 확인을 통해 비밀번호를 찾으실 수 있습니다.");
                 model.addAttribute("activePage", "reset-password");
                 break;
             case "register":
@@ -153,7 +153,7 @@ public class LoginPageController {
      */
     @GetMapping("/reset-password")
     public String resetPasswordPage() {
-        log.info("=== 비밀번호 재설정 페이지 요청 - verification으로 리다이렉트 ===");
+        log.info("=== 비밀번호 찾기 페이지 요청 - verification으로 리다이렉트 ===");
         return "redirect:/verification?purpose=reset-password";
     }
 
@@ -216,18 +216,6 @@ public class LoginPageController {
         return "redirect:/login";
     }
 
-    @GetMapping("/")
-    public String mainPage(HttpServletRequest request, Model model) {
-        log.info("=== 메인 페이지 요청 ===");
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            return "redirect:/asset/list";
-        } else {
-            return "redirect:/login";
-        }
-    }
-
 
     /**
      * 아이디 찾기 결과 페이지
@@ -274,12 +262,12 @@ public class LoginPageController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        log.info("=== 비밀번호 재설정 폼 페이지 요청 ===");
+        log.info("=== 비밀번호 찾기 폼 페이지 요청 ===");
         log.info("인증 타입: {}, 사용자 ID: {}", authType, userId);
 
         // 인증 정보가 없으면 비밀번호 재설정 첫 페이지로 리다이렉트
         if (authType == null || authKey == null || userId == null) {
-            log.warn("인증 정보 없음 - 비밀번호 재설정 페이지로 리다이렉트");
+            log.warn("인증 정보 없음 - 비밀번호 찾기 페이지로 리다이렉트");
             redirectAttributes.addAttribute("error", "true");
             return "redirect:/verification?purpose=reset-password";
         }
