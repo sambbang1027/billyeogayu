@@ -61,7 +61,7 @@ public class MaintenanceController {
 	@GetMapping("/search")
 	public  Map<String, Object> searchMaintenance (@ModelAttribute MaintSearch maintSearch,
 						@RequestParam(name="page", defaultValue = "1") int page) {
-
+        log.info("orderBy = {}", maintSearch.getOrderBy());
 		int pageSize = 10; // 한 페이지에 보여줄 행 수
 		maintSearch.setStartRow((page -1) * pageSize+1);
 		maintSearch.setEndRow(page * pageSize);
