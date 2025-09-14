@@ -77,10 +77,11 @@
     width: 95%;
     border-radius: 0.5rem;
     outline: none;
-    border: 1px solid #ccc;
+    border: 1px solid #dadada;
 
     margin: 1rem 0 1rem 2rem;
     padding: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .filter-text-data {
@@ -322,9 +323,10 @@
     border-collapse: separate;
     background-color: #fff;
     border-radius: 0.5rem;
-    border: 1px solid #ccc;
+    border: 1px solid #dadada;
     font-size: 0.9rem;
     margin: 0 auto;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .asset-table th,
@@ -639,7 +641,8 @@
 .modal-company-container,
 .modal-model-container,
 .modal-lifecycle-container,
-.modal-image-container {
+.modal-image-container,
+.modal-owner-container{
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

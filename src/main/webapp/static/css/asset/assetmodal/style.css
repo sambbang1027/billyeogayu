@@ -1,0 +1,76 @@
+/* util */
+.hidden { display:none!important; }
+.sr-only {
+  position:absolute; width:1px; height:1px; padding:0;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* 공통 자산 모달 (변수 제거 버전) */
+.asset-modal {
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,.3);
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+}
+
+.asset-modal-panel {
+  width:100%;
+  min-width:320px; max-width:400px;
+  background:#fff;
+  border-radius:15px;
+  box-shadow:0 4px 15px rgba(0,0,0,.2);
+  overflow:hidden;
+  padding:0;
+}
+
+.asset-modal-title {
+  margin:0;
+  padding:1rem;
+  font-size:20px;
+  font-weight:700;
+  text-align:center;
+  color:#111;
+  border-bottom:1px solid #ddd;
+}
+
+.asset-modal-desc {
+  margin:0;
+  padding:1.5rem;
+  font-size:1rem;
+  line-height:1.5;
+  text-align:center;
+  color:#333;
+}
+
+.asset-modal-actions {
+  display:flex; justify-content:center; gap:.75rem;
+  padding:1rem;
+  margin:0;
+}
+
+.asset-btn {
+  height:auto;
+  padding:.6rem 1.2rem;
+  border-radius:2rem;
+  border:1px solid #46645E;
+  font-size:.95rem;
+  font-weight:600;
+  cursor:pointer;
+  background:#fff;
+  color:#46645E;
+  transition:transform .02s ease, filter .15s ease;
+}
+
+.asset-btn-primary {
+  background:#46645E;
+  color:#fff;
+  border-color:#46645E;
+}
+.asset-btn-primary:active { background:#3b554f; transform:translateY(1px); }
+.asset-btn-ghost:active   { transform:translateY(1px); }
+
+.asset-btn:focus { outline:none; }
+.asset-btn:focus-visible {
+  outline:3px solid rgba(70,100,94,.35);
+  outline-offset:2px;
+}

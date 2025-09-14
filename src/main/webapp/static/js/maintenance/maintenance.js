@@ -7,6 +7,17 @@ $(function () {
   loadList(1); // 처음 로드될 때 1페이지 데이터 호출
 });
 
+let sortOrder = "desc";
+let sortField = "maintDate";  // 기본값
+
+$(document).on("click", "th.sortable", function () {
+  const $th = $(this);
+  sortField = $th.data("sort"); 
+  sortOrder = $th.attr("data-order"); // DOM 속성 읽기
+  sortOrder = (sortOrder === "desc") ? "asc" : "desc";
+  $th.attr("data-order", sortOrder);  // DOM 속성 갱신
+  loadList(1);
+});
 
 // 필터 + 검색 값 수집
 function getFilterValues(){
@@ -15,7 +26,8 @@ function getFilterValues(){
 		keyword : $(".search-input").val().trim(),
 		assetKind  : activeFilters.assetKind || "",
 		company    : activeFilters.company || "",
-		maintStatus: activeFilters.maintStatus || ""
+		maintStatus: activeFilters.maintStatus || "",
+		orderBy : sortField + (sortOrder === "asc" ? "Asc" : "Desc")
 	};
 }
 
@@ -100,32 +112,39 @@ function renderTable(list){
 
 // 페이지네이션 렌더링
 function renderPagination(currentPage, totalPage){
-	const $pagination = $(".pagination");
-	$pagination.empty();
-	// 이전
-	  if (currentPage > 1) {
-	    $pagination.append(`
-	      <a href="#" class="arrow prev" data-page="${currentPage - 1}">
-	        <img src="/assets/asset/left.svg" alt="이전">
-	      </a>
-	    `);
-	  }
+  const $pagination = $(".pagination");
+  $pagination.empty();
 
-	  // 번호
-	  for (let i = 1; i <= totalPage; i++) {
-	    $pagination.append(`
-	      <a href="#" class="page ${i === currentPage ? "active" : ""}" data-page="${i}">${i}</a>
-	    `);
-	  }
+  // 이전 화살표
+  if (currentPage > 1) {
+    $pagination.append(`
+      <a href="#" class="arrow prev" data-page="${currentPage - 1}">
+        <img src="/assets/asset/left.svg" alt="이전">
+      </a>
+    `);
+  }
 
-	  // 다음
-	  if (currentPage < totalPage) {
-	    $pagination.append(`
-	      <a href="#" class="arrow next" data-page="${currentPage + 1}">
-	        <img src="/assets/asset/right.svg" alt="다음">
-	      </a>
-	    `);
-	  }
+  // === 페이지 번호 범위 계산 (5개 단위) ===
+  const pageGroupSize = 5; // 한 그룹에 보여줄 페이지 개수
+  const groupStart = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+  let groupEnd = groupStart + pageGroupSize - 1;
+  if (groupEnd > totalPage) groupEnd = totalPage;
+
+  // 번호 버튼 출력
+  for (let i = groupStart; i <= groupEnd; i++) {
+    $pagination.append(`
+      <a href="#" class="page ${i === currentPage ? "active" : ""}" data-page="${i}">${i}</a>
+    `);
+  }
+
+  // 다음 화살표
+  if (currentPage < totalPage) {
+    $pagination.append(`
+      <a href="#" class="arrow next" data-page="${currentPage + 1}">
+        <img src="/assets/asset/right.svg" alt="다음">
+      </a>
+    `);
+  }
 
 	  // 페이지 버튼 이벤트 바인딩
 	  $pagination.find("a").on("click", function (e) {

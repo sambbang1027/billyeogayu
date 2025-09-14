@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
-public class AlarmResponseDto {
+public class AlarmResponse {
     private Long id;
     private Long assetId;
     private String type;
@@ -22,12 +22,12 @@ public class AlarmResponseDto {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static AlarmResponseDto from(Alarm alarm) {
+    public static AlarmResponse from(Alarm alarm) {
         if (alarm == null) {
             return null;
         }
 
-        return AlarmResponseDto.builder()
+        return AlarmResponse.builder()
                 .id(alarm.getId())
                 .assetId(alarm.getAssetId())
                 .type(alarm.getType())
