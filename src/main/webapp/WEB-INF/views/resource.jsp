@@ -128,56 +128,39 @@
             </c:choose>
         </section>
 
+  
         <!-- 페이지네이션 -->
         <c:if test="${totalPages >= 1}">
-            <nav class="resource-paging" aria-label="페이지 이동">
-                <!-- 처음(«) -->
-                <c:choose>
-                    <c:when test="${page > 1}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='1'/></c:url>">&laquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&laquo;</span>
-                    </c:otherwise>
-                </c:choose>
+            <div class="pagination" aria-label="페이지 이동">
+                <!-- 이전 화살표 -->
+                <c:if test="${page > 1}">
+                    <a class="arrow prev" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${page - 1}'/></c:url>">
+                        <img src="<c:url value='/assets/asset/left.svg'/>" alt="이전">
+                    </a>
+                </c:if>
 
-                <!-- 이전(‹) -->
-                <c:choose>
-                    <c:when test="${page > 1}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${prevPage}'/></c:url>">&lsaquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&lsaquo;</span>
-                    </c:otherwise>
-                </c:choose>
+                <!-- 페이지 번호 (5개 단위 그룹) -->
+                <c:set var="pageGroupSize" value="5"/>
+                <c:set var="groupStart" value="${((page - 1) / pageGroupSize) * pageGroupSize + 1}"/>
+                <c:set var="groupEnd" value="${groupStart + pageGroupSize - 1}"/>
+                <c:if test="${groupEnd > totalPages}">
+                    <c:set var="groupEnd" value="${totalPages}"/>
+                </c:if>
 
-                <!-- 현재 블록의 페이지들 (예: 1~10, 11~20 ...) -->
-                <c:forEach var="p" begin="${startPage}" end="${endPage}">
-                    <a class="resource-paging__item ${p == page ? 'is-active' : ''}" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${p}'/></c:url>">${p}</a>
+                <c:forEach var="p" begin="${groupStart}" end="${groupEnd}">
+                    <a class="${p == page ? 'active' : ''}" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${p}'/></c:url>">${p}</a>
                 </c:forEach>
 
-                <!-- 다음(›) -->
-                <c:choose>
-                    <c:when test="${page < totalPages}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${nextPage}'/></c:url>">&rsaquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&rsaquo;</span>
-                    </c:otherwise>
-                </c:choose>
-
-                <!-- 마지막(») -->
-                <c:choose>
-                    <c:when test="${page < totalPages}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${totalPages}'/></c:url>">&raquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&raquo;</span>
-                    </c:otherwise>
-                </c:choose>
-            </nav>
+                <!-- 다음 화살표 -->
+                <c:if test="${page < totalPages}">
+                    <a class="arrow next" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${page + 1}'/></c:url>">
+                        <img src="<c:url value='/assets/asset/right.svg'/>" alt="다음">
+                    </a>
+                </c:if>
+            </div>
         </c:if>
     </section>
+
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

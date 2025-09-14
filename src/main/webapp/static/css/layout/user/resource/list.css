@@ -183,7 +183,7 @@ body {
     border: 1px solid #d9d9d9;
     border-radius: 6px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 10;
+    z-index: 9999;
     margin-top: 4px;
     list-style: none;
     padding: 0;
@@ -322,35 +322,52 @@ body {
     cursor: not-allowed; 
 }
 
-/* 페이지네이션: 항상 하단 고정 */
-.resource-paging {
-    display: flex; 
-    gap: 0.375rem; 
+/* ---------------- 페이지네이션 ---------------- */
+.pagination {
+    display: flex;
     justify-content: center;
-    margin-top: 1rem;              
-    margin-bottom: 0.5rem;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 1.5rem 0;
+    font-size: 1rem;
+}
+
+.pagination a {
+    color: #000;
+    text-decoration: none;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.pagination a:hover {
+    background-color: #f0f4f9;
+}
+
+.pagination a.active {
+    border: 1px solid #587570;
+    color: #000;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.pagination .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.pagination .arrow img {
+    width: 24px;
+    height: 24px;
 }
 
 .resource-grid { 
     margin-bottom: 0.5rem; 
-}
-
-.resource-paging__item {
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center;
-    min-width: 1.75rem; 
-    height: 1.75rem; 
-    padding: 0 0.5rem; 
-    border-radius: 0.25rem;
-    text-decoration: none; 
-    color: #1e1e1e; 
-    font-size: 0.875rem;
-}
-
-.resource-paging__item.is-active { 
-    background: #659f7c; 
-    color: #fff; 
 }
 
 /* 반응형 디자인 */
