@@ -44,11 +44,11 @@ public class AlarmScheduler {
     
     @Async
     public void checkAssetMaintenance() {
+        System.out.println("=========Checking asset maintenance...");
         try {
-            var targetAssets = alarmService.getAssetsForMaintenanceAlarm();
-            if (!targetAssets.isEmpty()) {
-                alarmService.createAssetMaintenanceAlarms(targetAssets);
-                log.info("[알람 - 자산 정기점검] {} alarms created and asset status updated", targetAssets.size());
+            boolean isAlarmGenerated = alarmService.createAssetMaintenanceAlarms();
+            if (isAlarmGenerated) {
+                log.info("[알람 - 자산 정기점검] alarms created and asset status updated");
             } else {
                 log.debug("[알람 - 자산 정기점검] No assets require maintenance alarm");
             }
@@ -59,11 +59,11 @@ public class AlarmScheduler {
     
     @Async
     public void checkPartReplace() {
+        System.out.println("========Checking part replace...");
         try {
-            var targetParts = alarmService.getPartsForReplaceAlarm();
-            if (!targetParts.isEmpty()) {
-                alarmService.createPartReplaceAlarms(targetParts);
-                log.info("[알람 - 부품 교체] {} alarms created and part status updated", targetParts.size());
+            boolean isAlarmGenerated = alarmService.createPartReplaceAlarms();
+            if (isAlarmGenerated) {
+                log.info("[알람 - 부품 교체] alarms created and part status updated");
             } else {
                 log.debug("[알람 - 부품 교체] No parts require replace alarm");
             }
@@ -74,11 +74,11 @@ public class AlarmScheduler {
     
     @Async
     public void checkReservationOverdue() {
+        System.out.println("========Checking reservation overdue...");
         try {
-            var targetReservations = alarmService.getReservationsForOverdueAlarm();
-            if (!targetReservations.isEmpty()) {
-                alarmService.createReservationOverdueAlarms(targetReservations);
-                log.info("[알람 - 예약 연체] {} alarms created", targetReservations.size());
+            boolean isAlarmGenerated = alarmService.createReservationOverdueAlarms();
+            if (isAlarmGenerated) {
+                log.info("[알람 - 예약 연체] alarms created");
             } else {
                 log.debug("[알람 - 예약 연체] No reservations require overdue alarm");
             }
@@ -89,11 +89,11 @@ public class AlarmScheduler {
     
     @Async
     public void checkMaintenanceLeaved() {
+        System.out.println("========Checking maintenance leaved...");
         try {
-            var targetMaintenances = alarmService.getMaintenancesForLeavedAlarm();
-            if (!targetMaintenances.isEmpty()) {
-                alarmService.createMaintenanceLeavedAlarms(targetMaintenances);
-                log.info("[알람 - 점검 방치] {} alarms created", targetMaintenances.size());
+            boolean isAlarmGenerated = alarmService.createMaintenanceLeavedAlarms();
+            if (isAlarmGenerated) {
+                log.info("[알람 - 점검 방치] alarms created");
             } else {
                 log.debug("[알람 - 점검 방치] No maintenances require leaved alarm");
             }

@@ -1,21 +1,19 @@
 package app.domains.alarm.service;
 
+import app.domains.alarm.dao.AlarmRepository;
+import app.domains.alarm.dto.AlarmResponseDto;
 import app.domains.alarm.dto.AssetMaintenanceAlarm;
+import app.domains.alarm.dto.MaintenanceLeavedAlarm;
 import app.domains.alarm.dto.PartReplaceAlarm;
 import app.domains.alarm.dto.ReservationOverdueAlarm;
-import app.domains.alarm.dto.MaintenanceLeavedAlarm;
+import app.domains.alarm.model.Alarm;
 import app.domains.alarm.model.AlarmType;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import app.domains.alarm.dao.AlarmRepository;
-import app.domains.alarm.dto.AlarmResponseDto;
-import app.domains.alarm.model.Alarm;
 
 @Service
 @Slf4j
@@ -23,6 +21,14 @@ public class AlarmServiceImpl implements AlarmService {
     @Autowired
     private AlarmRepository alarmRepository;
 
+    private static final String ASSET_MAINTENANCE_CONTENT = "%s %s-%d의 정기점검 주기가 5일 남았습니다.";
+    private static final String PART_REPLACE_CONTENT = "부품 %s-%d의 정기교체 주기가 5일 남았습니다.";
+    private static final String RESERVATION_OVERDUE_CONTENT = "예약 %d이(가) 반납 기한 20일 이상 연체되었습니다.";
+    private static final String MAINTENANCE_LEAVED_CONTENT = "%s %s-%d의 점검 %d이 30일 이상 소요되고 있습니다.";
+
+    /**
+     * 알람 API 메서드
+     */
     @Override
     public List<AlarmResponseDto> findAll() {
         List<Alarm> alarms = alarmRepository.findAll();
@@ -41,18 +47,19 @@ public class AlarmServiceImpl implements AlarmService {
         return alarmRepository.getUnreadCount();
     }
 
-    private static final String ASSET_MAINTENANCE_CONTENT = "%s %s-%d의 정기점검 주기가 5일 남았습니다.";
-    private static final String PART_REPLACE_CONTENT = "부품 %s-%d의 정기교체 주기가 5일 남았습니다.";
-    private static final String RESERVATION_OVERDUE_CONTENT = "예약 %d이(가) 반납 기한 20일 이상 연체되었습니다.";
-    private static final String MAINTENANCE_LEAVED_CONTENT = "%s %s-%d의 점검 %d이 30일 이상 소요되고 있습니다.";
 
     /**
-     * 자산 정기점검 알람 생성 및 상태 업데이트
+     * 알람 스케줄링 메서드
      */
     @Override
     @Transactional
-    public void createAssetMaintenanceAlarms(List<AssetMaintenanceAlarm> assets) {
-        for (AssetMaintenanceAlarm asset : assets) {
+    public boolean createAssetMaintenanceAlarms() {
+        List<AssetMaintenanceAlarm> targetAssets = getAssetsForMaintenanceAlarm();
+        if (targetAssets.isEmpty()) {
+            return false;
+        }
+
+        for (AssetMaintenanceAlarm asset : targetAssets) {
             // 알람 생성
             String description = String.format("[%s]\n%s",
                     AlarmType.ASSET_REGULAR_MAINTENANCE.toDescription(),
@@ -69,34 +76,18 @@ public class AlarmServiceImpl implements AlarmService {
             // 자산 상태 업데이트
             updateAssetStatus(asset.assetId());
         }
+        return true;
     }
 
-    /**
-     * 자산 상태를 MAINTENANCE_REQUIRED로 업데이트
-     *
-     */
-    public void updateAssetStatus(Long assetId) {
-        alarmRepository.updateAssetStatusToMaintenanceRequired(assetId);
-    }
-
-    /**
-     * 정기점검 알람 대상 자산 조회
-     */
-    @Override
-    public List<AssetMaintenanceAlarm> getAssetsForMaintenanceAlarm() {
-        return alarmRepository.getAssetsForMaintenanceAlarm();
-    }
-
-
-
-
-    /**
-     * 부품 교체 알람 생성 및 상태 업데이트
-     */
     @Override
     @Transactional
-    public void createPartReplaceAlarms(List<PartReplaceAlarm> parts) {
-        for (PartReplaceAlarm part : parts) {
+    public boolean createPartReplaceAlarms() {
+        List<PartReplaceAlarm> targetParts = getPartsForReplaceAlarm();
+        if (targetParts.isEmpty()) {
+            return false;
+        }
+
+        for (PartReplaceAlarm part : targetParts) {
             // 알람 생성
             String description = String.format("[%s]\n%s",
                     AlarmType.PART_REGULAR_REPLACE.toDescription(),
@@ -113,22 +104,18 @@ public class AlarmServiceImpl implements AlarmService {
             // 부품 상태 업데이트
             updatePartStatus(part.partId());
         }
+        return true;
     }
 
-    /**
-     * 부품 상태를 UNAVAILABLE로 업데이트
-     */
-    public void updatePartStatus(Long partId) {
-        alarmRepository.updatePartStatusToUnavailable(partId);
-    }
-
-    /**
-     * 예약 연체 알람 생성
-     */
     @Override
     @Transactional
-    public void createReservationOverdueAlarms(List<ReservationOverdueAlarm> reservations) {
-        for (ReservationOverdueAlarm reservation : reservations) {
+    public boolean createReservationOverdueAlarms() {
+        List<ReservationOverdueAlarm> targetReservations = getReservationsForOverdueAlarm();
+        if (targetReservations.isEmpty()) {
+            return false;
+        }
+
+        for (ReservationOverdueAlarm reservation : targetReservations) {
             // 알람 생성
             String description = String.format("[%s]\n%s",
                     AlarmType.RESERVATION_OVERDUE.toDescription(),
@@ -142,15 +129,19 @@ public class AlarmServiceImpl implements AlarmService {
 
             alarmRepository.insert(alarm);
         }
+        return true;
     }
 
-    /**
-     * 점검 방치 알람 생성
-     */
     @Override
     @Transactional
-    public void createMaintenanceLeavedAlarms(List<MaintenanceLeavedAlarm> maintenances) {
-        for (MaintenanceLeavedAlarm maintenance : maintenances) {
+    public boolean createMaintenanceLeavedAlarms() {
+        List<MaintenanceLeavedAlarm> targetMaintenances = getMaintenancesForLeavedAlarm();
+
+        if (targetMaintenances.isEmpty()) {
+            return false;
+        }
+
+        for (MaintenanceLeavedAlarm maintenance : targetMaintenances) {
             // 알람 생성
             String description = String.format("[%s]\n%s",
                     AlarmType.ASSET_MAINTENANCE_LEAVED.toDescription(),
@@ -168,23 +159,39 @@ public class AlarmServiceImpl implements AlarmService {
 
             alarmRepository.insert(alarm);
         }
+        return true;
     }
 
     /**
-     * 알람 대상 조회 메서드들
+     * 알람 대상 조회 메서드들 (private)
      */
-    @Override
-    public List<PartReplaceAlarm> getPartsForReplaceAlarm() {
+    private List<AssetMaintenanceAlarm> getAssetsForMaintenanceAlarm() {
+        return alarmRepository.getAssetsForMaintenanceAlarm();
+    }
+
+    private List<PartReplaceAlarm> getPartsForReplaceAlarm() {
         return alarmRepository.getPartsForReplaceAlarm();
     }
 
-    @Override
-    public List<ReservationOverdueAlarm> getReservationsForOverdueAlarm() {
+    private List<ReservationOverdueAlarm> getReservationsForOverdueAlarm() {
         return alarmRepository.getReservationsForOverdueAlarm();
     }
 
-    @Override
-    public List<MaintenanceLeavedAlarm> getMaintenancesForLeavedAlarm() {
+    private List<MaintenanceLeavedAlarm> getMaintenancesForLeavedAlarm() {
         return alarmRepository.getMaintenancesForLeavedAlarm();
     }
+
+
+    /**
+     * 자산, 부품 상태 업데이트 메서드(private)
+     */
+    private void updatePartStatus(Long partId) {
+        alarmRepository.updatePartStatusToUnavailable(partId);
+    }
+
+    private void updateAssetStatus(Long assetId) {
+        alarmRepository.updateAssetStatusToMaintenanceRequired(assetId);
+    }
+
+
 }
