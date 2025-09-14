@@ -35,8 +35,8 @@
     <select id="getPartsForReplaceAlarm" resultType="app.domains.alarm.dto.PartReplaceAlarm">
         SELECT
             p.part_id as partId,
-            p.name as name,
-            p.asset_id as assetId
+            p.asset_id as assetId,
+            p.name as name
         FROM part p
         WHERE p.expected_maintenance_date &lt;= SYSDATE + INTERVAL '5' DAY
           AND p.status = 'AVAILABLE'
