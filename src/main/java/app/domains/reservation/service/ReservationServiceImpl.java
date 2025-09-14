@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.domains.reservation.dao.ReservationRepository;
@@ -214,95 +215,122 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean apply(Long assetId, Long userId,
                         Date startAt, Date endAt,
                         String purpose,
                         String useZipcode, String useAddr1, String useAddr2) {
 
-        // 기본 유효성 검증
-        if (assetId == null || userId == null) {
-            log.warn("필수 파라미터 누락: assetId={}, userId={}", assetId, userId);
-            return false;
-        }
-        
-        if (startAt == null || endAt == null || !startAt.before(endAt)) {
-            log.warn("잘못된 날짜 범위: startAt={}, endAt={}", startAt, endAt);
-            return false;
-        }
-        
-        if (purpose == null || purpose.trim().isEmpty() || useZipcode == null || useZipcode.trim().isEmpty()) {
-            log.warn("필수 입력값 누락: purpose 또는 zipcode가 비어있음");
-            return false;
-        }
-        
-        if (useAddr1 == null || useAddr1.trim().isEmpty()) {
-            log.warn("주소 정보 누락: addr1이 비어있음");
-            return false;
-        }
-        
-        if (useAddr2 == null) {
-            useAddr2 = "";
-        }
+        log.info("=== 예약 신청 시작 ===");
+        log.info("파라미터 - assetId: {}, userId: {}, 시간: {} ~ {}", assetId, userId, startAt, endAt);
 
-        // PURPOSE 길이 체크 (DB는 100 BYTE 제한)
-        if (purpose.trim().length() > 100) {
-            log.warn("목적 텍스트가 너무 깁니다: {} 글자", purpose.trim().length());
-            return false;
+        try {
+            // 기본 유효성 검증
+            if (assetId == null || userId == null) {
+                log.warn("필수 파라미터 누락: assetId={}, userId={}", assetId, userId);
+                return false;
+            }
+            
+            if (startAt == null || endAt == null || !startAt.before(endAt)) {
+                log.warn("잘못된 날짜 범위: startAt={}, endAt={}", startAt, endAt);
+                return false;
+            }
+            
+            if (purpose == null || purpose.trim().isEmpty() || useZipcode == null || useZipcode.trim().isEmpty()) {
+                log.warn("필수 입력값 누락: purpose 또는 zipcode가 비어있음");
+                return false;
+            }
+            
+            if (useAddr1 == null || useAddr1.trim().isEmpty()) {
+                log.warn("주소 정보 누락: addr1이 비어있음");
+                return false;
+            }
+            
+            if (useAddr2 == null) {
+                useAddr2 = "";
+            }
+
+            // PURPOSE 길이 체크 (DB는 100 BYTE 제한)
+            if (purpose.trim().length() > 100) {
+                log.warn("목적 텍스트가 너무 깁니다: {} 글자", purpose.trim().length());
+                return false;
+            }
+
+            // 해당 자산 정보 조회
+            Resource asset = repo.findAssetById(assetId);
+            if (asset == null) {
+                log.warn("자산을 찾을 수 없습니다: assetId={}", assetId);
+                return false;
+            }
+
+            log.info("자산 정보 - name: {}, category: {}, company: {}", 
+                    asset.getModelName(), asset.getCategory(), asset.getCompany());
+
+            // ===== 오라클 호환 락 적용 =====
+            // 1단계: 사용 가능한 자산들을 잠금과 함께 조회
+            log.info("비관적 락 획득 시도...");
+            List<Resource> lockedAssets = repo.lockAssetGroup(asset.getModelName(), asset.getCategory(), asset.getCompany());
+            
+            if (lockedAssets == null || lockedAssets.isEmpty()) {
+                log.warn("잠금할 수 있는 자산이 없습니다.");
+                return false;
+            }
+            
+            log.info("비관적 락 획득 완료 - 잠금된 자산 수: {}", lockedAssets.size());
+
+            // 2단계: 잠금된 자산 개수 확인 (실제 사용 가능한 재고)
+            int totalStock = repo.countLockedAssets(asset.getModelName(), asset.getCategory(), asset.getCompany());
+            int reservedCount = repo.countOverlapByTime(asset.getModelName(), asset.getCategory(), 
+                                                       asset.getCompany(), startAt, endAt);
+            
+            log.info("락 획득 후 검증 - 자산: {}, 총 재고: {}, 예약된 수: {}, 사용 가능: {}", 
+                    asset.getModelName(), totalStock, reservedCount, (totalStock - reservedCount));
+            
+            if (reservedCount >= totalStock) {
+                log.warn("예약 가능한 자산이 없습니다. 총 재고: {}, 예약된 수: {}", totalStock, reservedCount);
+                return false;
+            }
+
+            // === 주소 파생값 생성 ===
+            String[] parsed = parseKoreanAddress(useAddr1);
+            String addressState = parsed[0]; // 시/도
+            String addressCity = parsed[1]; // 시/군/구(또는 시+구)
+            String addressFull = buildFullAddress(useZipcode, useAddr1, useAddr2);
+
+            log.debug("주소 파싱 결과 - 시/도: {}, 시/군/구: {}, 전체주소: {}", 
+                     addressState, addressCity, addressFull);
+
+            // 예약 객체 생성
+            Reservation r = Reservation.builder()
+                    .assetId(assetId)
+                    .userId(userId)
+                    .startAt(startAt)
+                    .endAt(endAt)
+                    .purpose(purpose.trim())
+                    .address(addressFull)
+                    .addressState(addressState)
+                    .addressCity(addressCity)
+                    .status("PENDING")
+                    .build();
+
+            // DB에 예약 삽입 (락이 보장된 상태에서 실행)
+            log.info("예약 데이터 삽입 시도...");
+            int insertResult = repo.insertReservation(r);
+            boolean success = insertResult == 1;
+            
+            if (success) {
+                log.info("예약 신청 성공 - userId: {}, assetId: {}, 기간: {} ~ {}", 
+                        userId, assetId, startAt, endAt);
+            } else {
+                log.error("예약 신청 실패 - DB 삽입 실패. userId: {}, assetId: {}", userId, assetId);
+            }
+            
+            return success;
+
+        } catch (Exception e) {
+            log.error("예약 신청 중 예외 발생", e);
+            throw e; // 트랜잭션 롤백을 위해 예외 재발생
         }
-
-        // 해당 자산 정보 조회
-        Resource asset = repo.findAssetById(assetId);
-        if (asset == null) {
-            log.warn("자산을 찾을 수 없습니다: assetId={}", assetId);
-            return false;
-        }
-
-        // 시간별 재고 기반 겹침 재검증 (동일 트랜잭션)
-        int totalStock = repo.countAssetStock(asset.getModelName(), asset.getCategory(), asset.getCompany());
-        int reservedCount = repo.countOverlapByTime(asset.getModelName(), asset.getCategory(), 
-                                                   asset.getCompany(), startAt, endAt);
-        
-        log.info("예약 신청 검증 - 자산: {}, 총 재고: {}, 예약된 수: {}, 사용 가능: {}", 
-                asset.getModelName(), totalStock, reservedCount, (totalStock - reservedCount));
-        
-        if (reservedCount >= totalStock) {
-            log.warn("예약 가능한 자산이 없습니다. 총 재고: {}, 예약된 수: {}", totalStock, reservedCount);
-            return false;
-        }
-
-        // === 주소 파생값 생성 ===
-        String[] parsed = parseKoreanAddress(useAddr1);
-        String addressState = parsed[0]; // 시/도
-        String addressCity = parsed[1]; // 시/군/구(또는 시+구)
-        String addressFull = buildFullAddress(useZipcode, useAddr1, useAddr2);
-
-        log.debug("주소 파싱 결과 - 시/도: {}, 시/군/구: {}, 전체주소: {}", 
-                 addressState, addressCity, addressFull);
-
-        Reservation r = Reservation.builder()
-                .assetId(assetId)
-                .userId(userId)
-                .startAt(startAt)
-                .endAt(endAt)
-                .purpose(purpose.trim())
-                .address(addressFull)
-                .addressState(addressState)
-                .addressCity(addressCity)
-                .status("PENDING")
-                .build();
-
-        int insertResult = repo.insertReservation(r);
-        boolean success = insertResult == 1;
-        
-        if (success) {
-            log.info("예약 신청 성공 - userId: {}, assetId: {}, 기간: {} ~ {}", 
-                    userId, assetId, startAt, endAt);
-        } else {
-            log.error("예약 신청 실패 - DB 삽입 실패. userId: {}, assetId: {}", userId, assetId);
-        }
-        
-        return success;
     }
 
     private static String buildFullAddress(String zipcode, String addr1, String addr2) {

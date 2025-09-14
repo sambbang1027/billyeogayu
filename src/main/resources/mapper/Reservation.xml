@@ -99,7 +99,7 @@
         )
     </select>
 
-    <!-- 보유대수 계산 (modelName, category, company가 같은 자산의 개수) - 사용 가능한 자산만 카운트 -->
+    <!-- 보유 대수 계산 (modelName, category, company가 같은 자산의 개수) - 사용 가능한 자산만 카운트 -->
     <select id="countAssetStock" resultType="int">
         SELECT COUNT(*) FROM ASSET 
         WHERE IS_DELETED = 'N'
@@ -122,6 +122,43 @@
         AND r.END_TIME &gt;= #{from}
         AND r.START_TIME &lt;= #{to}
         ORDER BY r.START_TIME
+    </select>
+
+    <!-- 오라클 호환 자산 그룹 잠금 (2단계 방식) -->
+    <!-- 1단계: 사용 가능한 자산들을 잠금과 함께 조회 -->
+    <select id="lockAssetGroup" resultMap="assetMap">
+        SELECT 
+            ASSET_ID,
+            NAME,
+            CATEGORY, 
+            COMPANY,
+            STATUS,
+            IMAGE,
+            MAINTENANCE_CYCLE,
+            USAGE_TIME,
+            LAST_MAINTENANCE_DATE,
+            EXPECTED_MAINTENANCE_DATE,
+            CREATED_AT,
+            UPDATED_AT,
+            DELETED_AT,
+            CASE WHEN IS_DELETED = 'N' THEN 0 ELSE 1 END AS IS_DELETED
+        FROM ASSET
+        WHERE IS_DELETED = 'N'
+        AND NAME = #{name}
+        AND (CATEGORY = #{category} OR (CATEGORY IS NULL AND #{category} IS NULL))
+        AND (COMPANY = #{company} OR (COMPANY IS NULL AND #{company} IS NULL))
+        AND STATUS = 'AVAILABLE'
+        FOR UPDATE WAIT 3
+    </select>
+
+    <!-- 2단계: 잠금된 자산 개수 확인 -->
+    <select id="countLockedAssets" resultType="int">
+        SELECT COUNT(*) FROM ASSET 
+        WHERE IS_DELETED = 'N'
+        AND NAME = #{name}
+        AND (CATEGORY = #{category} OR (CATEGORY IS NULL AND #{category} IS NULL))
+        AND (COMPANY = #{company} OR (COMPANY IS NULL AND #{company} IS NULL))
+        AND STATUS = 'AVAILABLE'
     </select>
 
     <!-- 예약 생성 (실제 DB 구조에 맞춤) -->

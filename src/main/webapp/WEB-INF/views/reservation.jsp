@@ -7,12 +7,6 @@
 <link rel="stylesheet"
 	href="<c:url value='/static/css/layout/user/header/style.css'/>" />
 
-<c:if test="${not empty successMessage}">
-	<div class="success-message"
-		style="background: #d4edda; color: #155724; padding: 15px; margin: 20px; border-radius: 5px; border: 1px solid #c3e6cb;">
-		${successMessage}</div>
-</c:if>
-
 <jsp:include page="/WEB-INF/views/layout/user/header.jsp" />
 
 <!DOCTYPE html>
@@ -25,11 +19,16 @@
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
+    <!-- 공통 모달(confirm/ alert) -->
+    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
+    
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <!-- 공통 모달 JS -->
+    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 </head>
 <body>
 
@@ -240,6 +239,9 @@
 
 <!-- Daum 우편번호 API -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<!-- 공통 모달 HTML include -->
+<jsp:include page="/WEB-INF/views/common/commonModal.jsp" />
 
 <script>
 $(document).ready(function() {
@@ -580,7 +582,7 @@ function callTestAPI() {
     });
 }
 
-// 시간대별 예약 현황 렌더링 (수정된 버전 - 페이지 스크롤 방지)
+// 시간대별 예약 현황 렌더링
 function renderTimeAvailability(timeSlots) {
     $('.time-availability-container').remove();
     
@@ -674,7 +676,7 @@ function renderTimeAvailability(timeSlots) {
     
     $('.date-summary').after(html);
     
-    // 이벤트 리스너 추가 (onclick 대신 - 페이지 스크롤 방지)
+    // 이벤트 리스너 추가
     $('#prevDateBtn').off('click').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -702,7 +704,7 @@ function renderTimeAvailability(timeSlots) {
     window.availableDateKeys = dateKeys;
 }
 
-// 날짜 스크롤 함수 (페이지 스크롤 방지)
+// 날짜 스크롤 함수
 function scrollTimeAvailability(direction) {
     if (!window.availableDateKeys || window.availableDateKeys.length <= 1) {
         return;
@@ -722,7 +724,7 @@ function scrollTimeAvailability(direction) {
     updateCurrentDateSlots();
 }
 
-// 특정 날짜로 이동 (페이지 스크롤 방지)
+// 특정 날짜로 이동
 function goToDate(index) {
     if (!window.availableDateKeys || index < 0 || index >= window.availableDateKeys.length) {
         return;
@@ -1036,7 +1038,7 @@ function initBackButtonPrevention() {
  
  // 키보드 단축키 차단 (Alt+Left, Backspace 등)
  document.addEventListener('keydown', function(event) {
-     // Backspace 키 차단 (입력 필드가 아닌 경우)
+     // Backspace 키 차단 (입력 필드가 아닐 경우)
      if (event.keyCode === 8) {
          const target = event.target;
          const isInputField = target.tagName === 'INPUT' || 
@@ -1113,7 +1115,7 @@ function initBackButtonPrevention() {
  console.log('뒤로가기 완전 차단 설정 완료');
 }
 
-//중복 제출 방지 초기화 (원래대로 유지)
+//중복 제출 방지 초기화
 function initDuplicateSubmissionPrevention() {
  console.log('중복 제출 방지 초기화');
  
@@ -1128,7 +1130,7 @@ function initDuplicateSubmissionPrevention() {
      // 이미 제출 중인 경우 방지
      if (isSubmitting) {
          console.log('이미 제출 중입니다');
-         alert('이미 처리 중입니다. 잠시만 기다려주세요.');
+         showAlert('이미 처리 중입니다. 잠시만 기다려주세요.');
          return false;
      }
      
@@ -1171,7 +1173,7 @@ function initDuplicateSubmissionPrevention() {
  });
 }
 
-//폼 변경사항 체크 (원래대로 유지)
+//폼 변경사항 체크
 function checkFormChanges() {
  let hasChanges = false;
  
@@ -1194,25 +1196,25 @@ function checkFormChanges() {
  return hasChanges;
 }
 
-//폼 유효성 검사 (원래대로 유지)
+//폼 유효성 검사 (실제 공통 모달 사용)
 function validateFormSubmission() {
  if (!$('#reserveStartDate').val() || !$('#reserveEndDate').val()) {
-     alert('예약 날짜를 선택해주세요.');
+     showAlert('예약 날짜를 선택해주세요.');
      return false;
  }
  
  if (!$('#reserveStartTime').val() || !$('#reserveEndTime').val()) {
-     alert('예약 시간을 선택해주세요.');
+     showAlert('예약 시간을 선택해주세요.');
      return false;
  }
  
  if (!$('textarea[name="purpose"]').val().trim()) {
-     alert('사용 목적을 입력해주세요.');
+     showAlert('사용 목적을 입력해주세요.');
      return false;
  }
  
  if (!$('#zipcode').val() || !$('#addr1').val()) {
-     alert('주소를 입력해주세요.');
+     showAlert('주소를 입력해주세요.');
      return false;
  }
  
@@ -1222,12 +1224,12 @@ function validateFormSubmission() {
  const now = new Date();
  
  if (startDate < now.setHours(0,0,0,0)) {
-     alert('과거 날짜로는 예약할 수 없습니다.');
+     showAlert('과거 날짜로는 예약할 수 없습니다.');
      return false;
  }
  
  if (startDate >= endDate) {
-     alert('종료일은 시작일보다 늦어야 합니다.');
+     showAlert('종료일은 시작일보다 늦어야 합니다.');
      return false;
  }
  
@@ -1243,71 +1245,6 @@ function markPageAsSubmitted() {
          sessionStorage.setItem('submittedPages', JSON.stringify(submittedPages));
      }
  }
-}
-
-console.log('뒤로가기 방지 및 중복 제출 방지 설정 완료');
-
-// 폼 유효성 검사 (제출용)
-function validateFormSubmission() {
-    if (!$('#reserveStartDate').val() || !$('#reserveEndDate').val()) {
-        alert('예약 날짜를 선택해주세요.');
-        return false;
-    }
-    
-    if (!$('#reserveStartTime').val() || !$('#reserveEndTime').val()) {
-        alert('예약 시간을 선택해주세요.');
-        return false;
-    }
-    
-    if (!$('textarea[name="purpose"]').val().trim()) {
-        alert('사용 목적을 입력해주세요.');
-        return false;
-    }
-    
-    if (!$('#zipcode').val() || !$('#addr1').val()) {
-        alert('주소를 입력해주세요.');
-        return false;
-    }
-    
-    // 날짜 유효성 검사
-    const startDate = new Date($('#reserveStartDate').val());
-    const endDate = new Date($('#reserveEndDate').val());
-    const now = new Date();
-    
-    if (startDate < now.setHours(0,0,0,0)) {
-        alert('과거 날짜로는 예약할 수 없습니다.');
-        return false;
-    }
-    
-    if (startDate >= endDate) {
-        alert('종료일은 시작일보다 늦어야 합니다.');
-        return false;
-    }
-    
-    return true;
-}
-
-// 페이지 가시성 변경 시 처리 (캐시된 페이지 복귀 방지)
-document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-        // 페이지가 다시 보이게 될 때
-        const submittedPages = JSON.parse(sessionStorage.getItem('submittedPages') || '[]');
-        if (submittedPages.includes(window.pageToken)) {
-            console.log('이미 제출된 페이지로 복귀 - 자원 목록으로 리다이렉트');
-            window.location.href = '<c:url value="/resource/list"/>';
-        }
-    }
-});
-
-// 제출 완료 표시 (성공 시)
-function markPageAsSubmitted() {
-    if (window.pageToken) {
-        const submittedPages = JSON.parse(sessionStorage.getItem('submittedPages') || '[]');
-        if (!submittedPages.includes(window.pageToken)) {
-            submittedPages.push(window.pageToken);
-            sessionStorage.setItem('submittedPages', JSON.stringify(submittedPages));
-        }
-    }
 }
 
 console.log('뒤로가기 방지 및 중복 제출 방지 설정 완료');

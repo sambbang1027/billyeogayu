@@ -8,6 +8,9 @@
 <link rel="stylesheet"
 	href="<c:url value='/static/css/layout/user/header/style.css'/>" />
 
+<!-- 공통 모달(confirm/ alert) -->
+<link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
+
 <c:if test="${not empty successMessage}">
 	<div class="success-message"
 		style="background: #d4edda; color: #155724; padding: 15px; margin: 20px; border-radius: 5px; border: 1px solid #c3e6cb;">
@@ -161,32 +164,42 @@
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- 공통 모달 JS -->
+<script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
+
+<!-- 공통 모달 HTML include -->
+<jsp:include page="/WEB-INF/views/common/commonModal.jsp" />
 
 <!-- 세션 기반 로그인 체크로 수정된 스크립트 -->
 <script>
-  $(function(){
+$(function(){
     $('.resource-card__cta').on('click', function(){
-      if ($(this).is(':disabled')) return;
+        if ($(this).is(':disabled')) return;
 
-      var id = $(this).data('id'); // data-id
-      
-      // 서버에서 전달받은 로그인 상태를 확인
-      var loggedIn = ${isLoggedIn ? 'true' : 'false'};
-      
-      
-      console.log('로그인 상태:', loggedIn); // 디버깅용
-      
-      if(!loggedIn){
-        if(confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')){
-          // 로그인 후 돌아올 페이지를 세션에 저장
-          sessionStorage.setItem('returnUrl', '<c:url value="/reservation/apply"/>?assetId=' + id);
-          window.location.href = '<c:url value="/login"/>';
+        var id = $(this).data('id'); // data-id
+        
+        // 서버에서 전달받은 로그인 상태를 확인
+        var loggedIn = ${isLoggedIn ? 'true' : 'false'};
+        
+        console.log('로그인 상태:', loggedIn); // 디버깅용
+        
+        if(!loggedIn){
+            // showConfirm으로 변경 (실제 공통 모달 사용)
+            showConfirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?',
+                function() {  // 확인 버튼 콜백
+                    // 로그인 후 돌아올 페이지를 세션에 저장
+                    sessionStorage.setItem('returnUrl', '<c:url value="/reservation/apply"/>?assetId=' + id);
+                    window.location.href = '<c:url value="/login"/>';
+                },
+                function() {  // 취소 버튼 콜백 (생략 가능)
+                    // 취소 시 아무것도 하지 않음
+                }
+            );
+            return;
         }
-        return;
-      }
-      
-      // 로그인된 상태면 바로 예약 신청 페이지로 이동
-      window.location.href = '<c:url value="/reservation/apply"/>' + '?assetId=' + encodeURIComponent(id);
+        
+        // 로그인된 상태면 바로 예약 신청 페이지로 이동
+        window.location.href = '<c:url value="/reservation/apply"/>' + '?assetId=' + encodeURIComponent(id);
     });
-  });
+});
 </script>
