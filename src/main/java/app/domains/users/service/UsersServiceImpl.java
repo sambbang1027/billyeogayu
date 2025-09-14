@@ -62,7 +62,7 @@ public class UsersServiceImpl implements UsersService {
 
             // 4. 기본 역할 설정
             if (user.getRole() == null || user.getRole().trim().isEmpty()) {
-                user.setRole("USER"); // Spring Security 표준: ROLE_USER
+                user.setRole("COMMON"); 
             }
 
             // 5. 사용자 등록
@@ -86,10 +86,6 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
-    @Override
-    public void registerUser(Users user) throws IllegalArgumentException {
-        createUser(user);
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -221,7 +217,6 @@ public class UsersServiceImpl implements UsersService {
 
 
 
-    // UsersServiceImpl.java 구현체에 추가
     @Override
     @Transactional(readOnly = true)
     public Users getUserByPhone(String phoneNumber) {

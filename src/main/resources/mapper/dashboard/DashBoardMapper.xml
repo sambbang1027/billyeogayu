@@ -7,27 +7,106 @@
 
     <select id="getTotalAssetCount" resultType="long">
         SELECT COUNT(asset_id) 
-        FROM asset 
+        FROM ASSET 
         WHERE is_deleted = 'N'
     </select>
     
     <select id="getAssetCountByStatus" parameterType="string" resultType="long">
         SELECT COUNT(asset_id) 
-        FROM asset 
+        FROM ASSET 
         WHERE status = #{status} 
           AND is_deleted = 'N'
     </select>
     
     <select id="getAssetCountByCategory" resultType="app.domains.dashboard.dto.CategoryDataDto">
         SELECT 
-            category,
+            CASE 
+                WHEN category = 'TRACTOR' THEN '트랙터'
+                WHEN category = 'COMBINE' THEN '콤바인'
+                WHEN category = 'RICE_PLANT' THEN '이앙기'
+                WHEN category = 'TRANSPORT' THEN '운반차'
+                WHEN category = 'LOADER' THEN '로더'
+                ELSE category
+            END as category,
             COUNT(*) as totalCount,
             COUNT(CASE WHEN status = 'MAINTENANCE_REQUIRED' THEN 1 END) as maintenanceRequiredCount
-        FROM asset 
+        FROM ASSET 
         WHERE is_deleted = 'N' 
-          AND category IN ('TRACTOR', 'COMBINE', 'RICE_PLANT', 'TRANSPORT', 'LOADER')
+          AND category IN ('트랙터', '콤바인', '이앙기', '운반차', '로더')
         GROUP BY category
         ORDER BY COUNT(*) DESC
+    </select>
+    
+    <!-- 사용량 차트 필터 데이터 조회 -->
+    <select id="getAssetCategories" resultType="string">
+        SELECT DISTINCT category 
+        FROM ASSET 
+        WHERE is_deleted = 'N' 
+        ORDER BY category
+    </select>
+    
+    <select id="getAssetModelsByCategory" resultType="app.domains.dashboard.dto.CategoryModelDto">
+        SELECT category, modelName, modelCount
+        FROM (
+            SELECT 
+                category,
+                name as modelName,
+                COUNT(*) as modelCount,
+                ROW_NUMBER() OVER (PARTITION BY category ORDER BY COUNT(*) DESC) as rn
+            FROM ASSET 
+            WHERE is_deleted = 'N' 
+              AND category IN ('트랙터', '콤바인', '이앙기', '운반차', '로더')
+            GROUP BY category, name
+        )
+        WHERE rn &lt; 8
+        ORDER BY category, modelCount DESC
+    </select>
+    
+    <select id="getReservationAddresses" resultType="string">
+        SELECT DISTINCT address 
+        FROM RESERVATION 
+        ORDER BY address
+    </select>
+    
+    <select id="getUsageDataByFilters" resultType="app.domains.dashboard.dto.UsageDataDto">
+        SELECT 
+            EXTRACT(YEAR FROM r.completed_at) as year,
+            COUNT(*) as reservationCount
+        FROM RESERVATION r
+        JOIN ASSET a ON r.asset_id = a.asset_id
+        WHERE a.is_deleted = 'N'
+          AND r.completed_at IS NOT NULL
+          AND EXTRACT(YEAR FROM r.completed_at) BETWEEN 2016 AND 2025
+          <if test="category != null and category != ''">
+            AND a.category = #{category}
+          </if>
+          <if test="model != null and model != ''">
+            AND a.name = #{model}
+          </if>
+          <if test="address != null and address != ''">
+            AND r.address_state = #{address}
+          </if>
+        GROUP BY EXTRACT(YEAR FROM r.completed_at)
+        ORDER BY year
+    </select>
+    
+    <select id="getInspectionDataByFilters" resultType="app.domains.dashboard.dto.InspectionDataDto">
+        SELECT 
+            EXTRACT(YEAR FROM m.resolved_at) as year,
+            COUNT(*) as inspectionCount
+        FROM MAINTENANCE m
+        JOIN ASSET a ON m.asset_id = a.asset_id
+        WHERE a.is_deleted = 'N'
+          AND m.resolved_at IS NOT NULL
+          AND EXTRACT(YEAR FROM m.resolved_at) BETWEEN 2016 AND 2025
+          <if test="category != null and category != ''">
+            AND a.category = #{category}
+          </if>
+          <if test="model != null and model != ''">
+            AND a.name = #{model}
+          </if>
+        GROUP BY EXTRACT(YEAR FROM m.resolved_at)
+        ORDER BY year
     </select>
 
 </mapper>

@@ -1,12 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
-<link rel="stylesheet"
-	href="<c:url value='/static/css/layout/user/resource/list.css'/>">
-<link rel="stylesheet"
-	href="<c:url value='/static/css/layout/user/header/style.css'/>" />
+<link rel="stylesheet" href="<c:url value='/static/css/layout/user/resource/list.css'/>">
+<link rel="stylesheet" href="<c:url value='/static/css/layout/user/header/style.css'/>" />
 
 <!-- 공통 모달(confirm/ alert) -->
 <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">

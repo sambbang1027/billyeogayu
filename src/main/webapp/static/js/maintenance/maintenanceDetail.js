@@ -40,7 +40,7 @@ function openModal(modal, requestId, mode){
 	
 	//Ajax
 	$.ajax({
-		url : "/maintenance/detail/"+ requestId,
+		url : "/admin/maintenance/detail/"+ requestId,
 		type : "GET",
 		success : function(res) {
 			console.log(res);
@@ -92,7 +92,7 @@ $(document).on("click", ".inspection-btn-complete.create", function() {
 	const note = $(".inspection-textarea.note").val().trim();
 	
 	$.ajax({
-		url : "/maintenance/complete",
+		url : "/admin/maintenance/complete",
 		type : "POST",
 		contentType: "application/json; charset=UTF-8",
        data: JSON.stringify({
@@ -123,7 +123,7 @@ $(document).on("click", ".inspection-btn-complete.edit", function(){
 	//console.log("수정된 비고 -->" + note);
 	
 	$.ajax({
-		url : "/maintenance/edit",
+		url : "/admin/maintenance/edit",
 		type : "POST",
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify({

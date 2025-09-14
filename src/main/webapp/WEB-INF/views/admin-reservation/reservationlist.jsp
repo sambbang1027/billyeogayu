@@ -72,7 +72,7 @@
             <thead>
                 <tr>
                     <th>예약번호</th>
-                    <th>자원명</th>
+                    <th>종류</th>
                     <th>시작일</th>
                     <th>종료일</th>
                     <th>신청자</th>

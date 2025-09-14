@@ -30,12 +30,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-@RequestMapping("/maintenance")
+@RequestMapping("/admin/maintenance")
 public class MaintenanceController {
 
 	@Autowired
 	private MaintenanceService maintenanceService;
 
+    @GetMapping
+    public String redirectToList() {
+        return "redirect:/admin/maintenance/list";
+    }
+
+	
     @GetMapping("/list")
     public String maintenance( Model model) {
 

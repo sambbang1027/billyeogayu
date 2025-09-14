@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import app.domains.users.model.Users;
 import app.domains.users.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -125,8 +124,8 @@ public class LoginPageController {
                 model.addAttribute("activePage", "find-id");
                 break;
             case "reset-password":
-                model.addAttribute("pageTitle", "비밀번호 재설정");
-                model.addAttribute("pageDescription", "본인 확인을 통해 비밀번호를 재설정하실 수 있습니다.");
+                model.addAttribute("pageTitle", "비밀번호 찾기");
+                model.addAttribute("pageDescription", "본인 확인을 통해 비밀번호를 찾으실 수 있습니다.");
                 model.addAttribute("activePage", "reset-password");
                 break;
             case "register":
@@ -154,7 +153,7 @@ public class LoginPageController {
      */
     @GetMapping("/reset-password")
     public String resetPasswordPage() {
-        log.info("=== 비밀번호 재설정 페이지 요청 - verification으로 리다이렉트 ===");
+        log.info("=== 비밀번호 찾기 페이지 요청 - verification으로 리다이렉트 ===");
         return "redirect:/verification?purpose=reset-password";
     }
 
@@ -217,52 +216,6 @@ public class LoginPageController {
         return "redirect:/login";
     }
 
-//    /**
-//     * 메인 페이지 (로그인 후)
-//     */
-//    @GetMapping("/")
-//    public String home(Model model, HttpServletRequest request, HttpSession session) {
-//        log.info("=== 메인 페이지 요청 ===");
-//
-//        try {
-//            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//
-//            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-//                // 로그인된 사용자
-//                String loginId = auth.getName();
-//                Users user = usersService.getUserByLoginId(loginId);
-//
-//                if (user != null) {
-//                    model.addAttribute("loginUser", user);
-//                    model.addAttribute("isLoggedIn", true);
-//                    log.info("로그인된 사용자 정보 설정: {} ({})", user.getName(), user.getLoginId());
-//
-//                    // 저장된 returnUrl이 있으면 해당 페이지로 리다이렉트
-//                    String returnUrl = (String) session.getAttribute("returnUrl");
-//                    if (returnUrl != null && !returnUrl.trim().isEmpty()) {
-//                        session.removeAttribute("returnUrl"); // 사용 후 제거
-//                        log.info("저장된 returnUrl로 리다이렉트: {}", returnUrl);
-//                        return "redirect:" + returnUrl;
-//                    }
-//                } else {
-//                    log.warn("인증된 사용자지만 사용자 정보를 찾을 수 없음: {}", loginId);
-//                    model.addAttribute("isLoggedIn", false);
-//                }
-//            } else {
-//                // 비로그인 사용자
-//                model.addAttribute("isLoggedIn", false);
-//                log.info("비로그인 사용자의 메인 페이지 접근");
-//            }
-//
-//        } catch (Exception e) {
-//            log.error("메인 페이지 처리 중 오류 발생", e);
-//            model.addAttribute("isLoggedIn", false);
-//        }
-//
-//        return "home";
-//    }
-//
-
 
     /**
      * 아이디 찾기 결과 페이지
@@ -309,12 +262,12 @@ public class LoginPageController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        log.info("=== 비밀번호 재설정 폼 페이지 요청 ===");
+        log.info("=== 비밀번호 찾기 폼 페이지 요청 ===");
         log.info("인증 타입: {}, 사용자 ID: {}", authType, userId);
 
         // 인증 정보가 없으면 비밀번호 재설정 첫 페이지로 리다이렉트
         if (authType == null || authKey == null || userId == null) {
-            log.warn("인증 정보 없음 - 비밀번호 재설정 페이지로 리다이렉트");
+            log.warn("인증 정보 없음 - 비밀번호 찾기 페이지로 리다이렉트");
             redirectAttributes.addAttribute("error", "true");
             return "redirect:/verification?purpose=reset-password";
         }

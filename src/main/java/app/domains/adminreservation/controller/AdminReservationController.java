@@ -2,8 +2,10 @@ package app.domains.adminreservation.controller;
 
 import app.domains.adminreservation.model.AdminReservationListDto;
 import app.domains.adminreservation.service.AdminReservationService;
+import app.domains.maintenance.service.MaintenanceService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -16,6 +18,21 @@ import java.util.Map;
 public class AdminReservationController {
 
     private final AdminReservationService reservationService;
+    private final MaintenanceService maintenanceService;
+  
+  @GetMapping
+  public String reservation(Model model) {
+  	
+  	List<String> categoryList = maintenanceService.getAssetCategoryList();
+
+  	model.addAttribute("categoryList", categoryList);
+  	
+      model.addAttribute("pageTitle", "예약 관리");
+      model.addAttribute("contentPage", "/WEB-INF/views/admin-reservation/reservationlist.jsp");
+      model.addAttribute("activePage", "reservation");
+      return "layout/admin/main";
+  }
+    
 
     @PostMapping("/list")
     @ResponseBody
@@ -24,15 +41,9 @@ public class AdminReservationController {
                                     @RequestParam(name = "category", required = false) String category,
                                     @RequestParam(name = "status", required = false) String status,
                                     @RequestParam(name = "startDate", required = false) String startDate) {
-    	
-    	System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-    	System.out.println(status + "상태");
-    	System.out.println("종류 "+ category);
-    	System.out.println("시작일 "+ startDate);
+    
         int total = reservationService.countAll(category, status, startDate);
         List<AdminReservationListDto> items = reservationService.getPage(page, size, category, status, startDate);
-
-        System.out.println("ffffffffffffffff"+ items);
         
         Map<String, Object> res = new HashMap<>();
         res.put("items", items);
