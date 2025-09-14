@@ -1,9 +1,12 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* 공통 속성 */
 :root {
     --card-font-size: 20px;
     --card-gap: 1.25rem; /* 20px */
-    --card-w: 12.5rem;
-    --card-color: linear-gradient(135deg, #a8e6cf 0%, #88d8a3 100%);
+    --card-w: 11rem; /* 12.5rem → 11rem으로 너비 감소 */
+    --card-color: #a8e6cf; /* 파스텔 그린 색상 */
 
     --first-chart-card-w: 560px; /* 카드 최대 너비 */
     --first-chart-h: 220px; /* 차트 영역 높이 */
@@ -16,6 +19,7 @@
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
+    font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */
 }
 .main-content {
     display: flex;
@@ -37,6 +41,7 @@
     flex-direction: column;
     align-self: flex-start;
 }
+
 .section-title {
     font-size: 20px;
     font-weight: bold;
@@ -128,9 +133,10 @@
     flex-direction: row;
     flex-wrap: nowrap;
     gap: var(--card-gap);
-    margin-inline: auto;
+    margin-inline: 0; /* auto → 0으로 변경하여 왼쪽 정렬 */
     overflow-x: auto;
     align-items: stretch;
+    padding-bottom: 20px; /* 하단 패딩 추가 */
 }
 .metric-card {
     flex: 0 0 var(--card-w);
@@ -151,7 +157,7 @@
     font-weight: 500;
 }
 .metric-value {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: bold;
     color: #1a252f;
     white-space: nowrap;

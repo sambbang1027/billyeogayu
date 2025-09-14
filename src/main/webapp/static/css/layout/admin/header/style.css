@@ -1,3 +1,6 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .header-container {
     display: flex;
     align-items: center;
@@ -6,6 +9,7 @@
     background-color: white;
     border: none;
     border-bottom: 1px solid #E7E7E7;
+    font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */
 }
 
 .alarm-container,
@@ -28,11 +32,11 @@
 }
 
 .alarm-count {
-    background-color: #ff4444;
-    color: white;
+    background-color: transparent; /* 배경색 제거 */
+    color: #ff4444; /* 흰색에서 빨간색으로 변경 */
     border-radius: 50%;
     padding: 2px 6px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     min-width: 18px;
     text-align: center;
