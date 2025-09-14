@@ -155,6 +155,12 @@
 	height : 28px;
 }
 
+.count-down-box {
+	display : flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
 
 /* ---------------- 테이블 ---------------- */
 .table-wrapper{

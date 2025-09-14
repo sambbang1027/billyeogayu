@@ -3,13 +3,14 @@
  */
 
 $(function () {
-	//console.log('페이지 로드 시작 ');
   loadList(1); // 처음 로드될 때 1페이지 데이터 호출
 });
 
 let sortOrder = "desc";
 let sortField = "maintDate";  // 기본값
+const pageSize = 10; // 페이지당 개수 (고정)
 
+// 정렬 이벤트
 $(document).on("click", "th.sortable", function () {
   const $th = $(this);
   sortField = $th.data("sort"); 
@@ -21,94 +22,92 @@ $(document).on("click", "th.sortable", function () {
 
 // 필터 + 검색 값 수집
 function getFilterValues(){
-	return {
-		searchType : $(".search-dropdown-label").data("value") || "", 
-		keyword : $(".search-input").val().trim(),
-		assetKind  : activeFilters.assetKind || "",
-		company    : activeFilters.company || "",
-		maintStatus: activeFilters.maintStatus || "",
-		orderBy : sortField + (sortOrder === "asc" ? "Asc" : "Desc")
-	};
+  return {
+    searchType : $(".search-dropdown-label").data("value") || "", 
+    keyword    : $(".search-input").val().trim(),
+    assetKind  : activeFilters.assetKind || "",
+    company    : activeFilters.company || "",
+    maintStatus: activeFilters.maintStatus || "",
+    orderBy    : sortField + (sortOrder === "asc" ? "Asc" : "Desc")
+  };
 }
-
 
 // 리스트 로드 
 function loadList(page = 1){
-	const filters = getFilterValues();
-	console.log('서버에 필터링 보내는 중 ' , filters);
-	$.ajax({
-		url : "/admin/maintenance/search",
-		type : "GET",
-		data : {...filters, page : page}, //DTO 매핑
-		success : function(res){
-		//	console.log(res);
-			renderTable(res.list);
-			renderPagination(res.currentPage, res.totalPage);
-		},
-		error : function(xhr, status, err){
-			console.error("리스트 로드 실패 -> ", err);
-		}
-	});
-}
+  const filters = getFilterValues();
+  console.log('서버에 필터링 보내는 중 ' , filters);
+  $.ajax({
+    url : "/admin/maintenance/search",
+    type : "GET",
+    data : {...filters, page : page}, // DTO 매핑
+    success : function(res){
+      renderTable(res.list, res.currentPage, res.pageSize || pageSize);
+      renderPagination(res.currentPage, res.totalPage);
+	  $('.total-count').text(`총 ${res.totalCount} 건`);
 
+    },
+    error : function(xhr, status, err){
+      console.error("리스트 로드 실패 -> ", err);
+    }
+  });
+}
 
 // 테이블 렌더링
-function renderTable(list){
-	const $tbody = $(".maintenance-table tbody");
-	$tbody.empty();
-	
-	if(!list || list.length === 0){
-		$tbody.append(`<tr><td colspan="7"> 데이터가 없습니다.</td></tr>`);
-		return;
-	}
-	
-	list.forEach((row, i) => {
-		let statusHtml = "";
-		
-		if(row.maintStatus === "COMPLETED"){
-			statusHtml = `
-				<div class ="status-complete">
-						<img class = "complete-img" src="/assets/asset/canuse.svg">
-						<span>점검완료</span>
-				</div>
-			`
-		}else if(row.maintStatus === "IN_PROGRESS"){
-			statusHtml = `
-				<div class ="status-progress">
-						<img class = "progress-img" src="/assets/asset/using.svg">
-						<span>점검중</span>
-				</div>
-			`
-		}
-		
-		let typeHtml = "";
-		if(row.maintType === "EMERGENCY"){
-			typeHtml = `<text>긴급점검</text>`
-		}else if(row.maintType === "REGULAR"){
-			typeHtml= `<text>정기점검</text>`
+function renderTable(list, currentPage, pageSize){
+  const $tbody = $(".maintenance-table tbody");
+  $tbody.empty();
+  
+  if(!list || list.length === 0){
+    $tbody.append(`<tr><td colspan="8"> 데이터가 없습니다.</td></tr>`);
+    return;
+  }
+  
+  list.forEach((row, i) => {
+    // 페이지별 이어지는 번호
+    const rowNumber = (currentPage - 1) * pageSize + (i + 1);
 
-		}
-		
-		
-		$tbody.append(`
-			<tr>
-					<td>${i + 1}</td>
-					<td>${row.assetKind}</td>
-					<td>${row.assetName}</td>
-					 <td>${row.maintDate && row.maintDate !== "null" ? row.maintDate : ""}</td>
-					<td>${typeHtml}</td>
-					<td>${statusHtml}</td>
-					<td>${row.adminName}</td>
-					<td>
-							<button class="edit-btn"  data-id="${row.requestId}">
-									<img src="/assets/maintenance/edit-btn.svg" alt="수정">
-							</button>
-					</td>
-			</tr>
-			`);
-	});
+    let statusHtml = "";
+    if(row.maintStatus === "COMPLETED"){
+      statusHtml = `
+        <div class="status-complete">
+          <img class="complete-img" src="/assets/asset/canuse.svg">
+          <span>점검완료</span>
+        </div>
+      `;
+    }else if(row.maintStatus === "IN_PROGRESS"){
+      statusHtml = `
+        <div class="status-progress">
+          <img class="progress-img" src="/assets/asset/using.svg">
+          <span>점검중</span>
+        </div>
+      `;
+    }
+    
+    let typeHtml = "";
+    if(row.maintType === "EMERGENCY"){
+      typeHtml = `<text>긴급점검</text>`;
+    }else if(row.maintType === "REGULAR"){
+      typeHtml= `<text>정기점검</text>`;
+    }
+    
+    $tbody.append(`
+      <tr>
+        <td>${rowNumber}</td>
+        <td>${row.assetKind}</td>
+        <td>${row.assetName}</td>
+        <td>${row.maintDate && row.maintDate !== "null" ? row.maintDate : ""}</td>
+        <td>${typeHtml}</td>
+        <td>${statusHtml}</td>
+        <td>${row.adminName}</td>
+        <td>
+          <button class="edit-btn"  data-id="${row.requestId}">
+            <img src="/assets/maintenance/edit-btn.svg" alt="수정">
+          </button>
+        </td>
+      </tr>
+    `);
+  });
 }
-
 
 // 페이지네이션 렌더링
 function renderPagination(currentPage, totalPage){
@@ -146,10 +145,9 @@ function renderPagination(currentPage, totalPage){
     `);
   }
 
-	  // 페이지 버튼 이벤트 바인딩
-	  $pagination.find("a").on("click", function (e) {
-	    e.preventDefault();
-	    loadList($(this).data("page"));
-	  });
-	}
-
+  // 페이지 버튼 이벤트 바인딩
+  $pagination.find("a").on("click", function (e) {
+    e.preventDefault();
+    loadList($(this).data("page"));
+  });
+}

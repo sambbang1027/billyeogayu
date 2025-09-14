@@ -97,6 +97,13 @@
 	height : 28px;
 }
 
+.rv-count-down-box {
+	display : flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom : 0.5rem;
+}
+
 /* ---------------- 테이블 ---------------- */
 .rv-table-wrapper {
   background-color: #ffffff;

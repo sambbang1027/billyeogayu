@@ -65,6 +65,10 @@
             </div>
         </div>
     </div>
+    
+    <div class = "count-down-box">
+				<text class ="rv-total-count"></text>
+		</div>
 
     <!-- reservation table -->
     <div class="rv-table-wrapper">
