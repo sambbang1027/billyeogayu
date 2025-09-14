@@ -275,17 +275,41 @@
     </update>
 
     <!-- 내 사용 통계 조회 - 수정됨 -->
-    <select id="selectMyUsageStatistics" resultType="map">
-        SELECT 
-            COUNT(CASE WHEN STATUS IN ('APPROVED', 'COMPLETED') THEN 1 END) as totalUsageCount,
-            COUNT(CASE WHEN STATUS = 'COMPLETED' OR COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount,
-            COUNT(CASE WHEN STATUS = 'APPROVED' AND START_TIME &lt;= SYSDATE AND END_TIME &gt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as activeCount,
-            COUNT(CASE WHEN STATUS = 'APPROVED' AND END_TIME &lt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as overdueCount,
-            NVL(SUM(CASE WHEN USAGE_DURATION IS NOT NULL THEN USAGE_DURATION ELSE 0 END), 0) as totalUsageMinutes,
-            NVL(AVG(CASE WHEN USAGE_DURATION IS NOT NULL THEN USAGE_DURATION ELSE NULL END), 0) as avgUsageMinutes
-        FROM RESERVATION
-        WHERE USER_ID = #{userId}
-    </select>
+	<select id="selectMyUsageStatistics" resultType="map">
+	    SELECT 
+	        COUNT(CASE WHEN STATUS IN ('APPROVED', 'COMPLETED') THEN 1 END) as totalUsageCount,
+	        COUNT(CASE WHEN STATUS = 'COMPLETED' OR COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount,
+	        COUNT(CASE WHEN STATUS = 'APPROVED' AND START_TIME &lt;= SYSDATE AND END_TIME &gt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as activeCount,
+	        COUNT(CASE WHEN STATUS = 'APPROVED' AND END_TIME &lt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as overdueCount,
+	        
+	        -- 실시간 계산으로 변경 (APPROVED 상태의 USAGE_DURATION도 포함)
+	        NVL(SUM(
+	            CASE 
+	                -- 1순위: 이미 저장된 USAGE_DURATION 사용
+	                WHEN USAGE_DURATION IS NOT NULL AND USAGE_DURATION &gt; 0 THEN USAGE_DURATION
+	                -- 2순위: COMPLETED_AT 기준 계산
+	                WHEN COMPLETED_AT IS NOT NULL AND START_TIME IS NOT NULL THEN 
+	                    ROUND((COMPLETED_AT - START_TIME) * 24 * 60)
+	                -- 3순위: END_TIME 기준 계산 (COMPLETED 상태만)
+	                WHEN STATUS = 'COMPLETED' AND END_TIME IS NOT NULL AND START_TIME IS NOT NULL THEN
+	                    ROUND((END_TIME - START_TIME) * 24 * 60)
+	                ELSE 0
+	            END
+	        ), 0) as totalUsageMinutes,
+	        
+	        NVL(AVG(
+	            CASE 
+	                WHEN USAGE_DURATION IS NOT NULL AND USAGE_DURATION &gt; 0 THEN USAGE_DURATION
+	                WHEN COMPLETED_AT IS NOT NULL AND START_TIME IS NOT NULL THEN 
+	                    ROUND((COMPLETED_AT - START_TIME) * 24 * 60)
+	                WHEN STATUS = 'COMPLETED' AND END_TIME IS NOT NULL AND START_TIME IS NOT NULL THEN
+	                    ROUND((END_TIME - START_TIME) * 24 * 60)
+	                ELSE NULL
+	            END
+	        ), 0) as avgUsageMinutes
+	    FROM RESERVATION
+	    WHERE USER_ID = #{userId}
+	</select>
 
     <!-- 예약 건수 조회 (상태별) - 수정됨 -->
     <select id="selectReservationCountByStatus" resultType="map">

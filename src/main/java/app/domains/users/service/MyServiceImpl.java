@@ -126,25 +126,35 @@ public class MyServiceImpl implements MyService {
         
         Map<String, Object> statistics = myRepository.selectMyUsageStatistics(userId);
         
+        // 디버깅용 로그 추가
+        log.info("=== 사용 통계 원본 데이터 ===");
+        log.info("totalUsageCount: {}", statistics.get("TOTALUSAGECOUNT"));
+        log.info("completedCount: {}", statistics.get("COMPLETEDCOUNT"));
+        log.info("totalUsageMinutes: {}", statistics.get("TOTALUSAGEMINUTES"));
+        log.info("statistics 전체: {}", statistics);
+        
         // 총 사용 시간을 시간 단위로 변환
-        Long totalMinutes = (Long) statistics.get("totalUsageMinutes");
-        if (totalMinutes != null) {
+        Long totalMinutes = null;
+        Object totalMinutesObj = statistics.get("TOTALUSAGEMINUTES");
+        
+        if (totalMinutesObj instanceof Number) {
+            totalMinutes = ((Number) totalMinutesObj).longValue();
+        }
+        
+        log.info("변환된 totalMinutes: {}", totalMinutes);
+        
+        if (totalMinutes != null && totalMinutes > 0) {
             int totalHours = (int) (totalMinutes / 60);
             int remainingMinutes = (int) (totalMinutes % 60);
             statistics.put("totalUsageHours", totalHours);
             statistics.put("totalUsageMinutesRemaining", remainingMinutes);
             statistics.put("totalUsageFormatted", 
                           totalHours > 0 ? totalHours + "시간 " + remainingMinutes + "분" : remainingMinutes + "분");
+        } else {
+            statistics.put("totalUsageFormatted", "0분");
         }
         
-        // 평균 사용 시간도 포맷팅
-        Double avgMinutes = (Double) statistics.get("avgUsageMinutes");
-        if (avgMinutes != null) {
-            int avgHours = (int) (avgMinutes / 60);
-            int avgMinutesRem = (int) (avgMinutes % 60);
-            statistics.put("avgUsageFormatted", 
-                          avgHours > 0 ? avgHours + "시간 " + avgMinutesRem + "분" : avgMinutesRem + "분");
-        }
+        log.info("최종 totalUsageFormatted: {}", statistics.get("totalUsageFormatted"));
         
         return statistics;
     }

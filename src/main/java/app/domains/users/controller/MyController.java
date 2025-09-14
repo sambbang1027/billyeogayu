@@ -79,6 +79,173 @@ public class MyController {
     }
     
     /**
+     * 내 정보 페이지
+     */
+    @GetMapping("/profile")
+    public String profile(HttpServletRequest request, Model model) {
+        log.info("=== 내 정보 페이지 요청 ===");
+        
+        Users currentUser = getCurrentUser(request);
+        if (currentUser == null) {
+            log.warn("인증되지 않은 사용자 - 로그인 페이지로 리다이렉트");
+            return "redirect:/login";
+        }
+        
+        try {
+            log.info("내 정보 조회 - userId: {}, loginId: {}", currentUser.getUserId(), currentUser.getLoginId());
+            
+            // 비밀번호는 제거하고 전달
+            currentUser.setPassword(null);
+            
+            model.addAttribute("user", currentUser);
+            model.addAttribute("isLoggedIn", true);
+            
+            log.info("JSP 반환: my/myProfile");
+            return "my/myProfile";
+            
+        } catch (Exception e) {
+            log.error("내 정보 조회 중 오류 발생 - userId: {}", currentUser.getUserId(), e);
+            model.addAttribute("error", "내 정보를 불러오는 중 오류가 발생했습니다.");
+            return "error/500";
+        }
+    }
+    
+    /**
+     * 내 정보 수정 인증 페이지
+     */
+    @GetMapping("/profile/verification")
+    public String profileVerification(HttpServletRequest request, Model model) {
+        log.info("=== 내 정보 수정 인증 페이지 요청 ===");
+        
+        Users currentUser = getCurrentUser(request);
+        if (currentUser == null) {
+            log.warn("인증되지 않은 사용자 - 로그인 페이지로 리다이렉트");
+            return "redirect:/login";
+        }
+        
+        model.addAttribute("isLoggedIn", true);
+        return "my/profileVerification";
+    }
+    
+    /**
+     * 내 정보 수정 인증 처리
+     */
+    @PostMapping("/profile/verification")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> verifyProfile(@RequestParam("password") String password,
+                                                           HttpServletRequest request) {
+        log.info("=== 내 정보 수정 인증 처리 요청 ===");
+        
+        Users currentUser = getCurrentUser(request);
+        Map<String, Object> response = new HashMap<>();
+        
+        if (currentUser == null) {
+            response.put("success", false);
+            response.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(response);
+        }
+        
+        try {
+            log.info("사용자 인증 시도 - loginId: {}", currentUser.getLoginId());
+            
+            // 비밀번호 확인
+            boolean isValid = usersService.authenticateUser(currentUser.getLoginId(), password);
+            
+            if (isValid) {
+                log.info("인증 성공 - userId: {}", currentUser.getUserId());
+                response.put("success", true);
+                response.put("message", "인증이 완료되었습니다.");
+                response.put("redirectUrl", "/my/profile?verified=true");
+                return ResponseEntity.ok(response);
+            } else {
+                log.warn("인증 실패 - 비밀번호 불일치 - userId: {}", currentUser.getUserId());
+                response.put("success", false);
+                response.put("message", "비밀번호가 일치하지 않습니다.");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+        } catch (Exception e) {
+            log.error("인증 처리 중 오류 발생 - userId: {}", currentUser.getUserId(), e);
+            response.put("success", false);
+            response.put("message", "인증 처리 중 오류가 발생했습니다.");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    /**
+     * 내 정보 업데이트
+     */
+    @PostMapping("/profile/update")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateProfile(@RequestParam("address") String address,
+                                                           @RequestParam("email") String email,
+                                                           @RequestParam("phoneNumber") String phoneNumber,
+                                                           HttpServletRequest request) {
+        log.info("=== 내 정보 업데이트 요청 ===");
+        
+        Users currentUser = getCurrentUser(request);
+        Map<String, Object> response = new HashMap<>();
+        
+        if (currentUser == null) {
+            response.put("success", false);
+            response.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(response);
+        }
+        
+        try {
+            log.info("사용자 정보 업데이트 시도 - userId: {}, 새 이메일: {}, 새 주소: {}, 새 핸드폰: {}", 
+                    currentUser.getUserId(), email, address, phoneNumber);
+            
+            // 이메일 중복 확인 (현재 사용자 제외)
+            Users existingEmailUser = usersService.getUserByEmail(email);
+            if (existingEmailUser != null && !existingEmailUser.getUserId().equals(currentUser.getUserId())) {
+                log.warn("이메일 중복 - email: {}, existingUserId: {}, currentUserId: {}", 
+                        email, existingEmailUser.getUserId(), currentUser.getUserId());
+                response.put("success", false);
+                response.put("message", "이미 사용 중인 이메일입니다.");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 핸드폰 번호 중복 확인 (현재 사용자 제외)
+            Users existingPhoneUser = usersService.getUserByPhone(phoneNumber);
+            if (existingPhoneUser != null && !existingPhoneUser.getUserId().equals(currentUser.getUserId())) {
+                log.warn("핸드폰 번호 중복 - phoneNumber: {}, existingUserId: {}, currentUserId: {}", 
+                        phoneNumber, existingPhoneUser.getUserId(), currentUser.getUserId());
+                response.put("success", false);
+                response.put("message", "이미 사용 중인 핸드폰 번호입니다.");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 사용자 정보 업데이트
+            Users updateUser = new Users();
+            updateUser.setUserId(currentUser.getUserId());
+            updateUser.setAddress(address.trim());
+            updateUser.setEmail(email.trim());
+            updateUser.setPhoneNumber(phoneNumber.trim());
+            
+            usersService.updateUser(updateUser);
+            
+            log.info("사용자 정보 업데이트 완료 - userId: {}", currentUser.getUserId());
+            
+            response.put("success", true);
+            response.put("message", "정보가 성공적으로 업데이트되었습니다.");
+            return ResponseEntity.ok(response);
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("사용자 정보 업데이트 실패 - userId: {}, reason: {}", currentUser.getUserId(), e.getMessage());
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+            
+        } catch (Exception e) {
+            log.error("사용자 정보 업데이트 중 오류 발생 - userId: {}", currentUser.getUserId(), e);
+            response.put("success", false);
+            response.put("message", "정보 업데이트 중 오류가 발생했습니다.");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    /**
      * 내 예약 내역 페이지
      */
     @GetMapping("/reservations")
@@ -163,7 +330,7 @@ public class MyController {
             model.addAttribute("user", currentUser);
             model.addAttribute("reservations", reservations);
             model.addAttribute("reservationSummary", reservationSummary);
-            model.addAttribute("usageStatistics", usageStatistics); // ✅ 추가
+            model.addAttribute("usageStatistics", usageStatistics); 
             model.addAttribute("currentStatus", status);
             model.addAttribute("currentStartDate", startDate);
             model.addAttribute("currentEndDate", endDate);
@@ -300,7 +467,7 @@ public class MyController {
             model.addAttribute("user", currentUser);
             model.addAttribute("usageHistory", usageHistory);
             model.addAttribute("usageStatistics", usageStatistics);
-            model.addAttribute("reservationSummary", reservationSummary); // ✅ 추가
+            model.addAttribute("reservationSummary", reservationSummary);
             model.addAttribute("currentStartDate", startDate);
             model.addAttribute("currentEndDate", endDate);
             model.addAttribute("currentCategory", category);
