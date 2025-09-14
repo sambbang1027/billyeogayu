@@ -25,9 +25,8 @@
                          alt="알람" />
                 </div>
                 
-                <!-- TODO: 최근 알람 개수 조회 및 출력 혹은 아예 숫자는 보여주지 말기? -->
-                <div class="alarm-text-box">
-                    23
+                <div class="alarm-text-box" id="alarmCount">
+                    <span class="alarm-count">0</span>
                 </div>
             </div>
             <div class="user-container">

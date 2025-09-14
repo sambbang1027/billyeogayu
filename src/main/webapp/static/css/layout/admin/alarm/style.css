@@ -55,10 +55,12 @@
     align-items: center;
     padding: 12px 0;
     border-bottom: 1px solid #eee;
+    transition: all 0.3s ease;
 }
 .alarm-item:last-child {
     border-bottom: none;
 }
+/* .read 클래스 스타일 제거 - 더 이상 필요 없음 */
 .alarm-icon {
     flex: 0 0 36px;
     display: flex;
@@ -80,7 +82,31 @@
     color: #333;
     margin-bottom: 4px;
 }
+
+/* 빈 상태 메시지 스타일 */
+.alarm-list:empty::after {
+    content: "모든 알람을 확인했습니다.";
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    display: block;
+}
 .alarm-date {
     font-size: 12px;
     color: #888;
+}
+.read-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.read-button:hover {
+    background-color: #0056b3;
 }
