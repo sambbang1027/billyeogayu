@@ -94,7 +94,7 @@ public class ReservationServiceImpl implements ReservationService {
         endCal.set(Calendar.SECOND, 59);
         endCal.set(Calendar.MILLISECOND, 999);
         
-        log.info("날짜 범위 설정 - 시작: {}, 종료: {}", cal.getTime(), endCal.getTime());
+        log.info("날짜 범위 설정 - 시작: {}, 반납: {}", cal.getTime(), endCal.getTime());
         
         while (!cal.after(endCal)) {
             // 주말 제외
