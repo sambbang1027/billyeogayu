@@ -71,13 +71,13 @@
 .inspection-info {
   display: grid;
   grid-template-columns: 1fr 1fr; /* 왼쪽/오른쪽 */
-  column-gap: 40px;
+  column-gap: 8rem;
   margin-bottom: 20px;
 }
 
 .inspection-info > div {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 1rem;
 }
 
@@ -98,7 +98,10 @@
   margin-bottom: 5px;
 }
 
-
+.inspec-title{
+	font-weight: 700;
+	margin-bottom : 3rem;
+}
 /* 라벨/값 */
 .inspection-label {
   font-weight: 600;
@@ -107,10 +110,6 @@
   text-align: left;
 }
 
-/* 오른쪽 컬럼 라벨 */
-.inspection-info > div:last-child .inspection-label {
-  text-align: right;
-}
 
 
 .inspection-value {

@@ -14,6 +14,7 @@
 				 <result property="description" column="resolve_description"/>
 				 <result property="note" column="note" />
 				 <result property="resolvedAt"  column="resolved_at"/>
+				 <result property="owner" column="owner"/>
 		</resultMap>
 		
 	
@@ -27,7 +28,8 @@
 					    MAX(a.category)    AS asset_kind,
 					    MAX(m.resolve_description) AS resolve_description,
 					    MAX(m.note)        AS note,
-						TO_CHAR(MAX(m.resolved_at), 'YYYY.MM.DD HH24:MI') AS resolved_at
+						TO_CHAR(MAX(m.resolved_at), 'YYYY.MM.DD HH24:MI') AS resolved_at,
+						MAX(a.owner) AS owner
 					
 					FROM maintenance m
 					JOIN asset a ON a.asset_id = m.asset_id

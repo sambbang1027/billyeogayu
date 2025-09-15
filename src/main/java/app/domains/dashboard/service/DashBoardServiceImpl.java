@@ -97,8 +97,8 @@ public class DashBoardServiceImpl implements DashBoardService {
         // 각 카테고리별 모델 리스트 정렬
         categoryModelMap.values().forEach(Collections::sort);
         
-        // 지역 데이터 (임시 더미, 나중에 실제 데이터로 변경)
-        List<String> addresses = List.of("서울특별시", "경기도", "강원도", "경상남도", "경상북도", "전라남도", "전라북도", "제주도");
+        // 실제 데이터베이스에서 상위 7개 도시 조회
+        List<String> addresses = dashBoardRepository.getTopCitiesByReservationCount();
         
         return Map.of(
             "categoryModels", categoryModelMap,

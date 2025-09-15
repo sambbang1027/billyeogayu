@@ -3,6 +3,95 @@ html {
 	font-size: 16px;
 }
 
+/* ========================================
+   헤더 스타일 - resource/list와 동일
+   ======================================== */
+.header {
+	background: #ffffff;
+	width: 100%;
+	height: 5.625rem; /* 90px */
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.header-content {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 1.5rem;
+	max-width: 1200px; /* 가운데 정렬을 위한 최대 너비 */
+	margin: 0 auto; /* 가운데 정렬 */
+}
+
+.logo-link {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+}
+
+.logo {
+	height: 3.5rem; /* 56px */
+	width: auto;
+	object-fit: contain;
+}
+
+.header-links {
+	display: flex;
+	gap: 1.5rem;
+	align-items: center;
+}
+
+.header-link {
+	color: #000000;
+	font-size: 0.9375rem;
+	font-weight: 400;
+	cursor: pointer;
+	text-decoration: none;
+	transition: color 0.3s ease;
+	border: none;
+	background: none;
+	padding: 0;
+	font-family: inherit;
+}
+
+.header-link:hover {
+	color: #659f7c;
+}
+
+.logout-btn {
+	color: #000000;
+	font-size: 0.9375rem;
+	font-weight: 400;
+	cursor: pointer;
+	text-decoration: none;
+	transition: color 0.3s ease;
+	border: none;
+	background: none;
+	padding: 0;
+	font-family: inherit;
+}
+
+.logout-btn:hover {
+	color: #659f7c;
+}
+
+/* 헤더 높이만큼 body에 padding-top 추가 */
+body {
+	padding-top: 5.625rem; /* 90px - 헤더 높이와 동일 */
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ========================================
+   기존 reservation-apply 스타일
+   ======================================== */
 .reservation-apply, .reservation-apply * {
 	box-sizing: border-box;
 }
@@ -10,6 +99,15 @@ html {
 .reservation-apply {
 	padding: 2rem 0 4rem;
 	background: #fff;
+}
+
+/* 폰트 통일 - 모든 입력 요소에 동일한 폰트 적용 */
+.reservation-apply input, 
+.reservation-apply textarea, 
+.reservation-apply select,
+.reservation-apply button {
+    font-family: inherit;
+    font-size: 1rem;
 }
 
 /* 가운데 정렬 컨테이너 */
@@ -49,7 +147,7 @@ html {
 	margin: 0 0 .75rem;
 }
 
-/* 카드 바디(안쪽 하얀 박스) — "네모칸 등 맞게" */
+/* 카드 바디(안쪽 하얀 박스) – "네모칸 등 맞게" */
 .reservation-apply .card-body {
 	background: #fff;
 	border: 1px solid #dedede;
@@ -89,6 +187,46 @@ html {
 	color: #f00;
 }
 
+/* 임대기간 선택 안내문 */
+.reservation-apply .rental-period-info {
+	background: #f8f9fa;
+	border: 1px solid #e9ecef;
+	border-radius: 0.5rem;
+	padding: 1.25rem;
+	margin-bottom: 1.5rem;
+}
+
+.reservation-apply .rental-period-info h4 {
+	color: #dc3545;
+	font-size: 1.1rem;
+	font-weight: 700;
+	margin: 0 0 1rem 0;
+}
+
+.reservation-apply .rental-period-info .info-list {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1rem 0;
+}
+
+.reservation-apply .rental-period-info .info-list li {
+	padding: 0.25rem 0;
+	color: #333;
+	line-height: 1.5;
+}
+
+.reservation-apply .rental-period-info .info-list li.highlight {
+	color: #dc3545;
+	font-weight: 600;
+}
+
+.reservation-apply .rental-period-info .sub-note {
+	color: #dc3545;
+	font-weight: 600;
+	margin: 0;
+	font-size: 0.95rem;
+}
+
 /* ================================
    신청상세: 달력 + 시간 통합 박스
    ================================ */
@@ -123,6 +261,11 @@ html {
 	width: auto;
 }
 
+/* 큰 달력 숨기기 */
+.reservation-apply .picker-box #rangeCalendar {
+    display: none !important;
+}
+
 /* 날짜 요약 인풋 */
 .reservation-apply .picker-box .date-summary {
 	display: grid;
@@ -132,29 +275,54 @@ html {
 	margin: 1rem auto 0;
 }
 
+.reservation-apply .picker-box .date-summary > div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
 .reservation-apply .picker-box .date-summary label {
 	display: block;
 	font-size: .9rem;
 	color: #475467;
-	margin-bottom: .35rem;
+	margin-bottom: .5rem;
 	font-weight: 600;
+	text-align: center;
 }
 
 .reservation-apply .picker-box .date-summary input {
 	width: 100%;
-	height: 2.75rem;
-	border: 1px solid #e5e7eb;
+	height: 3rem !important;
+	border: 1px solid #d0d0d0 !important;
 	border-radius: .75rem;
 	padding: .6rem .85rem;
 	background: #fff;
 	box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
 	transition: border-color .15s, box-shadow .15s;
+	font-size: 1.1rem !important;
+	font-weight: 600 !important;
+	text-align: center !important;
+	cursor: pointer !important;
+	color: #999 !important;
+	font-family: inherit !important;
+}
+
+.reservation-apply .picker-box .date-summary input:hover {
+    border-color: #659f7c !important;
+    box-shadow: 0 2px 8px rgba(101, 159, 124, .2) !important;
 }
 
 .reservation-apply .picker-box .date-summary input:focus {
 	outline: none;
-	border-color: #659f7c;
-	box-shadow: 0 0 0 3px rgba(101, 159, 124, .2);
+	border-color: #659f7c !important;
+	box-shadow: 0 0 0 3px rgba(101, 159, 124, .2) !important;
+}
+
+/* 선택된 날짜 표시 */
+.reservation-apply .picker-box .date-summary input:not(:placeholder-shown) {
+    background: #f8fdf9 !important;
+    border-color: #659f7c !important;
+    color: #2b6f54 !important;
 }
 
 /* ================================
@@ -201,6 +369,7 @@ html {
     font-size: 1.2rem;
     color: #2b6f54;
     transition: all 0.2s ease;
+    font-family: inherit;
 }
 
 .arrow-btn:hover:not(:disabled) {
@@ -249,6 +418,7 @@ html {
     font-weight: 600;
     border: 1px solid #ddd;
     transition: all 0.2s ease;
+    font-family: inherit;
 }
 
 .time-availability-container .time-slot.available {
@@ -319,6 +489,7 @@ html {
     transition: all 0.2s ease;
     color: #666;
     line-height: 1.2;
+    font-family: inherit;
 }
 
 .date-dot:hover {
@@ -370,6 +541,7 @@ html {
 	font-size: .95rem;
 	font-weight: 600;
 	transition: all 0.2s ease;
+	font-family: inherit;
 }
 
 .reservation-apply .picker-box .tabs .tab:hover {
@@ -408,12 +580,24 @@ html {
 	font-size: 1.2rem;
 	color: #2b6f54;
 	transition: all 0.2s ease;
+	font-family: inherit;
 }
 
 .reservation-apply .picker-box .time-scroll .arrow:hover {
 	background: #f0f7f4;
 	border-color: #2b6f54;
 	box-shadow: 0 4px 8px rgba(16, 24, 40, .12);
+}
+
+/* 시간 라벨 스타일 추가 */
+.reservation-apply .time-label {
+    font-size: .9rem;
+    color: #475467;
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: center;
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
 /* 트랙 */
@@ -450,6 +634,7 @@ html {
 	transition: all 0.2s ease;
 	cursor: pointer;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	font-family: inherit;
 }
 
 .reservation-apply .picker-box .time-btn:hover:not(:disabled):not(.disabled) {
@@ -490,38 +675,51 @@ html {
 	grid-template-columns: 1fr 1fr;
 	gap: 1rem;
 	margin-top: 1.5rem;
-	max-width: 500px;
+	max-width: 400px;
 	margin-left: auto;
 	margin-right: auto;
-	background: rgba(255, 255, 255, 0.8);
+	background: transparent;
 	padding: 1rem;
 	border-radius: 0.75rem;
-	border: 1px solid #e0e0e0;
-}
-
-.reservation-apply .picked label {
-	display: block;
-	font-size: .9rem;
-	color: #2b6f54;
-	margin-bottom: .5rem;
-	font-weight: 600;
-}
-
-.reservation-apply .picked output {
-	display: block;
-	height: 3rem;
-	border: 1px solid #d6ebe6;
-	border-radius: .5rem;
-	padding: .75rem 1rem;
-	background: #fff;
-	box-shadow: 0 1px 3px rgba(16, 24, 40, .04);
-	font-size: 1rem;
-	color: #333;
-	display: flex;
+	border: none;
 	align-items: center;
 }
 
-/* 목적 */
+.reservation-apply .picked > div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.reservation-apply .picked label {
+	font-size: .9rem;
+	color: #475467;
+	font-weight: 600;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.reservation-apply .picked output {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 3rem;
+	width: 100%;
+	border: 1px solid #d0d0d0;
+	border-radius: .75rem;
+	padding: .75rem 1rem;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #999;
+	transition: border-color .15s, box-shadow .15s;
+	cursor: default;
+	font-family: inherit;
+}
+
+/* 목적 textarea 폰트 통일 */
 .reservation-apply .purpose {
 	width: 100%;
 	min-height: 10.5rem;
@@ -530,6 +728,9 @@ html {
 	border: 1px solid #d9d9d9;
 	border-radius: .5rem;
 	line-height: 1.6;
+	font-family: inherit;
+	font-size: 1rem;
+	font-weight: normal;
 }
 
 /* 카드 안 제출 버튼(쓰지 않지만 유지) */
@@ -555,6 +756,7 @@ html {
 	border: 1px solid transparent;
 	cursor: pointer;
 	text-decoration: none;
+	font-family: inherit;
 }
 
 .reservation-apply .btn.primary {
@@ -664,6 +866,7 @@ html {
 	font-size: 1rem;
 	line-height: 2.5rem;
 	box-sizing: border-box;
+	font-family: inherit;
 }
 
 .reservation-apply .col-r input[readonly] {
@@ -750,6 +953,7 @@ html {
 	outline: none;
 	cursor: pointer;
 	font-weight: 600;
+	font-family: inherit;
 }
 
 .page-actions .btn.ghost {
@@ -812,8 +1016,28 @@ html {
 	margin: 0;
 }
 
-/* 반응형 디자인 */
-@media ( max-width : 768px) {
+/* ========================================
+   반응형 디자인
+   ======================================== */
+@media (max-width: 768px) {
+	/* 헤더 반응형 */
+	.header-content {
+		padding: 0 1rem;
+	}
+	
+	.logo {
+		height: 3rem; /* 모바일에서 조금 작게 */
+	}
+	
+	.header-links {
+		gap: 1rem;
+	}
+	
+	.header-link {
+		font-size: 0.875rem;
+	}
+	
+	/* 기존 reservation-apply 반응형 */
 	.reservation-apply .container {
 		padding: 0 0.5rem;
 	}
@@ -821,6 +1045,17 @@ html {
 	.reservation-apply .picker-box {
 		padding: 1rem;
 	}
+	
+    /* 날짜 선택 영역 반응형 */
+    .reservation-apply .picker-box .date-summary {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .reservation-apply .picker-box .date-summary input {
+        height: 2.75rem !important;
+        font-size: 1rem !important;
+    }
 	
 	.time-availability-container {
 	    padding: 1rem;

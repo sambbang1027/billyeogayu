@@ -1,0 +1,443 @@
+/* ===== Google Fonts Import ===== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ===== 메인 페이지 스타일 ===== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fffe 0%, #f0f9ff 100%);
+    min-height: 100vh;
+    color: #1a1a1a;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+}
+
+/* 좌우 데코레이션 요소들 */
+.container::before {
+    content: '🚜';
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    font-size: 3rem;
+    opacity: 0.1;
+    z-index: -1;
+    animation: float 6s ease-in-out infinite;
+}
+
+.container::after {
+    content: '🌾';
+    position: absolute;
+    bottom: 20%;
+    right: 8%;
+    font-size: 2.5rem;
+    opacity: 0.15;
+    z-index: -1;
+    animation: float 4s ease-in-out infinite reverse;
+}
+
+/* 추가 데코레이션 */
+.decoration {
+    position: absolute;
+    z-index: -1;
+    opacity: 0.08;
+}
+
+.decoration-1 {
+    top: 15%;
+    right: 10%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #22c55e 30%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 4s ease-in-out infinite;
+}
+
+.decoration-2 {
+    bottom: 25%;
+    left: 8%;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, #3b82f6 30%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.decoration-3 {
+    top: 40%;
+    left: 3%;
+    font-size: 2rem;
+    opacity: 0.1;
+}
+
+.decoration-4 {
+    top: 60%;
+    right: 5%;
+    font-size: 1.8rem;
+    opacity: 0.12;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.08; }
+    50% { transform: scale(1.1); opacity: 0.12; }
+}
+
+/* ===== 사용자 정보 영역 ===== */
+.user-info {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.95);
+    padding: 0.8rem 1.2rem;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    z-index: 10;
+}
+
+.user-greeting {
+    color: #2c5530;
+    font-weight: 300;
+    font-size: 0.9rem;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.logout-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+}
+
+/* ===== 헤더 영역 ===== */
+.header {
+    text-align: center;
+    padding: 80px 0 40px 0;
+}
+
+.logo-container {
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.logo-image {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    display: inline-block;
+    margin: 0;
+}
+
+.logo-fallback {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #659f7c;
+    margin: 1rem 0;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.main-title {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 3.8rem;
+    font-weight: 800;
+    color: #1a1a1a; 
+    margin-bottom: 2.5rem;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+
+.main-title .highlight {
+    color: #1a1a1a;
+    position: relative;
+}
+
+.main-title .highlight::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent 0%, #22c55e 50%, transparent 100%);
+    border-radius: 2px;
+    opacity: 0.6;
+}
+
+.subtitle {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #2c5530; 
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    letter-spacing: -0.01em;
+}
+
+.tractor-icon {
+    font-size: 2rem;
+}
+
+.description {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 1.3rem;
+    color: #4a5568;
+    line-height: 1.7;
+    margin-bottom: 3.5rem;
+    font-weight: 500;
+}
+
+.description p {
+    margin-bottom: 0.4rem;
+}
+
+/* ===== 액션 버튼 영역 ===== */
+.action-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    font-family: 'Noto Sans KR', sans-serif;
+    padding: 1.2rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    min-width: 200px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    letter-spacing: -0.01em;
+}
+
+.btn-primary {
+    background: white;
+    color: #1a1a1a;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 167, 254, 0.4);
+    text-decoration: none;
+    color: white;
+    background: #66A7FE;
+    border-color: #66A7FE;
+}
+
+.btn-secondary {
+    background: white;
+    color: #1a1a1a;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(197, 222, 218, 0.5);
+    background: #C5DEDA;
+    text-decoration: none;
+    color: #1a1a1a;
+    border-color: #C5DEDA;
+}
+
+/* ===== 메인 비주얼 영역 ===== */
+.main-visual {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto 3rem auto;
+    background: transparent;
+    padding: 1rem;
+}
+
+.visual-content {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    box-shadow: none;
+    /* 흰색 배경 제거를 위한 CSS 필터 */
+    mix-blend-mode: multiply;
+    filter: contrast(1.05) brightness(1.02);
+}
+
+.visual-fallback {
+    display: none;
+    padding: 3rem;
+    color: #666;
+    font-size: 1.2rem;
+    text-align: center;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.fallback-detail {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* ===== 반응형 디자인 ===== */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .user-info {
+        position: relative;
+        top: 10px;
+        right: auto;
+        margin-bottom: 1rem;
+        justify-content: center;
+        display: inline-flex;
+    }
+    
+    .header {
+        padding: 60px 0 30px 0;
+    }
+    
+    .logo-image {
+        max-width: 250px;
+    }
+    
+    .main-title {
+        font-size: 2.8rem;
+    }
+
+    .subtitle {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .description {
+        font-size: 1.1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 280px;
+        min-width: auto;
+    }
+
+    .main-visual {
+        margin: 0 0 2rem 0;
+        padding: 0.5rem;
+    }
+
+    .user-info {
+        padding: 0.6rem 1rem;
+        border-radius: 15px;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .user-greeting {
+        font-size: 0.85rem;
+    }
+
+    .logout-btn {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 2.2rem;
+    }
+
+    .subtitle {
+        font-size: 1.7rem;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 0.95rem;
+    }
+    
+    .logo-image {
+        max-height: 35px;
+    }
+}
+
+/* 한 화면에 모든 내용이 들어가도록 조정 */
+@media (min-width: 1025px) {
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 1rem;
+    }
+    
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 90vh;
+    }
+    
+    .header {
+        padding: 40px 0 30px 0;
+    }
+    
+    .main-visual {
+        margin-bottom: 2rem;
+    }
+}

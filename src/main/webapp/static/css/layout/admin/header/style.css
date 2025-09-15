@@ -1,3 +1,6 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .header-container {
     display: flex;
     align-items: center;
@@ -6,6 +9,10 @@
     background-color: white;
     border: none;
     border-bottom: 1px solid #E7E7E7;
+    font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */
+    height: 70px; /* 헤더 높이 명시적 설정 */
+    min-height: 70px;
+    padding: 10px 0; /* 상하 패딩으로 추가적인 중앙 정렬 */
 }
 
 .alarm-container,
@@ -13,32 +20,60 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    height: 100%; /* 부모 높이에 맞춤 */
+    justify-content: center; /* 수평 중앙 정렬 */
+}
+
+.alarm-container {
+    cursor: pointer; /* 마우스 호버 시 포인터 커서 */
+    transition: opacity 0.2s ease; /* 부드러운 호버 효과 */
+}
+
+.alarm-container:hover {
+    opacity: 0.7; /* 호버 시 약간 투명하게 */
 }
 
 .alarm-img,
 .user-img,
 .logout-img {
-    width: 1rem;
-    height: 1rem;
+    width: 1.2rem; /* 1rem → 1.2rem으로 아이콘 크기 증가 */
+    height: 1.2rem;
+    display: block; /* 인라인 요소의 정렬 개선 */
+    margin: 0 auto; /* 자동 마진으로 완전한 중앙 정렬 */
 }
 
 .logout-img-box {
 	cursor: pointer;
 	margin-right : 3rem;
+    height: 100%; /* 부모 높이에 맞춤 */
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
 }
 
 .alarm-count {
-    background-color: #ff4444;
-    color: white;
+    background-color: transparent; /* 배경색 제거 */
+    color: #ff4444; /* 흰색에서 빨간색으로 변경 */
     border-radius: 50%;
     padding: 2px 6px;
-    font-size: 12px;
+    font-size: 16px; /* 14px → 16px로 폰트 크기 증가 */
     font-weight: bold;
     min-width: 18px;
     text-align: center;
     display: inline-block;
+    line-height: 1; /* 텍스트의 기본 라인 높이 제거 */
 }
 
 .alarm-count.hidden {
     display: none;
+}
+
+/* 사용자 텍스트 스타일 추가 */
+.user-text-box {
+    font-size: 16px; /* 폰트 크기 증가 */
+    font-weight: 500;
+    line-height: 1; /* 텍스트의 기본 라인 높이 제거 */
+    display: flex;
+    align-items: center; /* 아이콘과 수직 정렬 */
+    height: 100%;
 }

@@ -8,6 +8,7 @@
     <resultMap id="AssetResultMap" type="app.domains.asset.model.Asset">
         <id property="assetId" column="ASSET_ID"/>
         <result property="modelName" column="NAME"/>
+        <result column="owner"     property="owner"/>
         <result property="assetStatus" column="STATUS"/>
         <result property="category" column="CATEGORY"/>
         <result property="company" column="COMPANY"/>
@@ -24,6 +25,7 @@
 
     <resultMap id="AssetDtoResultMap" type="app.domains.asset.model.AssetDto">
         <id property="assetId" column="ASSET_ID"/>
+        <result column="owner"     property="owner"/>
         <result property="modelName" column="NAME"/>
         <result property="assetStatus" column="STATUS"/>
         <result property="category" column="CATEGORY"/>
@@ -184,6 +186,7 @@
         STATUS,
         CATEGORY,
         COMPANY,
+        OWNER,
         MAINTENANCE_CYCLE,
         USAGE_TIME,
         LAST_MAINTENANCE_DATE,
@@ -223,7 +226,7 @@
         (NAME, STATUS, CATEGORY, COMPANY,
         MAINTENANCE_CYCLE, USAGE_TIME,
         LAST_MAINTENANCE_DATE, EXPECTED_MAINTENANCE_DATE,
-        IMAGE, UPDATED_AT)
+        IMAGE, UPDATED_AT, OWNER)
         VALUES
         (#{modelName},
         #{assetStatus},
@@ -234,24 +237,32 @@
         #{lastMaintenanceDate,   jdbcType=TIMESTAMP},
         #{expectedMaintenanceDate,jdbcType=TIMESTAMP},
         #{imagePath},
-        #{updatedAt,             jdbcType=TIMESTAMP})
+        #{updatedAt,             jdbcType=TIMESTAMP},
+        #{owner})
     </insert>
 
     <insert id="insertParts" parameterType="map" useGeneratedKeys="false">
         INSERT ALL
         <foreach collection="parts" item="p">
             INTO PART (
-            ASSET_ID, NAME, STATUS, MAINTENANCE_CYCLE, EXPECTED_MAINTENANCE_DATE
+            ASSET_ID, NAME, STATUS,
+            MAINTENANCE_CYCLE, EXPECTED_MAINTENANCE_DATE,
+            CREATED_AT, IS_DELETED
             ) VALUES (
             #{p.assetId},
             #{p.partName},
             #{p.partStatus},
             #{p.maintenanceCycle, jdbcType=NUMERIC},
-            #{p.expectedMaintenanceDate, jdbcType=TIMESTAMP}
+            #{p.expectedMaintenanceDate, jdbcType=TIMESTAMP},
+            SYSDATE, 'N'
             )
         </foreach>
         SELECT 1 FROM DUAL
     </insert>
+
+
+
+
 
     <update id="updateAsset">
         UPDATE asset

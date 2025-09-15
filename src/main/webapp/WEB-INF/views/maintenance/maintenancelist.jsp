@@ -86,10 +86,12 @@
 		   		 </div>
 		     </div>
 	    </div>
-	
+		<div class = "count-down-box">
+				<text class ="total-count"></text>
 	     <button class="btn-download">
 	     			<img alt="download-list" src="<c:url value='/assets/asset/download.svg'/>">
 	     </button>
+		</div>
 	    <!-- maintenance table -->
 	  <div class="table-wrapper">
 	    <table class="maintenance-table">

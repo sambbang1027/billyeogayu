@@ -75,6 +75,7 @@ $(document).on("click", ".apply-btn-submit", function() {
 
 	// 점검자
 	const resolverName = $(".apply-input").val().trim();
+	
 	// 부품 목록 
 		const selectedItems = inspectionSelect.getValue();
 		const data = selectedItems.map(item => ({
