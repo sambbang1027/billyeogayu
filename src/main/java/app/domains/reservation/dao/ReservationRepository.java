@@ -1,5 +1,6 @@
 package app.domains.reservation.dao;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -44,15 +45,15 @@ public interface ReservationRepository {
      * 예약된 날짜 범위 조회 (기존 호환성 유지)
      */
     List<BlockedRange> findBlockedRanges(@Param("assetId") Long assetId, 
-                                        @Param("from") Date from, 
-                                        @Param("to") Date to);
+                                        @Param("from") LocalDateTime from, 
+                                        @Param("to") LocalDateTime to);
 
     /**
      * 기존 겹치는 예약 개수 확인 (기존 호환성 유지)
      */
     int countOverlap(@Param("assetId") Long assetId, 
-                    @Param("startAt") Date startAt, 
-                    @Param("endAt") Date endAt);
+                    @Param("startAt") LocalDateTime startAt, 
+                    @Param("endAt") LocalDateTime endAt);
 
     /**
      * 시간별 겹침 체크 (동일한 name, category, company를 가진 모든 자산 대상)
@@ -60,8 +61,8 @@ public interface ReservationRepository {
     int countOverlapByTime(@Param("name") String name, 
                           @Param("category") String category, 
                           @Param("company") String company, 
-                          @Param("startAt") Date startAt, 
-                          @Param("endAt") Date endAt);
+                          @Param("startAt") LocalDateTime startAt, 
+                          @Param("endAt") LocalDateTime endAt);
 
     /**
      * 보유대수 계산 (modelName, category, company가 같은 자산의 개수) - 사용 가능한 자산만 카운트
@@ -76,8 +77,8 @@ public interface ReservationRepository {
     List<Reservation> findReservationsByAssetGroup(@Param("name") String name, 
                                                    @Param("category") String category, 
                                                    @Param("company") String company, 
-                                                   @Param("from") Date from, 
-                                                   @Param("to") Date to);
+                                                   @Param("from") LocalDateTime from, 
+                                                   @Param("to") LocalDateTime to);
 
     /**
      * 예약 생성

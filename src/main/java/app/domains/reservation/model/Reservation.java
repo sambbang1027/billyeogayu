@@ -1,5 +1,6 @@
 package app.domains.reservation.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -13,8 +14,8 @@ public class Reservation {
     private Long reservationId;
     private Long assetId;
     private Long userId;
-    private Date startAt;      // -> START_TIME
-    private Date endAt;        // -> END_TIME
+    private LocalDateTime startAt;      // -> START_TIME
+    private LocalDateTime endAt;        // -> END_TIME
     private String purpose;
 
     // 화면에서 받는 원본 입력들

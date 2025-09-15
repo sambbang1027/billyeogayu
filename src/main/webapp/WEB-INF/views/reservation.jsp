@@ -29,6 +29,9 @@
 <!-- 공통 모달 JS -->
 <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 
+</head>
+<body>
+
 	<!-- 헤더 -->
 	<div class="header">
 		<div class="header-content">
@@ -252,7 +255,6 @@
 									<button type="button" class="arrow" id="timeRight">▶</button>
 								</div>
 
-
 								<!-- 선택된 시간 표시 -->
 								<div class="picked">
 									<div>
@@ -305,7 +307,7 @@
 
 	<script>
 $(document).ready(function() {
-    console.log('페이지 로드 완료 - 데이터 우선 로드 후 달력 생성');
+    console.log('페이지 로드 완료 - 날짜별 가용성 체크 후 달력 생성');
     
     // 전역 변수
     let activeTarget = "start";
@@ -314,8 +316,9 @@ $(document).ready(function() {
     window.cachedTimeSlots = null;
     window.fp = null;
     window.endDatePicker = null;
+    window.dateAvailabilityMap = {}; // 날짜별 가용성 정보
     
-    // 핵심: API 데이터를 먼저 로드한 후 달력 생성
+    // 핵심: 날짜별 가용성 체크 후 달력 생성
     loadDataFirstThenCreateCalendar();
     
     // 시간 버튼 생성
@@ -415,22 +418,70 @@ $(document).ready(function() {
     initDuplicateSubmissionPrevention();
 });
 
-// 핵심 함수: 개별 달력 초기화 (기존 큰 달력 대신)
+// 날짜별 가용성 체크 후 달력 생성
 function loadDataFirstThenCreateCalendar() {
-    console.log('개별 달력 초기화');
+    console.log('날짜별 가용성 체크 후 달력 생성 시작');
+    
+    // 먼저 날짜별 가용성 정보를 가져옴
+    loadDateAvailability().then(function() {
+        // 가용성 정보를 바탕으로 달력 생성
+        createCalendarWithDisabledDates();
+    });
+}
+
+// 날짜별 가용성 정보 로드
+function loadDateAvailability() {
+    const assetId = $('#assetId').val();
+    const today = new Date();
+    const fromDate = formatDateToString(today);
+    const toDate = formatDateToString(new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000))); // 30일 후
+    
+    return $.ajax({
+        url: '/api/reservation/date-availability',
+        method: 'GET',
+        data: {
+            assetId: assetId,
+            from: fromDate,
+            to: toDate
+        },
+        timeout: 5000,
+        success: function(response) {
+            console.log('날짜별 가용성 정보 로드 완료:', response);
+            window.dateAvailabilityMap = response.dateAvailability || {};
+        },
+        error: function(xhr, status, error) {
+            console.error('날짜별 가용성 정보 로드 실패:', error);
+            window.dateAvailabilityMap = {}; // 실패 시 빈 객체로 설정
+        }
+    });
+}
+
+// 가용성 정보를 적용한 달력 생성
+function createCalendarWithDisabledDates() {
+    console.log('비활성화 날짜가 적용된 달력 생성');
     
     // 기존 큰 달력 숨기기
     $('#rangeCalendar').hide();
     
-    // 시작일 달력
+    // 시작일 달력 - 비활성화 날짜 적용
     $("#reserveStartDate").flatpickr({
         locale: "ko",
         dateFormat: "Y-m-d",
         minDate: "today",
         maxDate: new Date().fp_incr(30),
-        disable: [function(date) {
-            return (date.getDay() === 0 || date.getDay() === 6);
-        }],
+        disable: [
+            // 주말 비활성화
+            function(date) {
+                return (date.getDay() === 0 || date.getDay() === 6);
+            },
+            // 임대 가능 시간대가 부족한 날짜 비활성화
+            function(date) {
+                const dateStr = formatDateToString(date);
+                const isAvailable = window.dateAvailabilityMap[dateStr];
+                console.log('시작일 날짜 체크:', dateStr, '가용:', isAvailable);
+                return isAvailable === false; // false이면 비활성화
+            }
+        ],
         onChange: function(selectedDates, dateStr, instance) {
             if (selectedDates.length > 0) {
                 // 반납일 달력의 최소날짜를 시작일로 설정
@@ -442,15 +493,25 @@ function loadDataFirstThenCreateCalendar() {
         }
     });
     
-    // 반납일 달력
+    // 반납일 달력 - 비활성화 날짜 적용
     window.endDatePicker = $("#reserveEndDate").flatpickr({
         locale: "ko", 
         dateFormat: "Y-m-d",
         minDate: "today",
         maxDate: new Date().fp_incr(30),
-        disable: [function(date) {
-            return (date.getDay() === 0 || date.getDay() === 6);
-        }],
+        disable: [
+            // 주말 비활성화
+            function(date) {
+                return (date.getDay() === 0 || date.getDay() === 6);
+            },
+            // 임대 가능 시간대가 부족한 날짜 비활성화
+            function(date) {
+                const dateStr = formatDateToString(date);
+                const isAvailable = window.dateAvailabilityMap[dateStr];
+                console.log('반납일 날짜 체크:', dateStr, '가용:', isAvailable);
+                return isAvailable === false; // false이면 비활성화
+            }
+        ],
         onChange: function(selectedDates, dateStr, instance) {
             if (selectedDates.length > 0) {
                 checkBothDatesSelected();
@@ -458,7 +519,7 @@ function loadDataFirstThenCreateCalendar() {
         }
     });
     
-    console.log('개별 달력 초기화 완료');
+    console.log('비활성화 날짜 적용된 달력 생성 완료');
 }
 
 // 시작일과 반납일 모두 선택되었을 때 시간대별 현황 업데이트

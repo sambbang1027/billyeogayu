@@ -1,6 +1,7 @@
 package app.domains.reservation.service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,12 +34,12 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<BlockedRange> getBlockedRanges(Long assetId, Date from, Date to) {
+    public List<BlockedRange> getBlockedRanges(Long assetId, LocalDateTime from, LocalDateTime to) {
         return repo.findBlockedRanges(assetId, from, to);
     }
 
     @Override
-    public List<TimeSlotAvailability> getTimeSlotAvailability(Long assetId, Date from, Date to) {
+    public List<TimeSlotAvailability> getTimeSlotAvailability(Long assetId, LocalDateTime from, LocalDateTime to) {
         log.info("=== getTimeSlotAvailability 시작 ===");
         log.info("파라미터 - assetId: {}, from: {}, to: {}", assetId, from, to);
         
@@ -80,32 +81,20 @@ public class ReservationServiceImpl implements ReservationService {
         List<TimeSlotAvailability> timeSlots = new ArrayList<>();
         
         // 30분 단위로 시간대를 생성 (9:00 ~ 18:00, 점심시간 제외)
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(from);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        LocalDateTime current = from.toLocalDate().atTime(0, 0); // 시작일 00:00부터
+        LocalDateTime end = to.toLocalDate().atTime(23, 59, 59); // 종료일 23:59:59까지
         
-        Calendar endCal = Calendar.getInstance();
-        endCal.setTime(to);
-        endCal.set(Calendar.HOUR_OF_DAY, 23);
-        endCal.set(Calendar.MINUTE, 59);
-        endCal.set(Calendar.SECOND, 59);
-        endCal.set(Calendar.MILLISECOND, 999);
+        log.info("날짜 범위 설정 - 시작: {}, 반납: {}", current, end);
         
-        log.info("날짜 범위 설정 - 시작: {}, 반납: {}", cal.getTime(), endCal.getTime());
-        
-        while (!cal.after(endCal)) {
+        while (!current.isAfter(end)) {
             // 주말 제외
-            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
-                log.debug("{} 주말이므로 건너뜀", cal.getTime());
-                cal.add(Calendar.DAY_OF_MONTH, 1);
+            if (current.getDayOfWeek().getValue() == 6 || current.getDayOfWeek().getValue() == 7) {
+                log.debug("{} 주말이므로 건너뜀", current.toLocalDate());
+                current = current.plusDays(1).toLocalDate().atTime(0, 0);
                 continue;
             }
             
-            log.debug("=== {} 날짜 처리 시작 ===", cal.getTime());
+            log.debug("=== {} 날짜 처리 시작 ===", current.toLocalDate());
             
             // 하루 동안의 30분 단위 슬롯 생성
             for (int hour = 9; hour <= 18; hour++) {
@@ -118,15 +107,8 @@ public class ReservationServiceImpl implements ReservationService {
                         continue;
                     }
                     
-                    Calendar slotCal = (Calendar) cal.clone();
-                    slotCal.set(Calendar.HOUR_OF_DAY, hour);
-                    slotCal.set(Calendar.MINUTE, minute);
-                    slotCal.set(Calendar.SECOND, 0);
-                    slotCal.set(Calendar.MILLISECOND, 0);
-                    
-                    Date slotStart = slotCal.getTime();
-                    slotCal.add(Calendar.MINUTE, 30);
-                    Date slotEnd = slotCal.getTime();
+                    LocalDateTime slotStart = current.toLocalDate().atTime(hour, minute);
+                    LocalDateTime slotEnd = slotStart.plusMinutes(30);
                     
                     // 메모리에서 예약 수 확인 (DB 쿼리 없음)
                     String slotKey = createSlotKey(slotStart, slotEnd);
@@ -149,7 +131,7 @@ public class ReservationServiceImpl implements ReservationService {
             }
             
             // 다음 날로 이동
-            cal.add(Calendar.DAY_OF_MONTH, 1);
+            current = current.plusDays(1).toLocalDate().atTime(0, 0);
         }
         
         log.info("시간대별 예약 가능성 조회 완료. 총 {} 개 슬롯 생성", timeSlots.size());
@@ -168,56 +150,50 @@ public class ReservationServiceImpl implements ReservationService {
         return timeSlots;
     }
 
-    // 예약이 겹치는 시간 슬롯들의 키 목록 반환
-    private List<String> getOverlappingTimeSlots(Date reservationStart, Date reservationEnd) {
+    // 예약이 겹치는 시간 슬롯들의 키 목록 반환 (LocalDateTime 버전)
+    private List<String> getOverlappingTimeSlots(LocalDateTime reservationStart, LocalDateTime reservationEnd) {
         List<String> overlappingSlots = new ArrayList<>();
         
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(reservationStart);
+        LocalDateTime current = reservationStart;
         
         // 30분 단위로 겹치는 슬롯 찾기
-        while (!cal.getTime().after(reservationEnd)) {
-            int hour = cal.get(Calendar.HOUR_OF_DAY);
-            int minute = cal.get(Calendar.MINUTE);
+        while (!current.isAfter(reservationEnd)) {
+            int hour = current.getHour();
+            int minute = current.getMinute();
             
             // 업무시간 내의 슬롯만 처리
             if (hour >= 9 && hour <= 18 && !(hour == 12 || (hour == 13 && minute == 0))) {
-                Calendar slotStart = (Calendar) cal.clone();
-                slotStart.set(Calendar.MINUTE, minute < 30 ? 0 : 30);
-                slotStart.set(Calendar.SECOND, 0);
-                slotStart.set(Calendar.MILLISECOND, 0);
-                
-                Calendar slotEnd = (Calendar) slotStart.clone();
-                slotEnd.add(Calendar.MINUTE, 30);
+                LocalDateTime slotStart = current.toLocalDate().atTime(hour, minute < 30 ? 0 : 30);
+                LocalDateTime slotEnd = slotStart.plusMinutes(30);
                 
                 // 예약 시간과 슬롯이 겹치는지 확인
-                if (isTimeOverlap(reservationStart, reservationEnd, slotStart.getTime(), slotEnd.getTime())) {
-                    String slotKey = createSlotKey(slotStart.getTime(), slotEnd.getTime());
+                if (isTimeOverlap(reservationStart, reservationEnd, slotStart, slotEnd)) {
+                    String slotKey = createSlotKey(slotStart, slotEnd);
                     overlappingSlots.add(slotKey);
                 }
             }
             
-            cal.add(Calendar.MINUTE, 30);
+            current = current.plusMinutes(30);
         }
         
         return overlappingSlots;
     }
 
-    // 시간 겹침 확인
-    private boolean isTimeOverlap(Date start1, Date end1, Date start2, Date end2) {
-        return start1.before(end2) && end1.after(start2);
+    // 시간 겹침 확인 (LocalDateTime 버전)
+    private boolean isTimeOverlap(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+        return start1.isBefore(end2) && end1.isAfter(start2);
     }
 
-    // 슬롯 키 생성 (날짜-시간 형태)
-    private String createSlotKey(Date startTime, Date endTime) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm");
-        return formatter.format(startTime);
+    // 슬롯 키 생성 (LocalDateTime 버전)
+    private String createSlotKey(LocalDateTime startTime, LocalDateTime endTime) {
+        return startTime.toLocalDate() + "-" + 
+               String.format("%02d:%02d", startTime.getHour(), startTime.getMinute());
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean apply(Long assetId, Long userId,
-                        Date startAt, Date endAt,
+                        LocalDateTime startAt, LocalDateTime endAt,
                         String purpose,
                         String useZipcode, String useAddr1, String useAddr2) {
 
@@ -231,7 +207,7 @@ public class ReservationServiceImpl implements ReservationService {
                 return false;
             }
             
-            if (startAt == null || endAt == null || !startAt.before(endAt)) {
+            if (startAt == null || endAt == null || !startAt.isBefore(endAt)) {
                 log.warn("잘못된 날짜 범위: startAt={}, endAt={}", startAt, endAt);
                 return false;
             }

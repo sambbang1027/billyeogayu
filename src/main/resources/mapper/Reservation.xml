@@ -21,16 +21,25 @@
         <result property="isDeleted" column="IS_DELETED" />
     </resultMap>
 
-    <!-- BlockedRange 매핑 -->
+    <!-- BlockedRange 매핑 (LocalDateTime 적용) -->
     <resultMap id="blockedRangeMap" type="app.domains.reservation.model.BlockedRange">
         <result property="startAt" column="START_AT" />
         <result property="endAt" column="END_AT" />
     </resultMap>
 
-    <!-- Reservation 매핑 -->
+    <!-- Reservation 매핑 (LocalDateTime 적용) -->
     <resultMap id="reservationMap" type="app.domains.reservation.model.Reservation">
+        <id property="reservationId" column="RESERVATION_ID" />
+        <result property="assetId" column="ASSET_ID" />
+        <result property="userId" column="USER_ID" />
         <result property="startAt" column="START_TIME" />
         <result property="endAt" column="END_TIME" />
+        <result property="purpose" column="PURPOSE" />
+        <result property="address" column="ADDRESS" />
+        <result property="addressState" column="ADDRESS_STATE" />
+        <result property="addressCity" column="ADDRESS_CITY" />
+        <result property="status" column="STATUS" />
+        <result property="createdAt" column="CREATED_AT" />
     </resultMap>
 
     <!-- 자산 조회 -->
@@ -55,7 +64,7 @@
         AND IS_DELETED = 'N'
     </select>
 
-    <!-- 예약된 날짜 범위 조회 (기존 호환성 유지) -->
+    <!-- 예약된 날짜 범위 조회 (LocalDateTime 적용) -->
     <select id="findBlockedRanges" resultMap="blockedRangeMap">
         SELECT START_TIME AS START_AT, END_TIME AS END_AT
         FROM RESERVATION r
@@ -70,7 +79,7 @@
         ORDER BY r.START_TIME
     </select>
 
-    <!-- 기존 겹치는 예약 개수 확인 (기존 호환성 유지) -->
+    <!-- 기존 겹치는 예약 개수 확인 (LocalDateTime 적용) -->
     <select id="countOverlap" resultType="int">
         SELECT COUNT(*) FROM RESERVATION
         WHERE ASSET_ID = #{assetId}
@@ -82,7 +91,7 @@
         )
     </select>
 
-    <!-- 시간별 겹침 체크 (동일한 name, category, company를 가진 모든 자산 대상) -->
+    <!-- 시간별 겹침 체크 (LocalDateTime 적용) -->
     <select id="countOverlapByTime" resultType="int">
         SELECT COUNT(*) 
         FROM RESERVATION r
@@ -109,9 +118,10 @@
         AND STATUS = 'AVAILABLE'
     </select>
 
-    <!-- 전체 기간의 예약 데이터를 한 번에 조회 (성능 최적화) -->
+    <!-- 전체 기간의 예약 데이터를 한 번에 조회 (LocalDateTime 적용) -->
     <select id="findReservationsByAssetGroup" resultMap="reservationMap">
-        SELECT r.START_TIME, r.END_TIME
+        SELECT r.RESERVATION_ID, r.ASSET_ID, r.USER_ID, r.START_TIME, r.END_TIME, r.PURPOSE, 
+               r.ADDRESS, r.ADDRESS_STATE, r.ADDRESS_CITY, r.STATUS, r.CREATED_AT
         FROM RESERVATION r
         INNER JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
         WHERE a.NAME = #{name}
@@ -161,13 +171,13 @@
         AND STATUS = 'AVAILABLE'
     </select>
 
-    <!-- 예약 생성 (실제 DB 구조에 맞춤) -->
+    <!-- 예약 생성 (LocalDateTime 적용) -->
     <insert id="insertReservation" parameterType="app.domains.reservation.model.Reservation">
         INSERT INTO RESERVATION (
             ASSET_ID,
             USER_ID,
-            START_TIME,
-            END_TIME,
+            START_TIME,     <!-- LocalDateTime → Oracle DATE 자동 변환 -->
+            END_TIME,       <!-- LocalDateTime → Oracle DATE 자동 변환 -->
             PURPOSE,
             ADDRESS,
             ADDRESS_STATE,
@@ -176,8 +186,8 @@
         ) VALUES (
             #{assetId},
             #{userId},
-            #{startAt},
-            #{endAt},
+            #{startAt},     <!-- LocalDateTime 파라미터 -->
+            #{endAt},       <!-- LocalDateTime 파라미터 -->
             #{purpose},
             #{address},
             #{addressState},
