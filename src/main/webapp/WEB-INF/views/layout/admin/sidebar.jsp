@@ -85,32 +85,17 @@
         <script>
         $(document).ready(function() {
             $(".navi-container > div").on("click", function() {
-                $(".navi-container > div").removeClass("active");
-
-                $(".dashboard-img").attr("src", "<c:url value='/assets/layout/admin/dashboard.svg'/>");
-                $(".asset-img").attr("src", "<c:url value='/assets/layout/admin/asset.svg'/>");
-                $(".maintenance-img").attr("src", "<c:url value='/assets/layout/admin/maintenance.svg'/>");
-                $(".reservation-img").attr("src", "<c:url value='/assets/layout/admin/reservation.svg'/>");
-
-                $(this).addClass("active");
-
                 if ($(this).hasClass("dashboard-container")) {
-                    $(".dashboard-img").attr("src", "<c:url value='/assets/layout/admin/dashboard-select.svg'/>");
                     window.location.href = "<c:url value='/admin/dashboard'/>";
                 } else if ($(this).hasClass("asset-container")) {
-                    $(".asset-img").attr("src", "<c:url value='/assets/layout/admin/asset-select.svg'/>");
                     window.location.href = "<c:url value='/admin/asset'/>";
                 } else if ($(this).hasClass("maintenance-container")) {
-                    $(".maintenance-img").attr("src", "<c:url value='/assets/layout/admin/maintenance-select.svg'/>");
                     window.location.href = "<c:url value='/admin/maintenance'/>";
                 } else if ($(this).hasClass("reservation-container")) {
-                    $(".reservation-img").attr("src", "<c:url value='/assets/layout/admin/reservation-select.svg'/>");
                     window.location.href = "<c:url value='/admin/reservations'/>";
                 }
             });
-        });
 
-        $(document).ready(function() {
             $(".logo").on("click", function() {
                 window.location.href = "<c:url value='/admin/dashboard'/>";
             });
