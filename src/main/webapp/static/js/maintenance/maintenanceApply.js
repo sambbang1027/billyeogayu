@@ -84,8 +84,9 @@ $(document).on("click", ".apply-btn-submit", function() {
 		}));
 		// 모달의 data 속성에서 assetId 가져오기
 		const assetId = $("#inspectionApplyModal").attr("data-asset-id");
+		const owner =   $("#inspectionApplyModal").attr("data-owner");
 
-		console.log('담당자: ',adminId, ' 자원 ID: ', assetId, ' 점검자 : ', resolverName, 
+		console.log('담당자: ',adminId, ' 자원 ID: ', assetId, '소유자 : ', owner,  ' 점검자 : ', resolverName, 
 							'정검 유형 : ', inspectionStatus, '항목 : ', JSON.stringify(data));
 		
 		
@@ -99,7 +100,8 @@ $(document).on("click", ".apply-btn-submit", function() {
 			parts : data,
 			adminId : adminId,
 			resolverName : resolverName,
-			type : inspectionStatus
+			type : inspectionStatus,
+			owner : owner,
 		}),
 		success : function(res){
 			if(res.code === "SUCCESS"){

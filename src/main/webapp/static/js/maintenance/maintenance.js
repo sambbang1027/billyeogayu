@@ -7,7 +7,7 @@ $(function () {
 });
 
 let sortOrder = "desc";
-let sortField = "maintDate";  // 기본값
+let sortField = "createdAt";  // 기본값
 const pageSize = 10; // 페이지당 개수 (고정)
 
 // 정렬 이벤트
@@ -41,6 +41,8 @@ function loadList(page = 1){
     type : "GET",
     data : {...filters, page : page}, // DTO 매핑
     success : function(res){
+		
+		console.log(res);
       renderTable(res.list, res.currentPage, res.pageSize || pageSize);
       renderPagination(res.currentPage, res.totalPage);
 	  $('.total-count').text(`총 ${res.totalCount} 건`);
@@ -95,9 +97,10 @@ function renderTable(list, currentPage, pageSize){
         <td>${rowNumber}</td>
         <td>${row.assetKind}</td>
         <td>${row.assetName}</td>
-        <td>${row.maintDate && row.maintDate !== "null" ? row.maintDate : ""}</td>
+        <td>${row.createdAt }</td>
         <td>${typeHtml}</td>
         <td>${statusHtml}</td>
+		<td>${row.owner? row.owner : "농촌진흥청"}</td>
         <td>${row.adminName}</td>
         <td>
           <button class="edit-btn"  data-id="${row.requestId}">

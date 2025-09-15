@@ -15,6 +15,9 @@
 				 <result property="maintStatus" column="status"/>
 				 <result property="maintDate" column="maint_date"/>
 				 <result property="adminName" column="admin_name"/>
+				 <result property="rnum" column="rnum" />
+				 <result property="createdAt" column="created_at"/>
+				 <result property="owner" column="owner" />
 		</resultMap>
 		
 		<select id="searchMaintList" parameterType="app.domains.maintenance.model.MaintSearch"
@@ -32,7 +35,10 @@
 						        m.status,
 						        NVL(TO_CHAR(m.resolved_at, 'YYYY.MM.DD'), '') AS maint_date,				        
 						        u.name AS admin_name,
-						        a.company
+						        a.company,
+								TO_CHAR(m.created_at, 'YYYY.MM.DD') AS created_at,
+								a.owner
+						        
 						      FROM maintenance m
 						      JOIN asset a ON a.asset_id = m.asset_id
 						      JOIN part p ON p.part_id = m.part_id
@@ -40,12 +46,17 @@
 						      <!-- 동적 where 절 있으면 적용되고 없으면 적용되지 않는 myBatis 동적 sql이다  -->
 						      <where>
 					      		
-						      		<if test="searchType == 'assetName' and keyword != null and keyword != ''">
-									    AND a.name LIKE '%' || #{keyword} || '%'
-									</if>
-									<if test="searchType == 'adminName' and keyword != null and keyword != ''">
-									    AND u.name LIKE '%' || #{keyword} || '%'
-									</if>
+								<if test='searchType != null and searchType.equals("assetName") and keyword != null and keyword != ""'>
+								    AND UPPER(a.name) LIKE UPPER(CONCAT('%', CONCAT(#{keyword}, '%')))
+								</if>
+								<if test='searchType != null and searchType.equals("adminName") and keyword != null and keyword != ""'>
+								    AND UPPER(u.name) LIKE UPPER(CONCAT('%', CONCAT(#{keyword}, '%')))
+								</if>
+							
+								<if test='searchType != null and searchType.equals("owner") and keyword != null and keyword != ""'>
+								    AND a.owner LIKE CONCAT('%', CONCAT(#{keyword}, '%'))
+								</if>
+
 						      		<if test="assetKind != null and assetKind != '' ">
 						      					AND a.category = #{assetKind}
 						      		</if>
@@ -56,13 +67,14 @@
 						      					AND a.company = #{company}
 						      		</if>
 						      </where>		 
-						      GROUP BY m.request_id, a.name, a.category, m.type, m.status, m.resolved_at, u.name, a.company
+						      GROUP BY m.request_id, a.name, a.category, m.type, m.status, m.resolved_at
+						      , u.name, a.company, m.created_at, a.owner
 							<choose>
-							    <when test="orderBy == 'maintDateAsc'">
-							        ORDER BY m.resolved_at ASC
+							    <when test="orderBy == 'createdAtAsc'">
+							        ORDER BY m.created_at ASC
 							    </when>
-							    <when test="orderBy == 'maintDateDesc'">
-							        ORDER BY m.resolved_at DESC
+							    <when test="orderBy == 'createdAtDesc'">
+							        ORDER BY m.created_at DESC
 							    </when>
 							    <otherwise>
 							        ORDER BY m.request_id DESC
@@ -82,12 +94,16 @@
 			    JOIN asset a ON a.asset_id = m.asset_id
 			    JOIN users u ON u.user_id = m.admin_id
 			      <where>
-				      				<if test="searchType == 'assetName' and keyword != null and keyword != ''">
-									    AND a.name LIKE '%' || #{keyword} || '%'
-									</if>
-									<if test="searchType == 'adminName' and keyword != null and keyword != ''">
-									    AND u.name LIKE '%' || #{keyword} || '%'
-									</if>
+				      						
+								<if test='searchType != null and searchType.equals("assetName") and keyword != null and keyword != ""'>
+								    AND UPPER(a.name) LIKE UPPER(CONCAT('%', CONCAT(#{keyword}, '%')))
+								</if>
+								<if test='searchType != null and searchType.equals("adminName") and keyword != null and keyword != ""'>
+								    AND UPPER(u.name) LIKE UPPER(CONCAT('%', CONCAT(#{keyword}, '%')))
+								</if>
+								<if test='searchType != null and searchType.equals("owner") and keyword != null and keyword != ""'>
+								    AND a.owner LIKE CONCAT('%', CONCAT(#{keyword}, '%'))
+								</if>
 						      		
 						      		<if test="assetKind != null and assetKind != '' ">
 						      					AND a.category = #{assetKind}
@@ -119,7 +135,8 @@
          m.type            AS maintType,
          m.status          AS maintStatus,
          TO_CHAR(m.resolved_at, 'YYYY-MM-DD') AS maintDate,
-         u.name            AS adminName
+         u.name            AS adminName,
+         a.owner 			AS owner 
   FROM maintenance m
   JOIN asset a ON a.asset_id = m.asset_id
   JOIN users u ON u.user_id = m.admin_id

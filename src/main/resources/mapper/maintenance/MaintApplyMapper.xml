@@ -34,10 +34,10 @@
 	
 			<insert id="applyMaintenance" parameterType="map">
 			    INSERT INTO maintenance (
-			        asset_id, admin_id, part_id, type, item, resolver_name, request_id
+			        asset_id, admin_id, part_id, type, item, resolver_name, request_id, owner 
 			    )
 			    VALUES (
-			        #{assetId}, #{adminId}, #{partId}, #{type}, #{partName}, #{resolverName}, #{requestId}
+			        #{assetId}, #{adminId}, #{partId}, #{type}, #{partName}, #{resolverName}, #{requestId}, #{owner}
 			    )
 			</insert>
 						

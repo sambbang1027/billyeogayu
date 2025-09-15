@@ -1110,6 +1110,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	    const inspectionModal = $("#inspectionApplyModal");
 	    inspectionModal.removeClass("hidden").css("display","block");
 	    inspectionModal.attr("data-asset-id", assetId); // data 속성에 저장
+	    inspectionModal.attr("data-owner", owner);
 	    
 	    $(".apply-input.asset").val(modelName);
 		$(".apply-input.owner").val(owner);

@@ -22,4 +22,7 @@ public class Maintenance {
 	private String maintStatus;
 	private String maintDate;
 	private String adminName;
+	private int rnum;
+	private String createdAt;
+	private String owner;
 }

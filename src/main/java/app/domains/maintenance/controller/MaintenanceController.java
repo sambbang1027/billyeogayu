@@ -65,10 +65,15 @@ public class MaintenanceController {
 		int pageSize = 10; // 한 페이지에 보여줄 행 수
 		maintSearch.setStartRow((page -1) * pageSize+1);
 		maintSearch.setEndRow(page * pageSize);
+		
+		System.out.println("필터 "+ maintSearch);
 
 		List<Maintenance> list = maintenanceService.searchMaintList(maintSearch);
 		int totalCount = maintenanceService.getSearchCount(maintSearch);
 		int totalPage = (int)Math.ceil((double)totalCount/pageSize);
+		
+		
+		System.out.println("리스트리스트 "+ list);
 
 		Map<String, Object>  response =   new HashMap<>();
 		response.put("list", list);
