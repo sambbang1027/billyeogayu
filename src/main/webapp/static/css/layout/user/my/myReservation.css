@@ -209,7 +209,6 @@ body {
     border: 0.0625rem solid #e5e5e5;
     border-radius: 0.625rem;
     padding: 1.5rem;
-    cursor: pointer;
     transition: all 0.15s ease;
     position: relative;
 }
@@ -251,6 +250,13 @@ body {
 .asset-meta {
     font-size: 0.75rem;
     color: #6f6f6f;
+}
+
+/* 상태 컨테이너 - 상태와 취소 버튼을 함께 배치 */
+.status-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .status-badge {
@@ -296,24 +302,40 @@ body {
     color: #dc2626;
 }
 
-.card-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    font-size: 0.875rem;
-    color: #484848;
+/* 작은 취소 버튼 - 상태 옆에 배치 */
+.btn-cancel-small {
+    background: #dc3545;
+    color: #ffffff;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    white-space: nowrap;
 }
 
-.info-item {
+.btn-cancel-small:hover {
+    background: #c82333;
+}
+
+.card-body {
+    position: relative;
+}
+
+.card-body .info-item {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    color: #484848;
 }
 
 .info-label {
     font-weight: 600;
     color: #6f6f6f;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
 }
 
 .info-value {
@@ -321,176 +343,39 @@ body {
     font-weight: 500;
 }
 
+/* 빈 상태 */
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
     color: #6f6f6f;
 }
 
-.empty-state h3 {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
+.empty-icon {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-message {
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
     color: #484848;
 }
 
-/* 모달 스타일 */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-    background: #ffffff;
-    margin: 5% auto;
-    padding: 0;
-    border-radius: 0.625rem;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-}
-
-.modal-header {
-    padding: 1.5rem;
-    border-bottom: 0.0625rem solid #e5e5e5;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #111;
-    margin: 0;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #6f6f6f;
-    padding: 0;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.25rem;
-    transition: background-color 0.3s ease;
-}
-
-.modal-close:hover {
-    background-color: #f8f9fa;
-}
-
-.modal-body {
-    padding: 1.5rem;
-}
-
-.modal-footer {
-    padding: 1.5rem;
-    border-top: 0.0625rem solid #e5e5e5;
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
-/* 모달 내부 스타일 */
-.modal-asset-info {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 0.0625rem solid #e5e5e5;
-}
-
-.modal-asset-image {
-    width: 5rem;
-    height: 5rem;
-    background: #f6f6f6;
+.btn-primary {
+    background: #659f7c;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.modal-asset-details {
-    flex: 1;
-}
-
-.modal-asset-details h3 {
-    font-size: 1.25rem;
+    text-decoration: none;
     font-weight: 600;
-    color: #111;
-    margin-bottom: 0.5rem;
-}
-
-.modal-asset-meta {
-    font-size: 0.875rem;
-    color: #6f6f6f;
-    margin-bottom: 0.5rem;
-}
-
-.modal-info-grid {
-    display: grid;
-    gap: 1rem;
-}
-
-.modal-info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.modal-info-label {
-    font-weight: 600;
-    color: #6f6f6f;
-    font-size: 0.875rem;
-}
-
-.modal-info-value {
-    color: #111;
-    font-weight: 500;
-    font-size: 0.875rem;
-    line-height: 1.4;
-}
-
-.btn-cancel {
-    background: #dc3545;
-    color: #ffffff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.25rem;
-    font-weight: 600;
-    cursor: pointer;
     transition: background 0.3s ease;
 }
 
-.btn-cancel:hover {
-    background: #c82333;
-}
-
-.btn-secondary {
-    background: #6c757d;
+.btn-primary:hover {
+    background: #567a67;
     color: #ffffff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.25rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
 }
 
 /* 반응형 디자인 */
@@ -522,8 +407,9 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .card-body {
-        grid-template-columns: 1fr;
+    .card-body .info-item {
+        flex-direction: column;
+        gap: 0.25rem;
     }
 
     .card-header {
@@ -532,25 +418,9 @@ body {
         align-items: flex-start;
     }
 
-    .modal-content {
-        width: 95%;
-        margin: 2% auto;
-    }
-
-    .modal-footer {
-        flex-direction: column-reverse;
-    }
-
-    .modal-footer button {
-        width: 100%;
-    }
-
-    .modal-asset-info {
+    .status-container {
         flex-direction: column;
-        text-align: center;
-    }
-
-    .modal-asset-image {
-        align-self: center;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 }

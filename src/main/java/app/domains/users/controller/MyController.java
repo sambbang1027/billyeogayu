@@ -78,6 +78,8 @@ public class MyController {
         }
     }
     
+
+    
     /**
      * 내 예약 내역 페이지
      */
@@ -111,8 +113,15 @@ public class MyController {
         }
         
         try {
+            // 상태값 변환 (소문자 -> 대문자)
+            String convertedStatus = null;
+            if (status != null && !status.trim().isEmpty()) {
+                convertedStatus = status.toUpperCase();
+                log.info("상태값 변환: {} -> {}", status, convertedStatus);
+            }
+            
             log.info("내 예약 내역 조회 - userId: {}, status: {}, startDate: {}, endDate: {}, category: {}", 
-                    currentUser.getUserId(), status, startDate, endDate, category);
+                    currentUser.getUserId(), convertedStatus, startDate, endDate, category);
             
             // 날짜 파싱
             Date parsedStartDate = null;
@@ -126,17 +135,17 @@ public class MyController {
                 parsedEndDate = dateFormat.parse(endDate);
             }
             
-            // 예약 목록 조회
+            // 예약 목록 조회 (변환된 상태값 사용)
             List<MyReservation> reservations = myService.getMyReservationsWithFilter(
-                currentUser.getUserId(), status, parsedStartDate, parsedEndDate, category);
+                currentUser.getUserId(), convertedStatus, parsedStartDate, parsedEndDate, category);
             
             // 예약 현황 요약
             Map<String, Object> reservationSummary = myService.getReservationSummary(currentUser.getUserId());
             
-            // ✅ 사용 통계도 추가 (JSP에서 usageStatistics도 표시하므로)
+            // 사용 통계도 추가 (JSP에서 usageStatistics도 표시하므로)
             Map<String, Object> usageStatistics = myService.getMyUsageStatistics(currentUser.getUserId());
             
-            // 🔍 디버깅 로그 추가
+            // 디버깅 로그 추가
             log.info("=== 통계 데이터 디버깅 ===");
             log.info("reservationSummary: {}", reservationSummary);
             log.info("usageStatistics: {}", usageStatistics);
@@ -163,8 +172,8 @@ public class MyController {
             model.addAttribute("user", currentUser);
             model.addAttribute("reservations", reservations);
             model.addAttribute("reservationSummary", reservationSummary);
-            model.addAttribute("usageStatistics", usageStatistics); // ✅ 추가
-            model.addAttribute("currentStatus", status);
+            model.addAttribute("usageStatistics", usageStatistics); 
+            model.addAttribute("currentStatus", status); // 원본 값 그대로 전달 (선택된 옵션 유지용)
             model.addAttribute("currentStartDate", startDate);
             model.addAttribute("currentEndDate", endDate);
             model.addAttribute("currentCategory", category);
@@ -261,6 +270,12 @@ public class MyController {
                               @RequestParam(value = "category", required = false) String category,
                               @RequestParam(value = "usageStatus", required = false) String usageStatus,
                               HttpServletRequest request, Model model) {
+    	
+    	System.out.println("=== 받은 파라미터 확인 ===");
+        System.out.println("usageStatus: [" + usageStatus + "]");
+        System.out.println("usageStatus 길이: " + (usageStatus != null ? usageStatus.length() : "null"));
+        System.out.println("usageStatus가 ACTIVE와 같은가: " + "ACTIVE".equals(usageStatus));
+        
         Users currentUser = getCurrentUser(request);
         if (currentUser == null) {
             return "redirect:/login";
@@ -300,7 +315,7 @@ public class MyController {
             model.addAttribute("user", currentUser);
             model.addAttribute("usageHistory", usageHistory);
             model.addAttribute("usageStatistics", usageStatistics);
-            model.addAttribute("reservationSummary", reservationSummary); // ✅ 추가
+            model.addAttribute("reservationSummary", reservationSummary);
             model.addAttribute("currentStartDate", startDate);
             model.addAttribute("currentEndDate", endDate);
             model.addAttribute("currentCategory", category);
