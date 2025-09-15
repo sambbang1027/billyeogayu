@@ -270,6 +270,12 @@ public class MyController {
                               @RequestParam(value = "category", required = false) String category,
                               @RequestParam(value = "usageStatus", required = false) String usageStatus,
                               HttpServletRequest request, Model model) {
+    	
+    	System.out.println("=== 받은 파라미터 확인 ===");
+        System.out.println("usageStatus: [" + usageStatus + "]");
+        System.out.println("usageStatus 길이: " + (usageStatus != null ? usageStatus.length() : "null"));
+        System.out.println("usageStatus가 ACTIVE와 같은가: " + "ACTIVE".equals(usageStatus));
+        
         Users currentUser = getCurrentUser(request);
         if (currentUser == null) {
             return "redirect:/login";

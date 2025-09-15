@@ -167,70 +167,71 @@
     </select>
 
     <!-- 내 사용 내역 조회 (필터링) -->
-    <select id="selectMyUsageHistoryWithFilter" resultMap="MyReservationMap">
-        SELECT 
-            r.RESERVATION_ID,
-            r.USER_ID,
-            r.ASSET_ID,
-            r.START_TIME,
-            r.END_TIME,
-            r.PURPOSE,
-            r.STATUS,
-            r.ADDRESS,
-            r.ADDRESS_STATE,
-            r.ADDRESS_CITY,
-            r.CREATED_AT,
-            r.COMPLETED_AT,
-            r.USAGE_DURATION,
-            r.ADMIN_ID,
-            r.IS_REJECTED,
-            r.REJECT_REASON,
-            a.NAME as ASSET_NAME,
-            a.CATEGORY as ASSET_CATEGORY,
-            a.COMPANY as ASSET_COMPANY,
-            a.IMAGE as ASSET_IMAGE,
-            u.name as ADMIN_NAME
-        FROM RESERVATION r
-        JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
-        LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
-        WHERE r.USER_ID = #{userId}
-        AND a.IS_DELETED = 'N'
-        AND r.STATUS IN ('APPROVED', 'COMPLETED')
-        AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
-        AND (
-            r.COMPLETED_AT IS NOT NULL 
-            OR (r.START_TIME &lt;= SYSDATE AND r.END_TIME &gt; SYSDATE)
-            OR r.END_TIME &lt;= SYSDATE
-        )
-        <if test="startDate != null">
-            AND r.START_TIME &gt;= #{startDate}
-        </if>
-        <if test="endDate != null">
-            AND r.END_TIME &lt;= #{endDate}
-        </if>
-        <if test="category != null and category != ''">
-            AND a.CATEGORY = #{category}
-        </if>
-        <if test="usageStatus != null and usageStatus != ''">
-		    <choose>
-		        <when test="usageStatus == 'COMPLETED'">
-		            AND (r.COMPLETED_AT IS NOT NULL)
-		        </when>
-		        <when test="usageStatus == 'ACTIVE'">
-		            AND r.STATUS = 'APPROVED'
-		            AND r.START_TIME &lt;= SYSDATE
-		            AND r.END_TIME &gt; SYSDATE
-		            AND r.COMPLETED_AT IS NULL
-		        </when>
-		        <when test="usageStatus == 'OVERDUE'">
-		            AND r.STATUS = 'APPROVED'
-		            AND r.END_TIME &lt; SYSDATE
-		            AND r.COMPLETED_AT IS NULL
-		        </when>
-		    </choose>
-		</if>
-        ORDER BY r.START_TIME DESC
-    </select>
+	<select id="selectMyUsageHistoryWithFilter" resultMap="MyReservationMap">
+	    SELECT 
+	        r.RESERVATION_ID,
+	        r.USER_ID,
+	        r.ASSET_ID,
+	        r.START_TIME,
+	        r.END_TIME,
+	        r.PURPOSE,
+	        r.STATUS,
+	        r.ADDRESS,
+	        r.ADDRESS_STATE,
+	        r.ADDRESS_CITY,
+	        r.CREATED_AT,
+	        r.COMPLETED_AT,
+	        r.USAGE_DURATION,
+	        r.ADMIN_ID,
+	        r.IS_REJECTED,
+	        r.REJECT_REASON,
+	        a.NAME as ASSET_NAME,
+	        a.CATEGORY as ASSET_CATEGORY,
+	        a.COMPANY as ASSET_COMPANY,
+	        a.IMAGE as ASSET_IMAGE,
+	        u.name as ADMIN_NAME
+	    FROM RESERVATION r
+	    JOIN ASSET a ON r.ASSET_ID = a.ASSET_ID
+	    LEFT JOIN USERS u ON r.ADMIN_ID = u.USER_ID
+	    WHERE r.USER_ID = #{userId}
+	    AND a.IS_DELETED = 'N'
+	    AND r.STATUS IN ('APPROVED', 'COMPLETED')
+	    AND (r.IS_REJECTED IS NULL OR r.IS_REJECTED = 'N')
+	    AND (
+	        r.COMPLETED_AT IS NOT NULL 
+	        OR (r.START_TIME &lt;= SYSDATE AND r.END_TIME &gt; SYSDATE)
+	        OR r.END_TIME &lt;= SYSDATE
+	    )
+	    <if test="startDate != null">
+	        AND r.START_TIME &gt;= #{startDate}
+	    </if>
+	    <if test="endDate != null">
+	        AND r.END_TIME &lt;= #{endDate}
+	    </if>
+	    <if test="category != null and category != ''">
+	        AND a.CATEGORY = #{category}
+	    </if>
+	    <!-- 여기에 usageStatus 필터링 추가 -->
+	    <if test="usageStatus != null and usageStatus != ''">
+	        <choose>
+	            <when test="usageStatus == 'COMPLETED'">
+	                AND (r.COMPLETED_AT IS NOT NULL)
+	            </when>
+				<when test="usageStatus == 'ACTIVE'">
+				    AND r.STATUS = 'APPROVED'
+				    AND r.START_TIME &lt;= #{currentTime}
+				    AND r.END_TIME &gt; #{currentTime}
+				    AND r.COMPLETED_AT IS NULL
+				</when>
+				<when test="usageStatus == 'OVERDUE'">
+				    AND r.STATUS = 'APPROVED'
+				    AND r.END_TIME &lt; #{currentTime}
+				    AND r.COMPLETED_AT IS NULL
+				</when>
+	        </choose>
+	    </if>
+	    ORDER BY r.START_TIME DESC
+	</select>
 
     <!-- 예약 상세 정보 조회 -->
     <select id="selectMyReservationDetail" resultMap="MyReservationMap">
@@ -281,8 +282,8 @@
 	    SELECT 
 	        COUNT(CASE WHEN STATUS IN ('APPROVED', 'COMPLETED') THEN 1 END) as totalUsageCount,
 	        COUNT(CASE WHEN STATUS = 'COMPLETED' OR COMPLETED_AT IS NOT NULL THEN 1 END) as completedCount,
-	        COUNT(CASE WHEN STATUS = 'APPROVED' AND START_TIME &lt;= SYSDATE AND END_TIME &gt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as activeCount,
-	        COUNT(CASE WHEN STATUS = 'APPROVED' AND END_TIME &lt; SYSDATE AND COMPLETED_AT IS NULL THEN 1 END) as overdueCount,
+	        COUNT(CASE WHEN STATUS = 'APPROVED' AND START_TIME &lt;= #{currentTime} AND END_TIME &gt; #{currentTime} AND COMPLETED_AT IS NULL THEN 1 END) as activeCount,
+	        COUNT(CASE WHEN STATUS = 'APPROVED' AND END_TIME &lt; #{currentTime} AND COMPLETED_AT IS NULL THEN 1 END) as overdueCount,
 	        
 	        -- 실시간 계산으로 변경 (APPROVED 상태의 USAGE_DURATION도 포함)
 	        NVL(SUM(
@@ -293,7 +294,7 @@
 	                WHEN COMPLETED_AT IS NOT NULL AND START_TIME IS NOT NULL THEN 
 	                    ROUND((COMPLETED_AT - START_TIME) * 24 * 60)
 	                -- 3순위: END_TIME 기준 계산 (COMPLETED 상태만)
-	                WHEN STATUS = 'COMPLETED' AND END_TIME IS NOT NULL AND START_TIME IS NOT NULL THEN
+	                WHEN STATUS = 'COMPLETED' AND END_TIME IS NOT NULL AND START_TIME IS NOT NULL THEN 
 	                    ROUND((END_TIME - START_TIME) * 24 * 60)
 	                ELSE 0
 	            END
@@ -304,15 +305,14 @@
 	                WHEN USAGE_DURATION IS NOT NULL AND USAGE_DURATION &gt; 0 THEN USAGE_DURATION
 	                WHEN COMPLETED_AT IS NOT NULL AND START_TIME IS NOT NULL THEN 
 	                    ROUND((COMPLETED_AT - START_TIME) * 24 * 60)
-	                WHEN STATUS = 'COMPLETED' AND END_TIME IS NOT NULL AND START_TIME IS NOT NULL THEN
+	                WHEN STATUS = 'COMPLETED' AND END_TIME IS NOT NULL AND START_TIME IS NOT NULL THEN 
 	                    ROUND((END_TIME - START_TIME) * 24 * 60)
 	                ELSE NULL
 	            END
 	        ), 0) as avgUsageMinutes
-	    FROM RESERVATION
+	    FROM RESERVATION 
 	    WHERE USER_ID = #{userId}
 	</select>
-
     <!-- 예약 건수 조회 (상태별) - 수정됨 -->
     <select id="selectReservationCountByStatus" resultType="map">
         SELECT 

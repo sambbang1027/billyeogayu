@@ -101,61 +101,86 @@ public class MyServiceImpl implements MyService {
         log.debug("내 사용 내역 조회 - userId: {}", userId);
         return myRepository.selectMyUsageHistory(userId);
     }
-    
     @Override
-    @Transactional(readOnly = true)
-    public List<MyReservation> getMyUsageHistoryWithFilter(Long userId, Date startDate, 
+    public List<MyReservation> getMyUsageHistoryWithFilter(Long userId, Date startDate,
                                                          Date endDate, String category, String usageStatus) {
-        log.debug("내 사용 내역 조회 (필터링) - userId: {}, startDate: {}, endDate: {}, category: {}, usageStatus: {}", 
-                 userId, startDate, endDate, category, usageStatus);
-        
+        System.out.println("=== MyServiceImpl.getMyUsageHistoryWithFilter 호출됨 ===");
+        System.out.println("usageStatus: [" + usageStatus + "]");
+
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         params.put("category", category);
         params.put("usageStatus", usageStatus);
+        params.put("currentTime", new Date());
+
+        System.out.println("=== MyBatis에 전달할 파라미터 ===");
+        params.forEach((key, value) -> System.out.println(key + ": [" + value + "]"));
+
+        // 여기에 결과 확인 로그 추가
+        List<MyReservation> result = myRepository.selectMyUsageHistoryWithFilter(params);
         
-        return myRepository.selectMyUsageHistoryWithFilter(params);
+        System.out.println("=== 조회 결과 ===");
+        System.out.println("총 조회된 건수: " + (result != null ? result.size() : 0));
+        
+        if (result != null && !result.isEmpty()) {
+            System.out.println("처음 3건의 상세 정보:");
+            for (int i = 0; i < Math.min(3, result.size()); i++) {
+                MyReservation r = result.get(i);
+                System.out.println("예약 " + (i+1) + ": " +
+                    "ID=" + r.getReservationId() + 
+                    ", 종료일=" + r.getEndTime() + 
+                    ", 완료일=" + r.getCompletedAt() + 
+                    ", 상태=" + r.getStatus());
+            }
+        }
+
+        return result;
     }
     
     @Override
     @Transactional(readOnly = true)
     public Map<String, Object> getMyUsageStatistics(Long userId) {
         log.debug("내 사용 통계 조회 - userId: {}", userId);
+
+        // 현재 시간을 파라미터로 전달
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("currentTime", new Date());
         
-        Map<String, Object> statistics = myRepository.selectMyUsageStatistics(userId);
-        
+        Map<String, Object> statistics = myRepository.selectMyUsageStatisticsWithTime(params);
+
         // 디버깅용 로그 추가
         log.info("=== 사용 통계 원본 데이터 ===");
         log.info("totalUsageCount: {}", statistics.get("TOTALUSAGECOUNT"));
         log.info("completedCount: {}", statistics.get("COMPLETEDCOUNT"));
         log.info("totalUsageMinutes: {}", statistics.get("TOTALUSAGEMINUTES"));
         log.info("statistics 전체: {}", statistics);
-        
+
         // 총 사용 시간을 시간 단위로 변환
         Long totalMinutes = null;
         Object totalMinutesObj = statistics.get("TOTALUSAGEMINUTES");
-        
+
         if (totalMinutesObj instanceof Number) {
             totalMinutes = ((Number) totalMinutesObj).longValue();
         }
-        
+
         log.info("변환된 totalMinutes: {}", totalMinutes);
-        
+
         if (totalMinutes != null && totalMinutes > 0) {
             int totalHours = (int) (totalMinutes / 60);
             int remainingMinutes = (int) (totalMinutes % 60);
             statistics.put("totalUsageHours", totalHours);
             statistics.put("totalUsageMinutesRemaining", remainingMinutes);
-            statistics.put("totalUsageFormatted", 
-                          totalHours > 0 ? totalHours + "시간 " + remainingMinutes + "분" : remainingMinutes + "분");
+            statistics.put("totalUsageFormatted",
+                totalHours > 0 ? totalHours + "시간 " + remainingMinutes + "분" : remainingMinutes + "분");
         } else {
             statistics.put("totalUsageFormatted", "0분");
         }
-        
+
         log.info("최종 totalUsageFormatted: {}", statistics.get("totalUsageFormatted"));
-        
+
         return statistics;
     }
     

@@ -62,8 +62,8 @@
 				                <small>사용 중</small>
 				            </div>
 				            <div class="stats-item">
-				                <h4><c:out value="${usageStatistics.totalUsageFormatted != null ? usageStatistics.totalUsageFormatted : '0분'}"/></h4>
-				                <small>총 사용 시간</small>
+				                <h4><c:out value="${usageStatistics.OVERDUECOUNT != null ? usageStatistics.OVERDUECOUNT : 0}"/></h4>
+				                <small>연체</small>
 				            </div>
 				        </div>
 				    </div>
