@@ -64,6 +64,9 @@ public interface MyRepository {
      * @return 사용 통계 정보
      */
     Map<String, Object> selectMyUsageStatistics(@Param("userId") Long userId);
+
+
+    Map<String, Object> selectMyUsageStatisticsWithTime(Map<String, Object> params);
     
     /**
      * 예약 건수 조회 (상태별)

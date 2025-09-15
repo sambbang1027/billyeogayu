@@ -23,7 +23,7 @@ public class MyReservation {
     private Date startTime;
     private Date endTime;
     private String purpose;
-    private String status;  // PENDING, APPROVED, REJECTED
+    private String status; 
     private String address;
     private String addressState;
     private String addressCity;
@@ -34,7 +34,7 @@ public class MyReservation {
     private Integer usageDuration;  // 분 단위
     private Long adminId;
     private Date returnedAt;
-    private String isRejected;  // 'Y' or 'N'
+    private String isRejected;  
     private String rejectReason;
     
     // 자산 정보 (JOIN)
@@ -72,7 +72,8 @@ public class MyReservation {
                     return "승인됨";
                 }
             case "REJECTED": return "거절됨";
-            case "CANCELLED": return "취소됨";  // 새로 추가
+            case "CANCELLED": return "취소됨";
+            case "COMPLETED": return "사용 완료";  // 추가된 케이스
             default: return status;
         }
     }
@@ -103,6 +104,11 @@ public class MyReservation {
         // CANCELLED 상태 처리 추가
         if ("CANCELLED".equals(status)) {
             return "status-cancelled";
+        }
+        
+        // COMPLETED 상태 처리 추가
+        if ("COMPLETED".equals(status)) {
+            return "status-completed";
         }
         
         return "status-" + (status != null ? status.toLowerCase() : "unknown");
@@ -184,5 +190,14 @@ public class MyReservation {
         } else {
             return String.format("%d분", minutes);
         }
+    }
+    
+    public boolean isOverdue() {
+        if (!"APPROVED".equals(status) || endTime == null || completedAt != null) {
+            return false;
+        }
+        
+        Date now = new Date();
+        return now.after(endTime);
     }
 }

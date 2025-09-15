@@ -14,32 +14,35 @@
     <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <a href="<c:url value='/resource/list'/>" class="logo-link">
-                <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="로고" class="logo">
-            </a>
-            <div class="header-links">
-			    <c:choose>
-			        <c:when test="${isLoggedIn}">
-			            <!-- 로그인한 경우 -->
-			            <a href="<c:url value='/resource/list'/>" class="header-link">농기계 목록</a>
-			            <a href="<c:url value='/my/reservations'/>" class="header-link">내 예약</a>
-			            <a href="<c:url value='/my/usage-history'/>" class="header-link">사용 내역</a>
-			            <form action="<c:url value='/logout'/>" method="post" style="display: inline;" id="logoutForm">
-			                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-			                <button type="submit" class="header-link logout-btn">로그아웃</button>
-			            </form>
-			        </c:when>
-			        <c:otherwise>
-			            <!-- 로그인하지 않은 경우 -->
-			            <a href="<c:url value='/verification'/>" class="header-link">회원가입</a>
-			            <a href="<c:url value='/login'/>" class="header-link">로그인</a>
-			        </c:otherwise>
-			    </c:choose>
-            </div>
-        </div>
-    </div>
+
+    <!-- 헤더 -->
+	<div class="header">
+	    <div class="header-content">
+	        <a href="<c:url value='/resource/list'/>" class="logo-link">
+	            <img src="<c:url value='/assets/layout/user/logo.svg'/>" alt="로고" class="logo">
+	        </a>
+	        <div class="header-links">
+	            <c:choose>
+	                <c:when test="${isLoggedIn}">
+	                    <!-- 로그인한 경우 -->
+	                    <a href="<c:url value='/resource/list'/>" class="header-link">농기계 목록</a>
+	                    <a href="<c:url value='/my/reservations'/>" class="header-link">내 예약</a>
+	                    <a href="<c:url value='/my/usage-history'/>" class="header-link">사용 내역</a>
+	                    <form action="<c:url value='/logout'/>" method="post" style="display: inline;" id="logoutForm">
+	                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	                        <button type="submit" class="header-link logout-btn">로그아웃</button>
+	                    </form>
+	                </c:when>
+	                <c:otherwise>
+	                    <!-- 로그인하지 않은 경우 -->
+	                    <a href="<c:url value='/verification'/>" class="header-link">회원가입</a>
+	                    <a href="<c:url value='/login'/>" class="header-link">로그인</a>
+	                </c:otherwise>
+	            </c:choose>
+	        </div>
+	    </div>
+	</div>
+
 
     <!-- 검색 및 필터 영역 -->
     <div class="search-filter-section">
@@ -170,6 +173,7 @@
     <!-- 공통 모달 HTML include -->
     <jsp:include page="/WEB-INF/views/common/commonModal.jsp" />
 
+
     <script>
     $(function(){
         // 필터 드롭다운 토글
@@ -196,6 +200,7 @@
             console.log('로그인 상태:', loggedIn);
             
             if(!loggedIn){
+
                 // showConfirm으로 변경 (공통 모달 사용)
                 showConfirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?',
                     function() {  // 확인 버튼 콜백

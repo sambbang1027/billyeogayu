@@ -7,7 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>빌려가유 - 비밀번호찾기</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/verification/style.css'/>">
+    
+    <!-- 공통 모달 CSS/JS -->
+    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 </head>
 <body>
     <div class="component">
@@ -83,11 +87,11 @@
                             <input type="hidden" id="authKey" value="${authKey}">
 
                             <div class="button-group">
-                                <button type="button" class="modal-button secondary" onclick="history.back()">
+                                <button type="button" class="modal-button secondary" onclick="goBack()">
                                     이전
                                 </button>
                                 <button type="submit" class="modal-button" id="resetBtn">
-                                    비밀번호찾기
+                                    비밀번호 재설정
                                 </button>
                             </div>
                         </form>
@@ -105,6 +109,9 @@
             </div>
         </div>
     </div>
+
+    <!-- 공통 모달 include -->
+    <jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
 
     <style>
         .password-reset-container {
@@ -262,14 +269,21 @@
                 updateSubmitButton();
             });
 
-            // 폼 제출
+            // 폼 제출 - 공통 모달 적용
             $('#resetPasswordForm').on('submit', function(e) {
                 e.preventDefault();
                 
                 if (isPasswordValid && isConfirmValid) {
-                    submitPasswordReset();
+                    showConfirm('비밀번호를 재설정하시겠습니까?',
+                        () => {
+                            submitPasswordReset();
+                        },
+                        () => {
+                            console.log('비밀번호 재설정 취소');
+                        }
+                    );
                 } else {
-                    alert('입력한 정보를 다시 확인해주세요.');
+                    showAlert('입력한 정보를 다시 확인해주세요.');
                 }
             });
 
@@ -365,7 +379,7 @@
                 }
             }
 
-            // 비밀번호 재설정 제출
+            // 비밀번호 재설정 제출 - 공통 모달 적용
             function submitPasswordReset() {
                 const submitBtn = $('#resetBtn');
                 submitBtn.prop('disabled', true).text('처리 중...');
@@ -383,14 +397,26 @@
                     data: JSON.stringify(formData),
                     success: function(response) {
                         if (response.success) {
-                            alert('비밀번호가 성공적으로 재설정되었습니다.');
-                            window.location.href = '<c:url value="/login?message=password-reset-success"/>';
+                            showAlert('비밀번호가 성공적으로 재설정되었습니다.', () => {
+                                window.location.href = '<c:url value="/login?message=password-reset-success"/>';
+                            });
                         } else {
-                            alert(response.message || '비밀번호 재설정에 실패했습니다.');
+                            showAlert(response.message || '비밀번호 재설정에 실패했습니다.');
                         }
                     },
-                    error: function() {
-                        alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                    error: function(xhr, status, error) {
+                        console.error('비밀번호 재설정 오류:', error);
+                        let errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+                        
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.status === 400) {
+                            errorMessage = '잘못된 요청입니다. 입력 정보를 확인해주세요.';
+                        } else if (xhr.status === 401) {
+                            errorMessage = '인증이 만료되었습니다. 다시 시도해주세요.';
+                        }
+                        
+                        showAlert(errorMessage);
                     },
                     complete: function() {
                         submitBtn.prop('disabled', false).text('비밀번호 재설정');
@@ -405,12 +431,26 @@
 
             // 유효성 메시지 초기화
             function clearValidationMessage(elementId) {
-                $('#' + elementId).text('').removeClass();
+                $('#' + elementId).text('').removeClass().addClass('validation-msg');
             }
 
             // 초기 버튼 상태 설정
             updateSubmitButton();
         });
+
+        /**
+         * 이전 버튼 처리 - 공통 모달 적용
+         */
+        function goBack() {
+            showConfirm('이전 단계로 돌아가시겠습니까? 입력한 정보는 저장되지 않습니다.',
+                () => {
+                    history.back();
+                },
+                () => {
+                    console.log('이전 단계 이동 취소');
+                }
+            );
+        }
     </script>
 </body>
 </html>
