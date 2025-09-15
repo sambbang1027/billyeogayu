@@ -124,7 +124,7 @@
                                                 <c:out value="${reservation.statusText}"/>
                                             </span>
                                             <!-- 승인 대기 상태일 때만 취소 버튼 표시 -->
-                                            <c:if test="${reservation.statusClass eq 'pending'}">
+                                            <c:if test="${reservation.status eq 'PENDING'}">
                                                 <button type="button" 
                                                         class="btn-cancel-small" 
                                                         data-reservation-id="${reservation.reservationId}"
@@ -144,20 +144,8 @@
                                             </span>
                                         </div>
                                         <div class="info-item">
-                                            <span class="info-label">사용 시간</span>
-                                            <span class="info-value">
-                                                <c:choose>
-                                                    <c:when test="${not empty reservation.usageDuration and reservation.usageDuration > 0}">
-                                                        <c:out value="${reservation.formattedUsageDuration}"/>
-                                                    </c:when>
-                                                    <c:when test="${not empty reservation.completedAt}">
-                                                        <c:out value="${reservation.actualUsageTime}"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        미정
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </span>
+                                            <span class="info-label">사용 장소</span>
+											<span class="info-value"><c:out value="${reservation.address}"/></span>
                                         </div>
                                         <div class="info-item">
                                             <span class="info-label">사용 목적</span>

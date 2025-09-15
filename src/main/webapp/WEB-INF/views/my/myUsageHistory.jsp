@@ -329,9 +329,6 @@
                     '<span class="usage-status modal-status">' + safeData.status + '</span>' +
                 '</div>' +
                 '</div>' +
-                '<div class="modal-duration">' +
-                    '<div>총 사용 시간: ' + safeData.usageDuration + '</div>' +
-                '</div>' +
                 '<div class="modal-info-grid">' +
                     '<div class="modal-info-item">' +
                         '<div class="modal-info-label">예약 기간</div>' +
