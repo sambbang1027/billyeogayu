@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -109,28 +110,10 @@
                             <c:forEach var="usage" items="${usageHistory}">
                                 <div class="usage-card" 
                                      data-usage-id="${usage.reservationId}"
-                                     data-usage='{
-                                         "reservationId": "${usage.reservationId}",
-                                         "assetName": "<c:out value='${usage.assetName}'/>",
-                                         "assetCategory": "<c:out value='${usage.assetCategory}'/>",
-                                         "assetCompany": "<c:out value='${usage.assetCompany}'/>",
-                                         "assetImage": "<c:out value='${usage.assetImage}'/>",
-                                         "startTime": "<fmt:formatDate value='${usage.startTime}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "endTime": "<fmt:formatDate value='${usage.endTime}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "purpose": "<c:out value='${usage.purpose}'/>",
-                                         "address": "<c:out value='${usage.address}'/>",
-                                         "status": "<c:out value='${usage.statusText}'/>",
-                                         "usageDuration": "<c:out value='${usage.formattedUsageDuration}'/>",
-                                         "actualUsageTime": "<c:out value='${usage.actualUsageTime}'/>",
-                                         "adminName": "<c:out value='${usage.adminName}'/>",
-                                         "completedAt": "<fmt:formatDate value='${usage.completedAt}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "returnedAt": "<fmt:formatDate value='${usage.returnedAt}' pattern='yyyy-MM-dd HH:mm'/>",
-                                         "createdAt": "<fmt:formatDate value='${usage.createdAt}' pattern='yyyy-MM-dd'/>"
-                                     }'
                                      onclick="openUsageModal('${usage.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='${empty usage.assetImage ? "default.png" : usage.assetImage}'/>" 
+                                            <img src="<c:url value='${empty usage.assetImage ? "/static/images/assets/default.png" : usage.assetImage}'/>" 
                                                  alt="<c:out value='${usage.assetName}'/>" 
                                                  class="asset-image">
                                             <div class="asset-details">
@@ -138,17 +121,20 @@
                                                 <div class="asset-meta"><c:out value="${usage.assetCategory}"/> | <c:out value="${usage.assetCompany}"/></div>
                                             </div>
                                         </div>
-                                        <c:choose>
-                                            <c:when test="${usage.completed}">
-                                                <span class="usage-status usage-completed">사용 완료</span>
-                                            </c:when>
-                                            <c:when test="${usage.currentlyInUse}">
-                                                <span class="usage-status usage-active">사용 중</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="usage-status usage-overdue">연체</span>
-                                            </c:otherwise>
-                                        </c:choose>
+										<c:choose>
+										    <c:when test="${usage.completed}">
+										        <span class="usage-status usage-completed">사용 완료</span>
+										    </c:when>
+										    <c:when test="${usage.overdue}">
+										        <span class="usage-status usage-overdue">연체</span>
+										    </c:when>
+										    <c:when test="${usage.currentlyInUse}">
+										        <span class="usage-status usage-active">사용 중</span>
+										    </c:when>
+										    <c:otherwise>
+										        <span class="usage-status usage-pending">대기중</span>
+										    </c:otherwise>
+										</c:choose>
                                     </div>
                                     
                                     <div class="card-body">
@@ -212,6 +198,33 @@
     <!-- 공통 모달 include -->
     <jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
 
+    <!-- JSP에서 JavaScript 변수로 데이터 전달 -->
+    <script>
+        // 사용 내역 데이터를 JavaScript 변수로 전달
+        window.usageHistoryData = {
+            <c:forEach var="usage" items="${usageHistory}" varStatus="status">
+                "${usage.reservationId}": {
+                    "reservationId": "${usage.reservationId}",
+                    "assetName": "<c:out value='${usage.assetName}'/>",
+                    "assetCategory": "<c:out value='${usage.assetCategory}'/>",
+                    "assetCompany": "<c:out value='${usage.assetCompany}'/>",
+                    "assetImage": "<c:out value='${usage.assetImage}'/>",
+                    "startTime": "<fmt:formatDate value='${usage.startTime}' pattern='yyyy-MM-dd HH:mm'/>",
+                    "endTime": "<fmt:formatDate value='${usage.endTime}' pattern='yyyy-MM-dd HH:mm'/>",
+                    "purpose": "<c:out value='${usage.purpose}'/>",
+                    "address": "<c:out value='${usage.address}'/>",
+                    "status": "<c:out value='${usage.statusText}'/>",
+                    "usageDuration": "<c:out value='${usage.formattedUsageDuration}'/>",
+                    "actualUsageTime": "<c:out value='${usage.actualUsageTime}'/>",
+                    "adminName": "<c:out value='${usage.adminName}'/>",
+                    "completedAt": "<fmt:formatDate value='${usage.completedAt}' pattern='yyyy-MM-dd HH:mm'/>",
+                    "returnedAt": "<fmt:formatDate value='${usage.returnedAt}' pattern='yyyy-MM-dd HH:mm'/>",
+                    "createdAt": "<fmt:formatDate value='${usage.createdAt}' pattern='yyyy-MM-dd'/>"
+                }<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        };
+    </script>
+
     <script>
         /**
          * 내 사용 내역 페이지 JavaScript
@@ -220,98 +233,151 @@
         let currentUsageId = null;
 
         /**
-         * 사용 내역 상세 모달 열기 (서버 데이터 직접 사용)
+         * 사용 내역 상세 모달 열기 (개선된 버전)
          */
         function openUsageModal(reservationId) {
+            console.log('openUsageModal 호출됨 - reservationId:', reservationId);
             currentUsageId = reservationId;
             
-            // 페이지에서 해당 사용 내역 데이터 찾기
-            const usageCard = $(`.usage-card[data-usage-id="${reservationId}"]`);
-            const usageDataStr = usageCard.attr('data-usage');
+            // 전역 변수에서 데이터 찾기
+            const usageData = window.usageHistoryData[reservationId];
             
-            if (usageDataStr) {
-                try {
-                    const usageData = JSON.parse(usageDataStr);
-                    displayUsageModal(usageData);
-                    $('#usageModal').show();
-                } catch (e) {
-                    console.error('JSON 파싱 오류:', e);
-                    showAlert('사용 내역 정보를 불러오는 중 오류가 발생했습니다.');
-                }
+            if (usageData) {
+                console.log('찾은 데이터:', usageData);
+                displayUsageModal(usageData);
+                $('#usageModal').show();
             } else {
-                showAlert('사용 내역 정보를 찾을 수 없습니다.');
+                console.error('해당 ID의 데이터를 찾을 수 없음:', reservationId);
+                // 대안: AJAX로 서버에서 데이터 가져오기
+                loadUsageDataFromServer(reservationId);
             }
         }
 
         /**
-         * 모달에 사용 내역 정보 표시
+         * 서버에서 사용 내역 데이터 가져오기 (대안 방법)
+         */
+        function loadUsageDataFromServer(reservationId) {
+            console.log('서버에서 데이터 로드 시도:', reservationId);
+            
+            $.ajax({
+                url: '<c:url value="/my/reservations/"/>' + reservationId,
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    console.log('서버에서 받은 데이터:', data);
+                    displayUsageModal(data);
+                    $('#usageModal').show();
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX 오류:', error);
+                    if (xhr.status === 404) {
+                        showAlert('사용 내역을 찾을 수 없습니다.');
+                    } else if (xhr.status === 401) {
+                        showAlert('로그인이 필요합니다.', function() {
+                            window.location.href = '<c:url value="/login"/>';
+                        });
+                    } else {
+                        showAlert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+                    }
+                }
+            });
+        }
+
+        /**
+         * 모달에 사용 내역 정보 표시 (개선된 버전)
          */
         function displayUsageModal(data) {
             const modalBody = $('#modalBody');
             
-            // 이미지 경로 안전하게 설정
-            const imagePath = data.assetImage ? 
-                '<c:url value="/static/images/assets/"/>' + data.assetImage : 
-                '<c:url value="/static/images/assets/default.png"/>';
+            // 데이터 안전성 검사
+            const safeData = {
+                assetName: data.assetName || '정보 없음',
+                assetCategory: data.assetCategory || '정보 없음',
+                assetCompany: data.assetCompany || '정보 없음',
+                assetImage: data.assetImage || '',
+                startTime: data.startTime || '정보 없음',
+                endTime: data.endTime || '정보 없음',
+                purpose: data.purpose || '정보 없음',
+                address: data.address || '정보 없음',
+                status: data.status || data.statusText || '정보 없음',
+                usageDuration: data.usageDuration || data.formattedUsageDuration || '미기록',
+                actualUsageTime: data.actualUsageTime || '-',
+                adminName: data.adminName || '',
+                completedAt: data.completedAt || '',
+                returnedAt: data.returnedAt || '',
+                createdAt: data.createdAt || '정보 없음'
+            };
             
-            // JavaScript에서 템플릿 문자열 대신 일반 문자열 연결 사용
+            // 이미지 경로 처리 - 완전한 경로 그대로 사용
+            let imagePath;
+            if (safeData.assetImage && safeData.assetImage.trim() !== '') {
+                imagePath = safeData.assetImage; // 완전한 경로 그대로 사용
+            } else {
+                imagePath = '/static/images/assets/default.png'; // 기본 이미지
+            }
+            
+            // 디버깅용 로그
+            console.log('원본 assetImage:', data.assetImage);
+            console.log('처리된 imagePath:', imagePath);
+            
+            // 모달 내용 생성
             let modalContent = '<div class="modal-asset-info">' +
-                '<img src="' + imagePath + '" alt="' + data.assetName + '" class="modal-asset-image">' +
+                '<img src="' + imagePath + '" alt="' + safeData.assetName + '" class="modal-asset-image">' +
                 '<div class="modal-asset-details">' +
-                    '<h3>' + data.assetName + '</h3>' +
-                    '<div class="modal-asset-meta">' + data.assetCategory + ' | ' + data.assetCompany + '</div>' +
-                    '<span class="usage-status modal-status">' + data.status + '</span>' +
+                    '<h3>' + safeData.assetName + '</h3>' +
+                    '<div class="modal-asset-meta">' + safeData.assetCategory + ' | ' + safeData.assetCompany + '</div>' +
+                    '<span class="usage-status modal-status">' + safeData.status + '</span>' +
                 '</div>' +
                 '</div>' +
                 '<div class="modal-duration">' +
-                    '<div>총 사용 시간: ' + (data.usageDuration || '미기록') + '</div>' +
+                    '<div>총 사용 시간: ' + safeData.usageDuration + '</div>' +
                 '</div>' +
                 '<div class="modal-info-grid">' +
                     '<div class="modal-info-item">' +
                         '<div class="modal-info-label">예약 기간</div>' +
-                        '<div class="modal-info-value">' + data.startTime + '<br>~ ' + data.endTime + '</div>' +
+                        '<div class="modal-info-value">' + safeData.startTime + '<br>~ ' + safeData.endTime + '</div>' +
                     '</div>' +
                     '<div class="modal-info-item">' +
                         '<div class="modal-info-label">실제 사용 시간</div>' +
-                        '<div class="modal-info-value">' + (data.actualUsageTime || '-') + '</div>' +
+                        '<div class="modal-info-value">' + safeData.actualUsageTime + '</div>' +
                     '</div>' +
                     '<div class="modal-info-item">' +
                         '<div class="modal-info-label">사용 목적</div>' +
-                        '<div class="modal-info-value">' + data.purpose + '</div>' +
+                        '<div class="modal-info-value">' + safeData.purpose + '</div>' +
                     '</div>' +
                     '<div class="modal-info-item">' +
                         '<div class="modal-info-label">사용 장소</div>' +
-                        '<div class="modal-info-value">' + data.address + '</div>' +
+                        '<div class="modal-info-value">' + safeData.address + '</div>' +
                     '</div>';
                     
             // 담당자 정보가 있을 때만 추가
-            if (data.adminName) {
+            if (safeData.adminName) {
                 modalContent += '<div class="modal-info-item">' +
                     '<div class="modal-info-label">담당자</div>' +
-                    '<div class="modal-info-value">' + data.adminName + '</div>' +
+                    '<div class="modal-info-value">' + safeData.adminName + '</div>' +
                     '</div>';
             }
             
             // 사용 완료일이 있을 때만 추가
-            if (data.completedAt) {
+            if (safeData.completedAt) {
                 modalContent += '<div class="modal-info-item">' +
                     '<div class="modal-info-label">사용 완료일</div>' +
-                    '<div class="modal-info-value">' + data.completedAt + '</div>' +
+                    '<div class="modal-info-value">' + safeData.completedAt + '</div>' +
                     '</div>';
             }
             
             // 반납일이 있을 때만 추가
-            if (data.returnedAt) {
+            if (safeData.returnedAt) {
                 modalContent += '<div class="modal-info-item">' +
                     '<div class="modal-info-label">반납일</div>' +
-                    '<div class="modal-info-value">' + data.returnedAt + '</div>' +
+                    '<div class="modal-info-value">' + safeData.returnedAt + '</div>' +
                     '</div>';
             }
             
             // 예약 신청일 추가
             modalContent += '<div class="modal-info-item">' +
                 '<div class="modal-info-label">예약 신청일</div>' +
-                '<div class="modal-info-value">' + data.createdAt + '</div>' +
+                '<div class="modal-info-value">' + safeData.createdAt + '</div>' +
                 '</div>' +
                 '</div>';
             
@@ -325,6 +391,13 @@
             $('#usageModal').hide();
             currentUsageId = null;
         }
+
+        // 페이지 로드 시 디버깅 정보 출력
+        $(document).ready(function() {
+            console.log('페이지 로드됨');
+            console.log('사용 내역 데이터:', window.usageHistoryData);
+            console.log('총 사용 내역 개수:', Object.keys(window.usageHistoryData || {}).length);
+        });
 
         // 공통 모달 테스트용 함수들 (개발/테스트용)
         function testAlert() {

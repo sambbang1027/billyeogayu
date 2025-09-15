@@ -212,21 +212,23 @@
             AND a.CATEGORY = #{category}
         </if>
         <if test="usageStatus != null and usageStatus != ''">
-            <choose>
-                <when test="usageStatus == 'COMPLETED'">
-                    AND (r.COMPLETED_AT IS NOT NULL )
-                </when>
-                <when test="usageStatus == 'ACTIVE'">
-                    AND r.START_TIME &lt;= SYSDATE 
-                    AND r.END_TIME &gt; SYSDATE
-                    AND r.COMPLETED_AT IS NULL
-                </when>
-                <when test="usageStatus == 'OVERDUE'">
-                    AND r.END_TIME &lt; SYSDATE
-                    AND r.COMPLETED_AT IS NULL
-                </when>
-            </choose>
-        </if>
+		    <choose>
+		        <when test="usageStatus == 'COMPLETED'">
+		            AND (r.COMPLETED_AT IS NOT NULL)
+		        </when>
+		        <when test="usageStatus == 'ACTIVE'">
+		            AND r.STATUS = 'APPROVED'
+		            AND r.START_TIME &lt;= SYSDATE
+		            AND r.END_TIME &gt; SYSDATE
+		            AND r.COMPLETED_AT IS NULL
+		        </when>
+		        <when test="usageStatus == 'OVERDUE'">
+		            AND r.STATUS = 'APPROVED'
+		            AND r.END_TIME &lt; SYSDATE
+		            AND r.COMPLETED_AT IS NULL
+		        </when>
+		    </choose>
+		</if>
         ORDER BY r.START_TIME DESC
     </select>
 
