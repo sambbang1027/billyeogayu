@@ -98,7 +98,7 @@
                                 <option value="기타" ${currentCategory == '기타' ? 'selected' : ''}>기타</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn-primary">조회</button>
+                        <button type="submit" class="btn-search">조회</button>
                     </form>
                 </div>
 
@@ -119,7 +119,7 @@
                                          "endTime": "<fmt:formatDate value='${usage.endTime}' pattern='yyyy-MM-dd HH:mm'/>",
                                          "purpose": "<c:out value='${usage.purpose}'/>",
                                          "address": "<c:out value='${usage.address}'/>",
-                                         "status": "<c:out value='${usage.usageStatusText}'/>",
+                                         "status": "<c:out value='${usage.statusText}'/>",
                                          "usageDuration": "<c:out value='${usage.formattedUsageDuration}'/>",
                                          "actualUsageTime": "<c:out value='${usage.actualUsageTime}'/>",
                                          "adminName": "<c:out value='${usage.adminName}'/>",
@@ -254,61 +254,66 @@
                 '<c:url value="/static/images/assets/"/>' + data.assetImage : 
                 '<c:url value="/static/images/assets/default.png"/>';
             
-            const modalContent = `
-                <div class="modal-asset-info">
-                    <img src="${imagePath}" alt="${data.assetName}" class="modal-asset-image">
-                    <div class="modal-asset-details">
-                        <h3>${data.assetName}</h3>
-                        <div class="modal-asset-meta">${data.assetCategory} | ${data.assetCompany}</div>
-                        <span class="usage-status modal-status">${data.status}</span>
-                    </div>
-                </div>
-                
-                <div class="modal-duration">
-                    <div>총 사용 시간: ${data.usageDuration || '미기록'}</div>
-                </div>
-                
-                <div class="modal-info-grid">
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">예약 기간</div>
-                        <div class="modal-info-value">${data.startTime}<br>~ ${data.endTime}</div>
-                    </div>
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">실제 사용 시간</div>
-                        <div class="modal-info-value">${data.actualUsageTime || '-'}</div>
-                    </div>
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">사용 목적</div>
-                        <div class="modal-info-value">${data.purpose}</div>
-                    </div>
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">사용 장소</div>
-                        <div class="modal-info-value">${data.address}</div>
-                    </div>
-                    ${data.adminName ? `
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">담당자</div>
-                        <div class="modal-info-value">${data.adminName}</div>
-                    </div>
-                    ` : ''}
-                    ${data.completedAt ? `
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">사용 완료일</div>
-                        <div class="modal-info-value">${data.completedAt}</div>
-                    </div>
-                    ` : ''}
-                    ${data.returnedAt ? `
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">반납일</div>
-                        <div class="modal-info-value">${data.returnedAt}</div>
-                    </div>
-                    ` : ''}
-                    <div class="modal-info-item">
-                        <div class="modal-info-label">예약 신청일</div>
-                        <div class="modal-info-value">${data.createdAt}</div>
-                    </div>
-                </div>
-            `;
+            // JavaScript에서 템플릿 문자열 대신 일반 문자열 연결 사용
+            let modalContent = '<div class="modal-asset-info">' +
+                '<img src="' + imagePath + '" alt="' + data.assetName + '" class="modal-asset-image">' +
+                '<div class="modal-asset-details">' +
+                    '<h3>' + data.assetName + '</h3>' +
+                    '<div class="modal-asset-meta">' + data.assetCategory + ' | ' + data.assetCompany + '</div>' +
+                    '<span class="usage-status modal-status">' + data.status + '</span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="modal-duration">' +
+                    '<div>총 사용 시간: ' + (data.usageDuration || '미기록') + '</div>' +
+                '</div>' +
+                '<div class="modal-info-grid">' +
+                    '<div class="modal-info-item">' +
+                        '<div class="modal-info-label">예약 기간</div>' +
+                        '<div class="modal-info-value">' + data.startTime + '<br>~ ' + data.endTime + '</div>' +
+                    '</div>' +
+                    '<div class="modal-info-item">' +
+                        '<div class="modal-info-label">실제 사용 시간</div>' +
+                        '<div class="modal-info-value">' + (data.actualUsageTime || '-') + '</div>' +
+                    '</div>' +
+                    '<div class="modal-info-item">' +
+                        '<div class="modal-info-label">사용 목적</div>' +
+                        '<div class="modal-info-value">' + data.purpose + '</div>' +
+                    '</div>' +
+                    '<div class="modal-info-item">' +
+                        '<div class="modal-info-label">사용 장소</div>' +
+                        '<div class="modal-info-value">' + data.address + '</div>' +
+                    '</div>';
+                    
+            // 담당자 정보가 있을 때만 추가
+            if (data.adminName) {
+                modalContent += '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">담당자</div>' +
+                    '<div class="modal-info-value">' + data.adminName + '</div>' +
+                    '</div>';
+            }
+            
+            // 사용 완료일이 있을 때만 추가
+            if (data.completedAt) {
+                modalContent += '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">사용 완료일</div>' +
+                    '<div class="modal-info-value">' + data.completedAt + '</div>' +
+                    '</div>';
+            }
+            
+            // 반납일이 있을 때만 추가
+            if (data.returnedAt) {
+                modalContent += '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">반납일</div>' +
+                    '<div class="modal-info-value">' + data.returnedAt + '</div>' +
+                    '</div>';
+            }
+            
+            // 예약 신청일 추가
+            modalContent += '<div class="modal-info-item">' +
+                '<div class="modal-info-label">예약 신청일</div>' +
+                '<div class="modal-info-value">' + data.createdAt + '</div>' +
+                '</div>' +
+                '</div>';
             
             modalBody.html(modalContent);
         }
@@ -323,15 +328,15 @@
 
         // 공통 모달 테스트용 함수들 (개발/테스트용)
         function testAlert() {
-            showAlert("사용 내역이 업데이트되었습니다.", () => {
+            showAlert("사용 내역이 업데이트되었습니다.", function() {
                 console.log("알림 확인됨");
             });
         }
 
         function testConfirm() {
             showConfirm("이 사용 내역을 삭제하시겠습니까?",
-                () => console.log("삭제 확인"),
-                () => console.log("삭제 취소")
+                function() { console.log("삭제 확인"); },
+                function() { console.log("삭제 취소"); }
             );
         }
     </script>

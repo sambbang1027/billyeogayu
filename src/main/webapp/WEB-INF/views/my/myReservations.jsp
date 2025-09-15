@@ -10,11 +10,7 @@
     <title>내 예약 내역</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/login/style.css'/>">
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/my/myReservation.css'/>">
-    
-    <!-- 공통 모달 CSS/JS -->
-    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
 </head>
 <body>
     <!-- 헤더 -->
@@ -44,6 +40,7 @@
                     <a href="<c:url value='/my/usage-history'/>" class="nav-link">사용 내역 보기</a>
                 </div>
 
+
 				<!-- 예약 현황 요약 -->
 				<c:if test="${not empty reservationSummary}">
 				    <div class="summary-card">
@@ -62,7 +59,7 @@
 				            </div>
 				            <div class="summary-item">
 				                <h4><c:out value="${reservationSummary.COMPLETEDCOUNT != null ? reservationSummary.COMPLETEDCOUNT : 0}"/></h4>
-				                <small>완료</small>
+				                <small>완료됨</small>
 				            </div>
 				        </div>
 				    </div>
@@ -72,15 +69,15 @@
                 <div class="filter-card">
                     <form method="get" action="<c:url value='/my/reservations'/>" class="filter-form">
                         <div class="form-group">
-                            <label class="form-label">예약 상태</label>
+                            <label class="form-label">상태</label>
                             <select name="status" class="form-select">
                                 <option value="">전체</option>
                                 <option value="PENDING" ${currentStatus == 'PENDING' ? 'selected' : ''}>승인 대기</option>
                                 <option value="APPROVED" ${currentStatus == 'APPROVED' ? 'selected' : ''}>승인됨</option>
-                                <option value="COMPLETED" ${currentStatus == 'COMPLETED' ? 'selected' : ''}>완료</option>
-                                <option value="REJECTED" ${currentStatus == 'REJECTED' ? 'selected' : ''}>반려</option>
+                                <option value="REJECTED" ${currentStatus == 'REJECTED' ? 'selected' : ''}>거절됨</option>
+                                <option value="COMPLETED" ${currentStatus == 'COMPLETED' ? 'selected' : ''}>완료됨</option>
+                                <option value="CANCELLED">취소됨</option>
                                 <option value="ACTIVE" ${currentStatus == 'ACTIVE' ? 'selected' : ''}>사용 중</option>
-                                <option value="CANCELLED" ${currentStatus == 'CANCELLED' ? 'selected' : ''}>취소</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -98,23 +95,33 @@
                                 <option value="트랙터" ${currentCategory == '트랙터' ? 'selected' : ''}>트랙터</option>
                                 <option value="콤바인" ${currentCategory == '콤바인' ? 'selected' : ''}>콤바인</option>
                                 <option value="이앙기" ${currentCategory == '이앙기' ? 'selected' : ''}>이앙기</option>
+                                <option value="기타" ${currentCategory == '기타' ? 'selected' : ''}>기타</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn-primary">조회</button>
+                        <div class="form-group">
+                            <button type="submit" class="btn-search">조회</button>
+                        </div>
                     </form>
                 </div>
 
-                <!-- 예약 내역 목록 -->
-                <div class="reservation-list">
+                <!-- 예약 목록 -->
+                <div class="reservation-grid">
                     <c:choose>
-                        <c:when test="${not empty reservations}">
+                        <c:when test="${empty reservations}">
+                            <div class="empty-state">
+                                <h3>예약 내역이 없습니다</h3>
+                                <p>새로운 농기계를 예약해보세요.</p>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
                             <c:forEach var="reservation" items="${reservations}">
                                 <div class="reservation-card" 
-                                     data-reservation-id="${reservation.reservationId}" 
+                                     data-reservation-id="${reservation.reservationId}"
                                      onclick="openReservationModal('${reservation.reservationId}')">
                                     <div class="card-header">
                                         <div class="asset-info">
-                                            <img src="<c:url value='${empty reservation.assetImage ? "default.png" : reservation.assetImage}'/>" 
+                                            <img src="<c:url value='${empty reservation.assetImage ? 
+                                            "/static/images/assets/default.png" : reservation.assetImage}'/>" 
                                                  alt="<c:out value='${reservation.assetName}'/>" 
                                                  class="asset-image">
                                             <div class="asset-details">
@@ -140,6 +147,10 @@
                                             <span class="info-value"><c:out value="${reservation.purpose}"/></span>
                                         </div>
                                         <div class="info-item">
+                                            <span class="info-label">사용 장소</span>
+                                            <span class="info-value"><c:out value="${reservation.fullAddress}"/></span>
+                                        </div>
+                                        <div class="info-item">
                                             <span class="info-label">신청일</span>
                                             <span class="info-value">
                                                 <fmt:formatDate value="${reservation.createdAt}" pattern="yyyy-MM-dd"/>
@@ -148,13 +159,6 @@
                                     </div>
                                 </div>
                             </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="empty-state">
-                                <h3>예약 내역이 없습니다</h3>
-                                <p>아직 신청한 예약이 없습니다.</p>
-                                <a href="<c:url value='/resource/list'/>" class="btn-primary">농기계 예약하러 가기</a>
-                            </div>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -163,7 +167,7 @@
     </div>
 
     <!-- 예약 상세 모달 -->
-    <div id="reservationModal" class="modal" style="display: none;">
+    <div id="reservationModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">예약 상세 정보</h2>
@@ -178,9 +182,6 @@
             </div>
         </div>
     </div>
-
-    <!-- 공통 모달 include -->
-    <jsp:include page="/WEB-INF/views/common/commonModal.jsp"/>
 
     <script>
         /**
@@ -215,13 +216,12 @@
                 error: function(xhr, status, error) {
                     console.error('Error:', error);
                     if (xhr.status === 404) {
-                        showAlert('예약 정보를 찾을 수 없습니다.');
+                        alert('예약 정보를 찾을 수 없습니다.');
                     } else if (xhr.status === 401) {
-                        showAlert('로그인이 필요합니다.', () => {
-                            window.location.href = '<c:url value="/login"/>';
-                        });
+                        alert('로그인이 필요합니다.');
+                        window.location.href = '<c:url value="/login"/>';
                     } else {
-                        showAlert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+                        alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
                     }
                 }
             });
@@ -248,56 +248,76 @@
 
             // 이미지 경로 설정
             const imagePath = reservation.assetImage ? 
-                '<c:url value="/static/images/assets/"/>' + reservation.assetImage : 
+                 reservation.assetImage : 
                 '<c:url value="/static/images/assets/default.png"/>';
-            
-            // 모달 내용 구성
-            let modalContent = '<div class="modal-asset-info">' +
-                '<img src="' + imagePath + '" alt="' + reservation.assetName + '" class="modal-asset-image">' +
-                '<div class="modal-asset-details">' +
-                    '<h3>' + reservation.assetName + '</h3>' +
-                    '<div class="modal-asset-meta">' + reservation.assetCategory + ' | ' + reservation.assetCompany + '</div>' +
-                    '<span class="status-badge modal-status status-' + statusClass + '">' + reservation.statusText + '</span>' +
-                '</div>' +
-            '</div>';
+                
 
-            modalContent += '<div class="modal-info-grid">';
 
-            // 예약 기간
-            modalContent += '<div class="modal-info-item">' +
-                '<div class="modal-info-label">예약 기간</div>' +
-                '<div class="modal-info-value">' + formatDateTime(reservation.startTime) + '<br>~ ' + formatDateTime(reservation.endTime) + '</div>' +
-            '</div>';
-
-            // 사용 목적
-            modalContent += '<div class="modal-info-item">' +
-                '<div class="modal-info-label">사용 목적</div>' +
-                '<div class="modal-info-value">' + reservation.purpose + '</div>' +
-            '</div>';
-
-            // 사용 장소
-            if (reservation.address) {
-                modalContent += '<div class="modal-info-item">' +
-                    '<div class="modal-info-label">사용 장소</div>' +
-                    '<div class="modal-info-value">' + reservation.address + '</div>' +
-                '</div>';
+            // 날짜 포맷팅 함수
+            function formatDateTime(dateStr) {
+                if (!dateStr) return '';
+                try {
+                    const date = new Date(dateStr);
+                    return date.toLocaleString('ko-KR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } catch (e) {
+                    return dateStr;
+                }
             }
 
-            // 신청일
-            modalContent += '<div class="modal-info-item">' +
-                '<div class="modal-info-label">신청일</div>' +
-                '<div class="modal-info-value">' + formatDate(reservation.createdAt) + '</div>' +
-            '</div>';
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                try {
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('ko-KR');
+                } catch (e) {
+                    return dateStr;
+                }
+            }
 
-            // 반려 사유
-            if (reservation.rejectReason && reservation.rejectReason !== '사용자 취소') {
+            // 모달 컨텐츠를 문자열 연결로 생성 (EL 충돌 방지)
+            let modalContent = '<div class="modal-asset-info">' +
+                '<img src="' + imagePath + '" alt="' + (reservation.assetName || '농기계') + '" class="modal-asset-image">' +
+                '<div class="modal-asset-details">' +
+                    '<h3>' + (reservation.assetName || '농기계명') + '</h3>' +
+                    '<div class="modal-asset-meta">' + (reservation.assetCategory || '카테고리') + ' | ' + (reservation.assetCompany || '제조사') + '</div>' +
+                    '<span class="status-badge status-' + statusClass + '">' + (reservation.statusText || reservation.status || '상태') + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="modal-info-grid">' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">예약 기간</div>' +
+                    '<div class="modal-info-value">' +
+                        formatDateTime(reservation.startTime) + '<br>' +
+                        '~ ' + formatDateTime(reservation.endTime) +
+                    '</div>' +
+                '</div>' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">사용 목적</div>' +
+                    '<div class="modal-info-value">' + (reservation.purpose || '목적 정보 없음') + '</div>' +
+                '</div>' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">사용 장소</div>' +
+                    '<div class="modal-info-value">' + (reservation.fullAddress || reservation.address || '주소 정보 없음') + '</div>' +
+                '</div>' +
+                '<div class="modal-info-item">' +
+                    '<div class="modal-info-label">신청일</div>' +
+                    '<div class="modal-info-value">' + formatDate(reservation.createdAt) + '</div>' +
+                '</div>';
+
+            // 추가 정보 표시 (상태에 따라)
+            if (reservation.status === 'REJECTED' && reservation.rejectReason) {
                 modalContent += '<div class="modal-info-item">' +
-                    '<div class="modal-info-label">반려 사유</div>' +
+                    '<div class="modal-info-label">거절 사유</div>' +
                     '<div class="modal-info-value">' + reservation.rejectReason + '</div>' +
                 '</div>';
             }
 
-            // 완료 정보
             if (reservation.status === 'COMPLETED') {
                 if (reservation.completedAt) {
                     modalContent += '<div class="modal-info-item">' +
@@ -313,7 +333,6 @@
                 }
             }
 
-            // 담당 관리자
             if (reservation.adminName) {
                 modalContent += '<div class="modal-info-item">' +
                     '<div class="modal-info-label">담당 관리자</div>' +
@@ -335,64 +354,63 @@
         }
 
         /**
-         * 예약 취소 - 공통 모달 사용
+         * 예약 취소
          */
         function cancelReservation() {
             if (!currentReservationId) return;
             
-            showConfirm('정말로 예약을 취소하시겠습니까?', 
-                () => {
-                    // 확인 클릭시 실행
-                    $.ajax({
-                        url: '<c:url value="/my/reservations/"/>' + currentReservationId + '/cancel',
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        success: function(data) {
-                            if (data.success) {
-                                showAlert('예약이 취소되었습니다.', () => location.reload());
-                            } else {
-                                showAlert(data.message || '예약 취소 중 오류가 발생했습니다.');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error:', error);
-                            if (xhr.status === 401) {
-                                showAlert('로그인이 필요합니다.', () => {
-                                    window.location.href = '<c:url value="/login"/>';
-                                });
-                            } else {
-                                showAlert('예약 취소 중 오류가 발생했습니다.');
-                            }
-                        }
-                    });
+            if (!confirm('정말로 예약을 취소하시겠습니까?')) return;
+            
+            $.ajax({
+                url: '<c:url value="/my/reservations/"/>' + currentReservationId + '/cancel',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                () => {
-                    // 취소 클릭시 실행 (아무 것도 하지 않음)
-                    console.log('예약 취소가 취소됨');
+                success: function(data) {
+                    if (data.success) {
+                        alert('예약이 취소되었습니다.');
+                        location.reload();
+                    } else {
+                        alert(data.message || '예약 취소 중 오류가 발생했습니다.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    if (xhr.status === 401) {
+                        alert('로그인이 필요합니다.');
+                        window.location.href = '<c:url value="/login"/>';
+                    } else {
+                        alert('예약 취소 중 오류가 발생했습니다.');
+                    }
                 }
-            );
-        }
-
-        /**
-         * 날짜/시간 포맷팅 함수들
-         */
-        function formatDateTime(dateStr) {
-            if (!dateStr) return '-';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('ko-KR') + ' ' + date.toLocaleTimeString('ko-KR', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
             });
         }
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('ko-KR');
-        }
+        /**
+         * 문서 로드 완료 후 이벤트 바인딩
+         */
+        $(document).ready(function() {
+            // 모달 외부 클릭시 닫기
+            $(window).click(function(event) {
+                if (event.target.id === 'reservationModal') {
+                    closeReservationModal();
+                }
+            });
+            
+            // ESC 키로 모달 닫기
+            $(document).keydown(function(event) {
+                if (event.keyCode === 27) { // ESC key
+                    closeReservationModal();
+                }
+            });
+            
+            // 필터 폼 자동 제출 (선택사항)
+            $('.form-select').change(function() {
+                // 자동으로 폼 제출하고 싶다면 주석 해제
+                // $(this).closest('form').submit();
+            });
+        });
     </script>
 </body>
 </html>
