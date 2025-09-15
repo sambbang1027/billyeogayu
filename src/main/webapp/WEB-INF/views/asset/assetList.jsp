@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+`<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
@@ -398,6 +398,9 @@
                         <div>점검주기</div>
                         <input class="modal-part-lifecycle-input" placeholder="ex) 1일, 1개월, 1년" />
                     </div>
+                    <button type="button" class="part-remove-btn" title="삭제">
+                      <img src="<c:url value='/assets/asset/delete.svg'/>" alt="삭제" />
+                    </button>
                 </div>
             </div>
         </div>
@@ -467,7 +470,6 @@
             <div class="detail-part-info-container collapsed">
               <div class="detail-part-info-title">
                 <strong>${part.name}</strong>
-                <span class="subtitle">종류</span>
               </div>
 
               <!-- Body (처음에는 숨김) -->
@@ -526,6 +528,7 @@
                    <div class="edit-info-box"><label>종류</label><div data-edit-field="category"></div></div>
                    <div class="edit-info-box"><label>모델</label><div data-edit-field="model"></div></div>
                    <div class="edit-info-box"><label>제조사</label><div data-edit-field="company"></div></div>
+                   <div class="edit-info-box"><label>소유자</label><div data-edit-field="owner"></div></div>
                    <div class="edit-info-box"><label>사용시간</label><div data-edit-field="usageTime"></div></div>
                    <div class="edit-info-box"><label>점검예정일</label><div data-edit-field="expectedDate"></div></div>
                    <div class="edit-info-box"><label>최근점검일</label><div data-edit-field="lastDate"></div></div>
@@ -605,10 +608,10 @@
 </div>
 
 
-	
+
 
 <!-- 모달 include (하드코딩된 UI만) -->
- <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" /> 
+ <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" />
 
 
 	<!-- 모달 넣을 자리 -->
@@ -659,6 +662,13 @@
   const modalContent = document.querySelector("#assetRegisterModal .register-modal-content");
   const addPartBtn   = document.getElementById("addPartBtn");
 
+  partList.addEventListener("click", (e) => {
+    const btn = e.target.closest(".part-remove-btn");
+    if (!btn) return;
+    const row = btn.closest(".modal-part-info-container");
+    if (row) row.remove();
+  });
+
   function makePartRow() {
     const wrap = document.createElement("div");
     wrap.className = "modal-part-info-container";
@@ -671,6 +681,9 @@
         <div>점검주기</div>
         <input class="modal-part-lifecycle-input" placeholder="ex) 1일, 1개월, 1년" />
       </div>
+      <button type="button" class="part-remove-btn" title="삭제">
+        <img src="<c:url value='/assets/asset/delete.svg'/>" alt="삭제" />
+      </button>
     `;
     return wrap;
   }
@@ -1057,7 +1070,6 @@ document.addEventListener("DOMContentLoaded", () => {
         div.innerHTML =
           '<div class="detail-part-info-title">' +
             '<strong>' + (p.partName || "정보 없음") + '</strong>' +
-            '<span class="subtitle">종류</span>' +
           '</div>' +
           '<div class="detail-part-info-body">' +
             '<div class="detail-part-top-container">' +
@@ -1082,48 +1094,48 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="detail-part-cancel">닫기</div>';
       partBox.appendChild(btns);
 
-      
-      
-      
-      
-     
+
+
+
+
+
 
    // 버튼 생성 직후 바로 이벤트 바인딩
   const requestBtn = btns.querySelector('.detail-part-request-btn');
    const cancelBtn = btns.querySelector('.detail-part-cancel');
-   
+
    requestBtn.addEventListener('click', function(e) {
 	    e.preventDefault();
 	    e.stopPropagation();
 	    console.log("점검요청 버튼 클릭됨");
-	    
+
 	    const modal = document.querySelector(".detail-modal");
 	    const modelName = asset.modelName;
 	    const owner =  asset?.owner ? asset.owner : "농촌진흥청";
-	  
-	    
+
+
 	    // 기존 상세 모달을 먼저 닫기
 	    closeModal(detailModal);
-	    
+
 	    // 새로운 점검요청 모달 열기
 
 	    const inspectionModal = $("#inspectionApplyModal");
 	    inspectionModal.removeClass("hidden").css("display","block");
 	    inspectionModal.attr("data-asset-id", assetId); // data 속성에 저장
-	    
+
 	    $(".apply-input.asset").val(modelName);
 		$(".apply-input.owner").val(owner);
-	    
-	    
+
+
 	    if (typeof partList === 'function') {
 	        partList(assetId);
 	    }
 	});
-   
-   
-   
-   
-      
+
+
+
+
+
       partBox.querySelectorAll(".toggle-icon").forEach(tg => {
         tg.addEventListener("click", () => {
           const box = tg.closest(".detail-part-info-container");
@@ -1165,6 +1177,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setField("[data-edit-field='category']", asset?.category);
       setField("[data-edit-field='model']", asset?.modelName);
       setField("[data-edit-field='company']", asset?.company);
+      setField("[data-edit-field='owner']", (asset?.owner ?? "").toString().trim() || "농촌진흥청");
       setField("[data-edit-field='usageTime']", asset?.usageTime);
       setField("[data-edit-field='expectedDate']", formatYmdDot(asset?.expectedMaintenanceDate));
       setField("[data-edit-field='lastDate']", formatYmdDot(asset?.lastMaintenanceDate));
@@ -1653,21 +1666,9 @@ function formatHoursToYMDH(value) {
       cancelText: '취소',
       bgClose: false,
       onOk: () => {
-        // 방법 A) 원래 폼 그대로 제출
         form.submit();
-
-        // 방법 B) fetch로 제출 후 새로고침 (서버가 리다이렉트 대신 JSON/문자열 반환할 때)
-        // const params = new URLSearchParams(new FormData(form));
-        // fetch(form.action, {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getCsrfHeaders() },
-        //   body: params
-        // }).then(res => {
-        //   if (!res.ok) throw new Error('삭제 실패');
-        //   location.reload();
-        // }).catch(err => showAssetError(err.message));
       }
-    });
+    });``
   });
 })();
 
@@ -1802,5 +1803,4 @@ function formatHoursToYMDH(value) {
   }
 })();
 </script>
-
 

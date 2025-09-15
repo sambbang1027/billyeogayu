@@ -110,10 +110,9 @@
 #resetFiltersBtn {
   -webkit-appearance: none;
   appearance: none;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  margin: 0;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 50%;
   line-height: 0;
   box-shadow: none;
   outline: none;
@@ -122,16 +121,21 @@
   align-items: center;
   justify-content: center;
 
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
 
   cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#resetFiltersBtn:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.05);
 }
 
 #resetFiltersBtn img.reset-btn {
   width: 1rem;
   height: 1rem;
-  display: block;
   pointer-events: none;
 }
 
@@ -676,6 +680,13 @@
     padding: 0 3rem;
 }
 
+.part-remove-btn {
+  all: unset;
+  cursor: pointer;
+  margin-left: auto;
+  line-height: 0;
+}
+
 
 .modal-part-category-container,
 .modal-part-lifecycle-container {
@@ -813,8 +824,8 @@
 }
 
 .detail-image {
-    width: 14.5rem;
-    height: 14.5rem;
+    width: 16rem;
+    height: 16rem;
 }
 
 .detail-info-box {
@@ -1046,9 +1057,9 @@
 
 .edit-info-bottom-container {
     display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-    margin: 0 3rem;
+    justify-content: flex-start;
+    gap: 12rem;
+    margin: 0 2rem;
 }
 
 .edit-info-bottom-left-box,
@@ -1071,8 +1082,8 @@
 }
 
 .edit-image {
-    width: 13rem;
-    height: 13rem;
+    width: 15rem;
+    height: 15rem;
 }
 
 .edit-info-box label {
