@@ -2,6 +2,10 @@ package app.domains.reservation.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -151,20 +155,102 @@ public class ReservationController {
     }
 
     /**
+     * 날짜별 임대 가능 여부 체크 API (달력 비활성화용)
+     */
+    @GetMapping("/api/reservation/date-availability")
+    @ResponseBody
+    public Map<String, Object> getDateAvailability(@RequestParam("assetId") Long assetId,
+                                                   @RequestParam("from") String from,
+                                                   @RequestParam("to") String to) {
+        log.info("=== 날짜별 가용성 체크 API 호출 ===");
+        log.info("요청 파라미터 - assetId: {}, from: {}, to: {}", assetId, from, to);
+        
+        try {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate fromDate = LocalDate.parse(from, dateFormatter);
+            LocalDate toDate = LocalDate.parse(to, dateFormatter);
+            
+            LocalDateTime fromDateTime = fromDate.atStartOfDay();
+            LocalDateTime toDateTime = toDate.atTime(23, 59, 59);
+            
+            // 전체 기간의 시간대별 데이터 조회
+            List<TimeSlotAvailability> allSlots = service.getTimeSlotAvailability(assetId, fromDateTime, toDateTime);
+            
+            // 날짜별로 그룹화하고 가용성 계산
+            Map<String, Boolean> dateAvailabilityMap = new HashMap<>();
+            Map<String, List<TimeSlotAvailability>> dateGroups = new HashMap<>();
+            
+            // 날짜별로 그룹화
+            for (TimeSlotAvailability slot : allSlots) {
+                String dateKey = slot.getStartTime().toLocalDate().toString(); // "2025-09-16"
+                dateGroups.computeIfAbsent(dateKey, k -> new ArrayList<>()).add(slot);
+            }
+            
+            // 각 날짜별 가용성 판단
+            for (Map.Entry<String, List<TimeSlotAvailability>> entry : dateGroups.entrySet()) {
+                String dateKey = entry.getKey();
+                List<TimeSlotAvailability> daySlots = entry.getValue();
+                
+                // 해당 날짜의 가용 시간대 개수 계산
+                long availableSlotCount = daySlots.stream()
+                    .filter(slot -> slot.getAvailableCount() > 0)
+                    .count();
+                
+                // 최소 2개 이상의 시간대가 가용해야 해당 날짜 활성화
+                boolean isDateAvailable = availableSlotCount >= 2;
+                
+                dateAvailabilityMap.put(dateKey, isDateAvailable);
+                
+                log.debug("날짜 {}: 전체 {}개 슬롯 중 {}개 가용 → {}", 
+                         dateKey, daySlots.size(), availableSlotCount, 
+                         isDateAvailable ? "활성화" : "비활성화");
+            }
+            
+            Map<String, Object> result = new HashMap<>();
+            result.put("dateAvailability", dateAvailabilityMap);
+            result.put("minAvailableSlots", 2); // 프론트엔드에서 참고용
+            
+            log.info("날짜별 가용성 체크 완료 - {} 개 날짜 처리", dateAvailabilityMap.size());
+            
+            return result;
+            
+        } catch (Exception e) {
+            log.error("날짜별 가용성 체크 중 오류 발생", e);
+            Map<String, Object> errorResult = new HashMap<>();
+            errorResult.put("dateAvailability", new HashMap<>());
+            return errorResult;
+        }
+    }
+
+    /**
      * 임대 신청된 날짜 조회 API (기존 호환성 유지)
      */
     @GetMapping("/api/reservation/blocked")
     @ResponseBody
-    public List<BlockedRange> apiBlocked(@RequestParam("assetId") Long assetId,
-                                         @RequestParam("from") String from,
-                                         @RequestParam("to") String to) {
+    public List<Map<String, Object>> apiBlocked(@RequestParam("assetId") Long assetId,
+                                                @RequestParam("from") String from,
+                                                @RequestParam("to") String to) {
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            Date fromDate = formatter.parse(from);
-            Date toDate = formatter.parse(to);
+            // LocalDateTime으로 파싱
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime fromDateTime = LocalDateTime.parse(from, formatter);
+            LocalDateTime toDateTime = LocalDateTime.parse(to, formatter);
 
-            return service.getBlockedRanges(assetId, fromDate, toDate);
-        } catch (ParseException e) {
+            List<BlockedRange> blockedRanges = service.getBlockedRanges(assetId, fromDateTime, toDateTime);
+            
+            // LocalDateTime을 문자열로 변환해서 반환
+            List<Map<String, Object>> result = new ArrayList<>();
+            DateTimeFormatter responseFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            
+            for (BlockedRange range : blockedRanges) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("startAt", range.getStartAt().format(responseFormatter));
+                map.put("endAt", range.getEndAt().format(responseFormatter));
+                result.add(map);
+            }
+            
+            return result;
+        } catch (Exception e) {
             log.error("날짜 파싱 오류", e);
             return new ArrayList<>();
         }
@@ -175,34 +261,49 @@ public class ReservationController {
      */
     @GetMapping("/api/reservation/timeslots")
     @ResponseBody
-    public List<TimeSlotAvailability> apiTimeSlots(@RequestParam("assetId") Long assetId,
-                                                   @RequestParam("from") String from,
-                                                   @RequestParam("to") String to) {
+    public List<Map<String, Object>> apiTimeSlots(@RequestParam("assetId") Long assetId,
+                                                  @RequestParam("from") String from,
+                                                  @RequestParam("to") String to) {
         log.info("=== /api/reservation/timeslots API 호출 ===");
         log.info("요청 파라미터 - assetId: {}, from: {}, to: {}", assetId, from, to);
         
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date fromDate = formatter.parse(from);
-            Date toDate = formatter.parse(to);
+            // 날짜만 파싱해서 LocalDateTime으로 변환
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate fromDate = LocalDate.parse(from, dateFormatter);
+            LocalDate toDate = LocalDate.parse(to, dateFormatter);
             
-            log.info("파싱된 날짜 - fromDate: {}, toDate: {}", fromDate, toDate);
+            // 시작일은 00:00:00, 종료일은 23:59:59로 설정
+            LocalDateTime fromDateTime = fromDate.atStartOfDay();
+            LocalDateTime toDateTime = toDate.atTime(23, 59, 59);
             
-            List<TimeSlotAvailability> result = service.getTimeSlotAvailability(assetId, fromDate, toDate);
+            log.info("파싱된 날짜 - fromDateTime: {}, toDateTime: {}", fromDateTime, toDateTime);
+            
+            List<TimeSlotAvailability> result = service.getTimeSlotAvailability(assetId, fromDateTime, toDateTime);
             
             log.info("서비스 호출 결과 - 슬롯 개수: {}", result.size());
             
-            if (!result.isEmpty()) {
-                log.info("첫 번째 슬롯: 시작시간={}, 반납시간={}, 가용={}/{}", 
-                        result.get(0).getStartTime(), result.get(0).getEndTime(),
-                        result.get(0).getAvailableCount(), result.get(0).getTotalCount());
+            // LocalDateTime을 문자열로 변환해서 Map으로 반환
+            List<Map<String, Object>> jsonResult = new ArrayList<>();
+            DateTimeFormatter responseFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            
+            for (TimeSlotAvailability slot : result) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("startTime", slot.getStartTime().format(responseFormatter));
+                map.put("endTime", slot.getEndTime().format(responseFormatter));
+                map.put("availableCount", slot.getAvailableCount());
+                map.put("totalCount", slot.getTotalCount());
+                jsonResult.add(map);
             }
             
-            return result;
+            if (!jsonResult.isEmpty()) {
+                log.info("첫 번째 슬롯: 시작시간={}, 반납시간={}, 가용={}/{}", 
+                        jsonResult.get(0).get("startTime"), jsonResult.get(0).get("endTime"),
+                        jsonResult.get(0).get("availableCount"), jsonResult.get(0).get("totalCount"));
+            }
             
-        } catch (ParseException e) {
-            log.error("날짜 파싱 오류", e);
-            return new ArrayList<>();
+            return jsonResult;
+            
         } catch (Exception e) {
             log.error("시간대별 임대 신청 현황 조회 중 오류 발생", e);
             return new ArrayList<>();
@@ -215,28 +316,25 @@ public class ReservationController {
      */
     @GetMapping("/api/reservation/timeslots-test")
     @ResponseBody
-    public List<TimeSlotAvailability> apiTimeSlotsTest(@RequestParam("assetId") Long assetId,
-                                                       @RequestParam("from") String from,
-                                                       @RequestParam("to") String to) {
+    public List<Map<String, Object>> apiTimeSlotsTest(@RequestParam("assetId") Long assetId,
+                                                      @RequestParam("from") String from,
+                                                      @RequestParam("to") String to) {
         log.info("=== 테스트용 /api/reservation/timeslots-test API 호출 ===");
         log.info("요청 파라미터 - assetId: {}, from: {}, to: {}", assetId, from, to);
         
-        List<TimeSlotAvailability> testSlots = new ArrayList<>();
+        List<Map<String, Object>> testSlots = new ArrayList<>();
         
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date fromDate = formatter.parse(from);
-            Date toDate = formatter.parse(to);
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate fromDate = LocalDate.parse(from, dateFormatter);
+            LocalDate toDate = LocalDate.parse(to, dateFormatter);
             
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(fromDate);
+            LocalDate currentDate = fromDate;
+            DateTimeFormatter responseFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
             
-            Calendar endCal = Calendar.getInstance();
-            endCal.setTime(toDate);
-            
-            while (!cal.after(endCal)) {
-                int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-                if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY) {
+            while (!currentDate.isAfter(toDate)) {
+                // 주말 제외
+                if (currentDate.getDayOfWeek().getValue() != 6 && currentDate.getDayOfWeek().getValue() != 7) {
                     
                     // 9:00 ~ 18:00 시간대 생성 (점심시간 제외)
                     for (int hour = 9; hour <= 18; hour++) {
@@ -244,15 +342,8 @@ public class ReservationController {
                             if (hour == 18 && minute == 30) break;
                             if ((hour == 12) || (hour == 13 && minute == 0)) continue;
                             
-                            Calendar slotCal = (Calendar) cal.clone();
-                            slotCal.set(Calendar.HOUR_OF_DAY, hour);
-                            slotCal.set(Calendar.MINUTE, minute);
-                            slotCal.set(Calendar.SECOND, 0);
-                            slotCal.set(Calendar.MILLISECOND, 0);
-                            
-                            Date slotStart = slotCal.getTime();
-                            slotCal.add(Calendar.MINUTE, 30);
-                            Date slotEnd = slotCal.getTime();
+                            LocalDateTime slotStart = currentDate.atTime(hour, minute);
+                            LocalDateTime slotEnd = slotStart.plusMinutes(30);
                             
                             // 테스트용 가용성 설정 (일부 시간대는 임대 신청 불가능하게 설정)
                             int availableCount = 1; // 기본 가용
@@ -262,12 +353,11 @@ public class ReservationController {
                                 availableCount = 0;
                             }
                             
-                            TimeSlotAvailability slot = TimeSlotAvailability.builder()
-                                    .startTime(slotStart)
-                                    .endTime(slotEnd)
-                                    .availableCount(availableCount)
-                                    .totalCount(1)
-                                    .build();
+                            Map<String, Object> slot = new HashMap<>();
+                            slot.put("startTime", slotStart.format(responseFormatter));
+                            slot.put("endTime", slotEnd.format(responseFormatter));
+                            slot.put("availableCount", availableCount);
+                            slot.put("totalCount", 1);
                             
                             testSlots.add(slot);
                             
@@ -276,7 +366,7 @@ public class ReservationController {
                         }
                     }
                 }
-                cal.add(Calendar.DAY_OF_MONTH, 1);
+                currentDate = currentDate.plusDays(1);
             }
             
             log.info("테스트 슬롯 생성 완료 - 총 {} 개", testSlots.size());
@@ -285,18 +375,15 @@ public class ReservationController {
             if (!testSlots.isEmpty()) {
                 log.info("=== 테스트 슬롯 샘플 (처음 5개) ===");
                 for (int i = 0; i < Math.min(5, testSlots.size()); i++) {
-                    TimeSlotAvailability slot = testSlots.get(i);
+                    Map<String, Object> slot = testSlots.get(i);
                     log.info("슬롯 {}: {} ~ {}, 가용: {}/{}", 
-                            i + 1, slot.getStartTime(), slot.getEndTime(), 
-                            slot.getAvailableCount(), slot.getTotalCount());
+                            i + 1, slot.get("startTime"), slot.get("endTime"), 
+                            slot.get("availableCount"), slot.get("totalCount"));
                 }
             }
             
             return testSlots;
             
-        } catch (ParseException e) {
-            log.error("날짜 파싱 오류", e);
-            return new ArrayList<>();
         } catch (Exception e) {
             log.error("테스트 시간대별 임대 신청 현황 조회 중 오류 발생", e);
             return new ArrayList<>();
@@ -318,7 +405,7 @@ public class ReservationController {
                          @RequestParam(value="addr2", required=false) String addr2,
                          HttpServletRequest request,
                          Model model,
-                         RedirectAttributes redirectAttributes) throws ParseException {
+                         RedirectAttributes redirectAttributes) {
 
         // 세션과 인증 정보를 메서드 최상단에서 선언
         HttpSession session = null;
@@ -384,20 +471,20 @@ public class ReservationController {
                 return "reservation";
             }
 
-            // 5) 날짜/시간 파싱
-            Date startAt = parseDateTime(reserveStartDate, reserveStartTime);
-            Date endAt = parseDateTime(reserveEndDate, reserveEndTime);
+            // 5) 날짜/시간 파싱 - LocalDateTime 반환
+            LocalDateTime startAt = parseDateTime(reserveStartDate, reserveStartTime);
+            LocalDateTime endAt = parseDateTime(reserveEndDate, reserveEndTime);
 
             // 6) 날짜 유효성 검증
-            Date now = new Date();
-            if (startAt.before(now)) {
+            LocalDateTime now = LocalDateTime.now();
+            if (startAt.isBefore(now)) {
                 log.warn("과거 날짜로 임대 신청 시도 - 시작일: {}", startAt);
                 restoreFormData(assetId, zipcode, addr1, addr2, purpose, model, loginUser);
                 model.addAttribute("error", "과거 날짜로는 임대 신청할 수 없습니다.");
                 return "reservation";
             }
 
-            if (!startAt.before(endAt)) {
+            if (!startAt.isBefore(endAt)) {
                 log.warn("잘못된 날짜 범위 - 시작일: {}, 반납일: {}", startAt, endAt);
                 restoreFormData(assetId, zipcode, addr1, addr2, purpose, model, loginUser);
                 model.addAttribute("error", "반납일은 시작일보다 늦어야 합니다.");
@@ -425,19 +512,13 @@ public class ReservationController {
                 return "reservation";
             }
 
-        } catch (ParseException e) {
-            log.error("날짜 파싱 오류", e);
+        } catch (Exception e) {
+            log.error("임대 신청 신청 제출 중 오류 발생", e);
             
             if (auth != null) {
                 restoreFormData(assetId, zipcode, addr1, addr2, purpose, model, 
                                usersService.getUserByLoginId(auth.getName()));
             }
-            model.addAttribute("error", "날짜 형식이 올바르지 않습니다.");
-            return "reservation";
-            
-        } catch (Exception e) {
-            log.error("임대 신청 신청 제출 중 오류 발생", e);
-            
             model.addAttribute("error", "임대 신청 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             return "reservation";
         }
@@ -496,9 +577,9 @@ public class ReservationController {
         return result;
     }
 
-    private static Date parseDateTime(String date, String time) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        formatter.setLenient(false);
-        return formatter.parse(date + " " + time);
+    // 날짜/시간 파싱 메서드 - LocalDateTime 반환
+    private static LocalDateTime parseDateTime(String date, String time) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return LocalDateTime.parse(date + " " + time, formatter);
     }
 }

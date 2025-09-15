@@ -1,6 +1,7 @@
 package app.domains.reservation.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,8 +10,8 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class TimeSlotAvailability {
-    private Date startTime;
-    private Date endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private int availableCount;  // 해당 시간대에 사용 가능한 자산 수
     private int totalCount;      // 총 자산 수
     
