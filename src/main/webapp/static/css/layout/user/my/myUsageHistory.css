@@ -353,7 +353,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #659f7c;
     color: white;
     border-radius: 0.625rem 0.625rem 0 0;
 }
@@ -473,15 +473,7 @@ body {
     font-weight: 500;
 }
 
-.modal-duration {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1.125rem;
-}
+
 
 /* 반응형 디자인 */
 @media (max-width: 90rem) {

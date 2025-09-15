@@ -1,6 +1,6 @@
 package app.domains.reservation.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,6 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class BlockedRange {
-    private Date startAt;
-    private Date endAt;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
 }

@@ -247,6 +247,10 @@ body {
     min-width: 200px;
     box-shadow: 0 3px 12px rgba(0,0,0,0.1);
     letter-spacing: -0.01em;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-primary {
@@ -316,128 +320,4 @@ body {
     font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* ===== 반응형 디자인 ===== */
-@media (max-width: 1024px) {
-    .container {
-        padding: 0 1.5rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 0 1rem;
-    }
-    
-    .user-info {
-        position: relative;
-        top: 10px;
-        right: auto;
-        margin-bottom: 1rem;
-        justify-content: center;
-        display: inline-flex;
-    }
-    
-    .header {
-        padding: 60px 0 30px 0;
-    }
-    
-    .logo-image {
-        max-width: 250px;
-    }
-    
-    .main-title {
-        font-size: 2.8rem;
-    }
-
-    .subtitle {
-        font-size: 2rem;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .description {
-        font-size: 1.1rem;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .btn {
-        width: 100%;
-        max-width: 280px;
-        min-width: auto;
-    }
-
-    .main-visual {
-        margin: 0 0 2rem 0;
-        padding: 0.5rem;
-    }
-
-    .user-info {
-        padding: 0.6rem 1rem;
-        border-radius: 15px;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .user-greeting {
-        font-size: 0.85rem;
-    }
-
-    .logout-btn {
-        padding: 0.35rem 0.7rem;
-        font-size: 0.75rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-title {
-        font-size: 2.2rem;
-    }
-
-    .subtitle {
-        font-size: 1.7rem;
-    }
-
-    .description {
-        font-size: 1rem;
-    }
-
-    .btn {
-        padding: 1rem 2rem;
-        font-size: 0.95rem;
-    }
-    
-    .logo-image {
-        max-height: 35px;
-    }
-}
-
-/* 한 화면에 모든 내용이 들어가도록 조정 */
-@media (min-width: 1025px) {
-    body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 1rem;
-    }
-    
-    .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-height: 90vh;
-    }
-    
-    .header {
-        padding: 40px 0 30px 0;
-    }
-    
-    .main-visual {
-        margin-bottom: 2rem;
-    }
 }
