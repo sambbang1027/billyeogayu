@@ -1,7 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
-
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -10,9 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>빌려가유 - 농기계 목록</title>
     <link rel="stylesheet" href="<c:url value='/static/css/layout/user/resource/list.css'/>">
+    <!-- 공통 모달(confirm/ alert) -->
+    <link rel="stylesheet" href="<c:url value='/static/css/common/commonModal.css'/>">
 </head>
 <body>
-    <!-- 헤더 -->
     <div class="header">
         <div class="header-content">
             <a href="<c:url value='/resource/list'/>" class="logo-link">
@@ -127,59 +128,47 @@
             </c:choose>
         </section>
 
+  
         <!-- 페이지네이션 -->
         <c:if test="${totalPages >= 1}">
-            <nav class="resource-paging" aria-label="페이지 이동">
-                <!-- 처음(«) -->
-                <c:choose>
-                    <c:when test="${page > 1}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='1'/></c:url>">&laquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&laquo;</span>
-                    </c:otherwise>
-                </c:choose>
+            <div class="pagination" aria-label="페이지 이동">
+                <!-- 이전 화살표 -->
+                <c:if test="${page > 1}">
+                    <a class="arrow prev" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${page - 1}'/></c:url>">
+                        <img src="<c:url value='/assets/asset/left.svg'/>" alt="이전">
+                    </a>
+                </c:if>
 
-                <!-- 이전(‹) -->
-                <c:choose>
-                    <c:when test="${page > 1}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${prevPage}'/></c:url>">&lsaquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&lsaquo;</span>
-                    </c:otherwise>
-                </c:choose>
+                <!-- 페이지 번호 (5개 단위 그룹) -->
+                <c:set var="pageGroupSize" value="5"/>
+                <c:set var="groupStart" value="${((page - 1) / pageGroupSize) * pageGroupSize + 1}"/>
+                <c:set var="groupEnd" value="${groupStart + pageGroupSize - 1}"/>
+                <c:if test="${groupEnd > totalPages}">
+                    <c:set var="groupEnd" value="${totalPages}"/>
+                </c:if>
 
-                <!-- 현재 블록의 페이지들 (예: 1~10, 11~20 ...) -->
-                <c:forEach var="p" begin="${startPage}" end="${endPage}">
-                    <a class="resource-paging__item ${p == page ? 'is-active' : ''}" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${p}'/></c:url>">${p}</a>
+                <c:forEach var="p" begin="${groupStart}" end="${groupEnd}">
+                    <a class="${p == page ? 'active' : ''}" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${p}'/></c:url>">${p}</a>
                 </c:forEach>
 
-                <!-- 다음(›) -->
-                <c:choose>
-                    <c:when test="${page < totalPages}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${nextPage}'/></c:url>">&rsaquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&rsaquo;</span>
-                    </c:otherwise>
-                </c:choose>
-
-                <!-- 마지막(») -->
-                <c:choose>
-                    <c:when test="${page < totalPages}">
-                        <a class="resource-paging__item" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${totalPages}'/></c:url>">&raquo;</a>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="resource-paging__item" aria-disabled="true">&raquo;</span>
-                    </c:otherwise>
-                </c:choose>
-            </nav>
+                <!-- 다음 화살표 -->
+                <c:if test="${page < totalPages}">
+                    <a class="arrow next" href="<c:url value='/resource/list'><c:param name='q' value='${param.q}'/><c:param name='filter' value='${param.filter}'/><c:param name='page' value='${page + 1}'/></c:url>">
+                        <img src="<c:url value='/assets/asset/right.svg'/>" alt="다음">
+                    </a>
+                </c:if>
+            </div>
         </c:if>
     </section>
 
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- 공통 모달 JS -->
+    <script src="<c:url value='/static/js/common/commonModal.js'/>"></script>
+
+    <!-- 공통 모달 HTML include -->
+    <jsp:include page="/WEB-INF/views/common/commonModal.jsp" />
 
     <script>
     $(function(){
@@ -201,19 +190,26 @@
 
             var id = $(this).data('id');
             
-            // 서버에서 전달받은 로그인 상태 확인 (Spring Security 태그 대신 사용)
+            // 서버에서 전달받은 로그인 상태 확인
             var loggedIn = ${isLoggedIn ? 'true' : 'false'};
             
             console.log('로그인 상태:', loggedIn);
             
             if(!loggedIn){
-                if(confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')){
-                    sessionStorage.setItem('returnUrl', '<c:url value="/reservation/apply"/>?assetId=' + id);
-                    window.location.href = '<c:url value="/login"/>';
-                }
+                // showConfirm으로 변경 (공통 모달 사용)
+                showConfirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?',
+                    function() {  // 확인 버튼 콜백
+                        sessionStorage.setItem('returnUrl', '<c:url value="/reservation/apply"/>?assetId=' + id);
+                        window.location.href = '<c:url value="/login"/>';
+                    },
+                    function() {  // 취소 버튼 콜백 (생략 가능)
+                        // 취소 시 아무것도 하지 않음
+                    }
+                );
                 return;
             }
             
+            // 로그인된 상태면 바로 예약 신청 페이지로 이동
             window.location.href = '<c:url value="/reservation/apply"/>' + '?assetId=' + encodeURIComponent(id);
         });
     });
