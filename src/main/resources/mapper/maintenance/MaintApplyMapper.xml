@@ -32,14 +32,21 @@
 	</insert>-->
 	
 	
-			<insert id="applyMaintenance" parameterType="map">
-			    INSERT INTO maintenance (
-			        asset_id, admin_id, part_id, type, item, resolver_name, request_id, owner 
-			    )
-			    VALUES (
-			        #{assetId}, #{adminId}, #{partId}, #{type}, #{partName}, #{resolverName}, #{requestId}, #{owner}
-			    )
-			</insert>
+<insert id="applyMaintenance" parameterType="map">
+    INSERT INTO maintenance (
+        asset_id, admin_id, part_id, type, item, resolver_name, request_id
+    )
+    VALUES (
+        #{assetId, jdbcType=INTEGER},
+        #{adminId, jdbcType=INTEGER},
+        #{partId, jdbcType=INTEGER},
+        #{type, jdbcType=VARCHAR},
+        #{partName, jdbcType=VARCHAR},
+        #{resolverName, jdbcType=VARCHAR},
+        #{requestId, jdbcType=INTEGER}
+    )
+</insert>
+
 						
 		
 		<update id="updateAssetStatus"  parameterType="int">
