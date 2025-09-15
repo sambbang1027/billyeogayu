@@ -7,12 +7,13 @@
 	    <div class="search-bar">
 		        <div class="search-dropdown">
 					  <button class="search-dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-							  <span class="search-dropdown-label" data-value="" >모델명</span>
+							  <span class="search-dropdown-label" data-value="" >선택</span>
   							  <img src="<c:url value='/assets/maintenance/arrow-down.svg' />" alt="▼" class="search-dropdown-btn">
 						</button>
 					  <ul class="search-dropdown-menu">
 					    <li data-value="assetName">모델명</li>
 					    <li data-value="adminName">담당자</li>
+					    <li data-value="owner">소유자</li>
 					  </ul>
 				</div>
 		    <input type="text" class="search-input" placeholder="Search" id="keyword">
@@ -100,9 +101,10 @@
 			      <th>No</th>
 			      <th>종류</th>
 			      <th>모델명</th>
-				  <th class="sortable" data-sort="maintDate" data-order="desc">점검 일시</th>
+				  <th class="sortable" data-sort="createdAt" data-order="desc">점검요청일</th>
 			      <th>점검 유형</th>
 			      <th>점검 상태</th>
+			      <th>소유자</th>
 			      <th>담당자</th>
 			      <th></th>
 			    </tr>

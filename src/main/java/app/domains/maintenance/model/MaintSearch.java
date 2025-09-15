@@ -23,5 +23,6 @@ public class MaintSearch {
 	    private int endRow;         // 페이지네이션 끝
 	    
 	    private String orderBy;  // 정렬 
+	   
 
 }
