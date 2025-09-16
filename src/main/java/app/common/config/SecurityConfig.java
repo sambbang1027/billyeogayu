@@ -1,3 +1,4 @@
+// 작성자 : 황요한
 package app.common.config;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,3 +1,4 @@
+// 작성자 : 황요한, 이원석
 package app.domains.alarm.dao;
 
 import app.domains.alarm.dto.AssetMaintenanceAlarm;

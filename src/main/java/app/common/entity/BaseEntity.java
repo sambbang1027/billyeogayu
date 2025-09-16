@@ -1,3 +1,4 @@
+// 작성자 : 황요한, 이원석
 package app.common.entity;
 
 import java.time.LocalDateTime;

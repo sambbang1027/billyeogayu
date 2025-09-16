@@ -1,3 +1,4 @@
+// 작성자 : 서샘이, 이원석
 package app.domains.dashboard.dto;
 
 import lombok.AllArgsConstructor;

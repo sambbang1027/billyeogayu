@@ -1,3 +1,4 @@
+// 작성자 : 서샘이
 package app.domains.maintenance.model;
 
 import lombok.AllArgsConstructor;

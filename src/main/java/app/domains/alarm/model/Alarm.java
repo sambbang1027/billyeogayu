@@ -1,3 +1,4 @@
+// 작성자 : 이원석
 package app.domains.alarm.model;
 
 import app.common.entity.BaseEntity;

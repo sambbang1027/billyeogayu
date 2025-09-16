@@ -1,3 +1,4 @@
+// 작성자 : 김민호
 package app.domains.asset.model;
 
 import lombok.AllArgsConstructor;

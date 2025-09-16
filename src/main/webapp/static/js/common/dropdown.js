@@ -3,6 +3,7 @@
  * - 열기/닫기
  * - 바깥 클릭 시 닫기
  */
+// 작성자 : 서샘이
 
 function initDropdown(scopeSelector, toggleSelector, menuSelector, activeClass = "active") {
     // 열기/닫기

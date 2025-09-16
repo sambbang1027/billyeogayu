@@ -1,3 +1,4 @@
+// 작성자 : 김민호
 package app.common.util;
 
 import jakarta.servlet.http.HttpServletResponse;

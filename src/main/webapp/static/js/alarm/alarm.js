@@ -1,3 +1,4 @@
+// 작성자 : 이원석
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Alarm script loaded");
     

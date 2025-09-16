@@ -1,3 +1,4 @@
+// 작성자 : 김민호
 /* ========== 공통 모달 유틸: assetModal ========== */
 const assetModal = (() => {
   const $root   = document.getElementById('assetModal');

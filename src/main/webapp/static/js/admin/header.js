@@ -1,6 +1,4 @@
-/**
- * 
- */
+// 작성자 : 서샘이
 
 
 document.addEventListener("DOMContentLoaded", function () {

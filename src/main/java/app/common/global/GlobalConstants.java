@@ -1,3 +1,4 @@
+// 작성자 : 이원석
 package app.common.global;
 
 public class GlobalConstants {
