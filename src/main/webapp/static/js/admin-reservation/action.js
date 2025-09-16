@@ -1,6 +1,7 @@
 /**
  * 처리 열에 해당하는 로직들  
  */
+// 작성자 : 서샘이
 
 // 승인 처리 
 $(document).on("click", ".rv-btn-approve", function(){

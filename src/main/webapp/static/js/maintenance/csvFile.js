@@ -1,3 +1,4 @@
+// 작성자 : 서샘이
 $(function(){
   $(".btn-download").on("click", function(){
     let sp = new URLSearchParams();

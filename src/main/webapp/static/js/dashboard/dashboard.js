@@ -1,3 +1,4 @@
+// 작성자 : 이원석
 // 공통 옵션
 Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 Chart.defaults.font.size = 14;

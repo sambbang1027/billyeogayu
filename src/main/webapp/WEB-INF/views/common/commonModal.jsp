@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%-- 작성자 : 서샘이 --%>
 
 <div id="commonModal" class="common-modal" style="display:none;">
   <div class="common-modal-content">

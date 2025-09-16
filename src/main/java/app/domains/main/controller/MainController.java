@@ -1,3 +1,4 @@
+// 작성자 : 이해든, 김민호, 서샘이, 황요한
 package app.domains.main.controller;
 
 import org.springframework.stereotype.Controller;

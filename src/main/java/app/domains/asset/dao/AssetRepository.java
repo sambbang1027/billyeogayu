@@ -1,3 +1,4 @@
+// 작성자 : 김민호
 package app.domains.asset.dao;
 
 import app.domains.asset.model.Asset;

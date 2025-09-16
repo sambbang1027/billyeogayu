@@ -1,6 +1,7 @@
 /**
  *  공통 모달 함수 
  */
+// 작성자 : 서샘이
 
 // 공통 모달 함수
 function showModal({title, message, buttons}) {

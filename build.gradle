@@ -1,3 +1,5 @@
+// 작성자 : 김민호, 서샘이, 황요한, 이원석
+
 plugins {
     id 'java'
     id 'war'

@@ -1,6 +1,7 @@
 /**
  *  예약페이지 필터 드롭다운 (rv 전용)
  */
+// 작성자 : 서샘이
 let rvActiveFilters = {
     assetKind: null,
     status: null,
