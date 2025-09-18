@@ -23,8 +23,8 @@ public interface AssetRepository {
                  @Param("category")     String category,
                  @Param("company")      String company,
                  @Param("location")    String location,
-                 @Param("field")        String field,        // "all" | "category" | "company" | "modelName" | "status"
-                 @Param("keywordLike")  String keywordLike); // "%ESCAPED%"
+                 @Param("field")        String field,
+                 @Param("keywordLike")  String keywordLike);
 
     List<AssetDto> findAllPaged(@Param("assetStatus") String assetStatus,
                                 @Param("category")     String category,
@@ -32,11 +32,10 @@ public interface AssetRepository {
                                 @Param("location")    String location,
                                 @Param("field")        String field,
                                 @Param("keywordLike")  String keywordLike,
-                                @Param("startRow")     int startRow,   // rn BETWEEN startRow AND endRow
+                                @Param("startRow")     int startRow,
                                 @Param("endRow")       int endRow);
 
     List<String> findCategories();
     List<String> findCompanies();
     List<String> findLocations();
-
 }

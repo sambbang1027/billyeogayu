@@ -109,40 +109,40 @@
 }
 
 #resetFiltersBtn {
-  -webkit-appearance: none;
-  appearance: none;
-  background: #fff;
-  border: 1px solid #000;
-  border-radius: 50%;
-  line-height: 0;
-  box-shadow: none;
-  outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 50%;
+    line-height: 0;
+    box-shadow: none;
+    outline: none;
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-  width: 1.5rem;
-  height: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
 
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 #resetFiltersBtn:hover {
-  background-color: #f0f0f0;
-  transform: scale(1.05);
+    background-color: #f0f0f0;
+    transform: scale(1.05);
 }
 
 #resetFiltersBtn img.reset-btn {
-  width: 1rem;
-  height: 1rem;
-  pointer-events: none;
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
 }
 
 #resetFiltersBtn:focus-visible {
-  outline: 2px solid #4c9ffe;
-  outline-offset: 2px;
+    outline: 2px solid #4c9ffe;
+    outline-offset: 2px;
 }
 
 .search-select {
@@ -352,30 +352,30 @@
 }
 
 .asset-table td.table-img-container {
-  display: table-cell;
-  vertical-align: middle;
-  white-space: nowrap;
+    display: table-cell;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 .asset-table td.table-img-container > button,
 .asset-table td.table-img-container > form,
 .asset-table td.table-img-container .icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: 0;
-  padding: 0;
-  margin: 0 1rem 0 0;
-  line-height: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0 1rem 0 0;
+    line-height: 0;
 }
 
 .asset-table td.table-img-container img {
-  width: 1rem;
-  height: 1rem;
-  display: block;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+    width: 1rem;
+    height: 1rem;
+    display: block;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
 }
 .asset-table td.table-img-container img:hover { opacity: 1; }
 
@@ -500,9 +500,9 @@
 .pagination a.page-num:visited,
 .pagination a.page-num:hover,
 .pagination a.page-num:active {
-  text-decoration: none !important;
-  border-bottom: none !important;
-  color: #222 !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    color: #222 !important;
 }
 
 .pagination a.page-img-box,
@@ -510,16 +510,16 @@
 .pagination a.page-img-box:visited,
 .pagination a.page-img-box:hover,
 .pagination a.page-img-box:active {
-  text-decoration: none !important;
-  border-bottom: none !important;
-  color: inherit !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    color: inherit !important;
 }
 
 .pagination .page-num.active {
-  border: 1px solid #4F7670;
-  border-radius: 0.5rem;
-  padding: 0.3rem 0.6rem;
-  color: #222;
+    border: 1px solid #4F7670;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    color: #222;
 }
 
 .modal {
@@ -530,10 +530,9 @@
     width: 100%; height: 100%;
     background: rgba(0,0,0,0.5);
     
-    /* 중앙 정렬 추가 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-title-container {
@@ -577,11 +576,11 @@
 
 .asset-info-top-container,
 .asset-info-bottom-container {
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .modal-input {
@@ -601,7 +600,7 @@
 }
 
 .modal-input:focus::placeholder {
-  color: transparent;
+    color: transparent;
 }
 
 .modal-input:focus {
@@ -614,7 +613,7 @@
 }
 
 .modal-part-input:focus::placeholder {
-  color: transparent;
+    color: transparent;
 }
 
 .modal-part-input:focus {
@@ -682,10 +681,10 @@
 }
 
 .part-remove-btn {
-  all: unset;
-  cursor: pointer;
-  margin-left: auto;
-  line-height: 0;
+    all: unset;
+    cursor: pointer;
+    margin-left: auto;
+    line-height: 0;
 }
 
 
@@ -727,7 +726,7 @@
 }
 
 .modal-part-lifecycle-input:focus::placeholder {
-  color: transparent;
+    color: transparent;
 }
 
 .modal-btn-container {
@@ -850,57 +849,57 @@
 }
 
 .detail-part-container {
-  margin-top: 1rem;
+    margin-top: 1rem;
 }
 
 .detail-part-title-box h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
 }
 
 .detail-part-info-container {
-  border: 1px solid #4F7670;
-  border-radius: 6px;
-  padding: 1rem;
-  background: #fff;
-  margin-bottom: 1rem;
+    border: 1px solid #4F7670;
+    border-radius: 6px;
+    padding: 1rem;
+    background: #fff;
+    margin-bottom: 1rem;
 
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
 }
 
 .detail-part-info-title {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
 }
 
 .detail-part-info-title strong {
-  font-size: 1.1rem;
+    font-size: 1.1rem;
 }
 
 .detail-part-info-title .subtitle {
-  font-size: 0.9rem;
-  color: #4F7670;
+    font-size: 0.9rem;
+    color: #4F7670;
 }
 
 .detail-part-info-body {
-  border-top: 1px solid #E6E6E6;
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
+    border-top: 1px solid #E6E6E6;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .detail-part-top-container,
 .detail-part-bottom-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 2rem;
 
-  margin: 1rem 0 0 2rem;
+    margin: 1rem 0 0 2rem;
 }
 
 .detail-part-top-container label,
@@ -915,89 +914,81 @@
 
 .detail-part-top-container div,
 .detail-part-bottom-container div {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .detail-part-image-box {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    cursor: pointer;
 }
 
 .detail-part-image-box img {
-  width: 1rem;
-  height: 1rem;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
+    width: 1rem;
+    height: 1rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
 }
 
 .detail-part-image-box img:hover {
-  opacity: 1;
+    opacity: 1;
 }
 
 .detail-part-btn {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
 }
 
 .detail-part-btn div {
-  min-width: 5rem;
-  height: 2rem;
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
+    min-width: 5rem;
+    height: 2rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
 
     pointer-events: auto !important;
     position: relative !important;
     z-index: 9999 !important;
     cursor: pointer;
-
 }
 
-
 .detail-part-btn div:first-child {
-  background-color: #4F7670;
-  color: #fff;
+    background-color: #4F7670;
+    color: #fff;
 }
 
 .detail-part-btn div:first-child:hover {
-  background-color: #3a5f4c;
+    background-color: #3a5f4c;
 }
 
 .detail-part-btn div:last-child {
-  border: 1px solid #4F7670;
-  color: #4F7670;
-  background: #fff;
+    border: 1px solid #4F7670;
+    color: #4F7670;
+    background: #fff;
 }
 
 .detail-part-btn div:last-child:hover {
-  background-color: #f9f9f9;
+    background-color: #f9f9f9;
 }
 
 .detail-part-info-container.collapsed .detail-part-info-body {
-  display: none;
+    display: none;
 }
 
 .detail-part-info-container.expanded .detail-part-info-body {
-  display: block;
+    display: block;
 }
 
-
-/* =========================
-   Edit Modal (자산수정)
-   detail-modal 스타일과 톤을 맞춤
-   ========================= */
 .edit-modal {
     display: none;
     position: fixed;
@@ -1100,7 +1091,7 @@
 }
 
 .edit-part-container {
-  margin-top: 1rem;
+    margin-top: 1rem;
 }
 
 .edit-part-title-box {
@@ -1110,22 +1101,22 @@
 }
 
 .edit-part-title-box h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
 }
 
 .edit-part-info-container {
-  border: 1px solid #4F7670;
-  border-radius: 6px;
-  padding: 1rem;
-  background: #fff;
-  margin-bottom: 1rem;
+    border: 1px solid #4F7670;
+    border-radius: 6px;
+    padding: 1rem;
+    background: #fff;
+    margin-bottom: 1rem;
 
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
 }
 
 .edit-part-info-title-container {
@@ -1136,34 +1127,34 @@
 }
 
 .edit-part-info-title {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
 }
 
 .edit-part-info-title strong {
-  font-size: 1.1rem;
+    font-size: 1.1rem;
 }
 
 .edit-part-info-title .subtitle {
-  font-size: 0.9rem;
-  color: #4F7670;
+    font-size: 0.9rem;
+    color: #4F7670;
 }
 
 .edit-part-info-body {
-  border-top: 1px solid #E6E6E6;
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
+    border-top: 1px solid #E6E6E6;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .edit-part-top-container,
 .edit-part-bottom-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 2rem;
 
-  margin: 1rem 0 0 2rem;
+    margin: 1rem 0 0 2rem;
 }
 
 .edit-part-top-container label,
@@ -1178,74 +1169,74 @@
 
 .edit-part-top-container div,
 .edit-part-bottom-container div {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .edit-part-image-box {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    cursor: pointer;
 }
 
 .edit-part-image-box img {
-  width: 1rem;
-  height: 1rem;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
+    width: 1rem;
+    height: 1rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
 }
 
 .edit-part-image-box img:hover {
-  opacity: 1;
+    opacity: 1;
 }
 
 .edit-modal-btn {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
 }
 
 .edit-modal-btn div {
-  min-width: 5rem;
-  height: 2rem;
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    min-width: 5rem;
+    height: 2rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .edit-modal-btn div:first-child {
-  background-color: #4F7670;
-  color: #fff;
+    background-color: #4F7670;
+    color: #fff;
 }
 
 .edit-modal-btn div:first-child:hover {
-  background-color: #3a5f4c;
+    background-color: #3a5f4c;
 }
 
 .edit-modal-btn div:last-child {
-  border: 1px solid #4F7670;
-  color: #4F7670;
-  background: #fff;
+    border: 1px solid #4F7670;
+    color: #4F7670;
+    background: #fff;
 }
 
 .edit-modal-btn div:last-child:hover {
-  background-color: #f9f9f9;
+    background-color: #f9f9f9;
 }
 
 .edit-part-info-container.collapsed .edit-part-info-body {
-  display: none;
+    display: none;
 }
 
 .edit-part-info-container.expanded .edit-part-info-body {
-  display: block;
+    display: block;
 }
 
 .edit-info-input {
@@ -1265,7 +1256,7 @@
 }
 
 .edit-info-input:focus::placeholder {
-  color: transparent;
+    color: transparent;
 }
 
 .edit-info-input:focus {
@@ -1273,15 +1264,15 @@
 }
 
 .edit-part-add-box {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .edit-part-add-box img {
-  width: 1rem;
-  height: 1rem;
-  display: block;
+    width: 1rem;
+    height: 1rem;
+    display: block;
 }
 
 .edit-part-input {
@@ -1301,7 +1292,7 @@
 }
 
 .edit-part-input:focus::placeholder {
-  color: transparent;
+    color: transparent;
 }
 
 .edit-part-input:focus {
@@ -1313,14 +1304,15 @@
 }
 
 .delete-part-btn{
-  background:none;
-  border:none;
-  padding:0;
-  margin:0;
-  cursor:pointer;
+    background:none;
+    border:none;
+    padding:0;
+    margin:0;
+    cursor:pointer;
 }
 
 .delete-part-btn img{
-  display:block;
-  width:20px; height:20px;
+    display:block;
+    width:20px;
+    height:20px;
 }

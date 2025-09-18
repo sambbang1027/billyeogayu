@@ -1,5 +1,4 @@
 // 작성자 : 김민호
-/* ========== 공통 모달 유틸: assetModal ========== */
 const assetModal = (() => {
   const $root   = document.getElementById('assetModal');
   const $title  = document.getElementById('assetModalTitle');
@@ -63,19 +62,17 @@ const assetModal = (() => {
   });
 
   return {
-    confirm: open, // 확인 + 취소
+    confirm: open,
     alert: (opts) => open({ ...(opts || {}), showCancel: false }) // 확인만
   };
 })();
 
-// CSRF 헤더 헬퍼
 function getCsrfHeaders() {
   const h = document.querySelector('meta[name="_csrf_header"]');
   const t = document.querySelector('meta[name="_csrf"]');
   return (h && t) ? { [h.getAttribute('content')]: t.getAttribute('content') } : {};
 }
 
-// 오류 모달 헬퍼
 function showAssetError(msg) {
   assetModal.alert({
     title: "주의 사항",

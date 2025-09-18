@@ -96,7 +96,6 @@ public class AssetServiceImpl implements AssetService{
                 p.setExpectedMaintenanceDate(LocalDateTime.now()
                         .plusHours(p.getMaintenanceCycle()));
             }
-
             parts.add(p);
         }
 

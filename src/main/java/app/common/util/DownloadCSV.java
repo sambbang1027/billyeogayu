@@ -15,7 +15,6 @@ public final class DownloadCSV {
 
     private static final byte[] UTF8_BOM = new byte[]{(byte)0xEF,(byte)0xBB,(byte)0xBF};
 
-    /** CSV 다운로드 공통 처리 (헤더 세팅 + UTF-8 BOM + 콜백으로 본문 작성) */
     public static void send(HttpServletResponse resp, String filename,
                             Consumer<CsvWriter> writer) throws IOException {
         setHeaders(resp, filename);
@@ -42,7 +41,6 @@ public final class DownloadCSV {
         }
     }
 
-    /** 간단한 CSV 라이터 (모든 셀을 큰따옴표로 감싸고 내부 따옴표는 이스케이프) */
     public static final class CsvWriter {
         private final OutputStream out;
         private final Charset cs;

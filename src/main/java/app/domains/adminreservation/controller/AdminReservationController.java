@@ -33,7 +33,6 @@ public class AdminReservationController {
       model.addAttribute("activePage", "reservation");
       return "layout/admin/main";
   }
-    
 
     @PostMapping("/list")
     @ResponseBody
