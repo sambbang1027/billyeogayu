@@ -86,7 +86,6 @@
            <img class="reset-btn" src="<c:url value='/assets/asset/reset.svg'/>" alt="리셋" />
          </button>
 
-         <!-- 종류 -->
          <c:forEach var="v" items="${paramValues.category}">
            <div class="filter-tag" data-key="category" data-label="${v}">
              <span class="filter-text">${v}</span>
@@ -94,7 +93,6 @@
            </div>
          </c:forEach>
 
-         <!-- 제조사 -->
          <c:forEach var="v" items="${paramValues.company}">
            <div class="filter-tag" data-key="company" data-label="${v}">
              <span class="filter-text">${v}</span>
@@ -109,7 +107,6 @@
            </div>
          </c:forEach>
 
-         <!-- 상태(라벨 매핑) -->
          <c:forEach var="v" items="${paramValues.assetStatus}">
            <c:set var="statusLabel"
                   value="${v=='AVAILABLE'?'사용가능':(v=='USING'?'사용중':(v=='MAINTENANCE_REQUIRED'?'정비필요':(v=='MAINTAINING'?'정비중':v)))}"/>
@@ -224,58 +221,58 @@
         </table>
     </div>
 
-<c:set var="pageSize"  value="${empty pageSize ? 10 : pageSize}" />
-<c:set var="blockSize" value="5" />
+    <c:set var="pageSize"  value="${empty pageSize ? 10 : pageSize}" />
+    <c:set var="blockSize" value="5" />
 
-<fmt:parseNumber var="totalPages" value="${(totalCount + pageSize - 1) / pageSize}" integerOnly="true" />
-<c:if test="${totalPages lt 1}">
-  <c:set var="totalPages" value="1"/>
-</c:if>
+    <fmt:parseNumber var="totalPages" value="${(totalCount + pageSize - 1) / pageSize}" integerOnly="true" />
+    <c:if test="${totalPages lt 1}">
+      <c:set var="totalPages" value="1"/>
+    </c:if>
 
-<fmt:parseNumber var="currentPage" value="${page}" integerOnly="true" />
-<c:if test="${empty currentPage or currentPage lt 1}">
-  <c:set var="currentPage" value="1" />
-</c:if>
-<c:if test="${currentPage gt totalPages}">
-  <c:set var="currentPage" value="${totalPages}" />
-</c:if>
+    <fmt:parseNumber var="currentPage" value="${page}" integerOnly="true" />
+    <c:if test="${empty currentPage or currentPage lt 1}">
+      <c:set var="currentPage" value="1" />
+    </c:if>
+    <c:if test="${currentPage gt totalPages}">
+      <c:set var="currentPage" value="${totalPages}" />
+    </c:if>
 
-<fmt:parseNumber var="blockIndex" value="${(currentPage - 1) / blockSize}" integerOnly="true" />
-<fmt:parseNumber var="startPage" value="${blockIndex * blockSize + 1}" integerOnly="true" />
-<c:set var="endPageRaw" value="${startPage + blockSize - 1}" />
-<c:if test="${endPageRaw > totalPages}">
-  <c:set var="endPageRaw" value="${totalPages}" />
-</c:if>
-<fmt:parseNumber var="endPage" value="${endPageRaw}" integerOnly="true" />
+    <fmt:parseNumber var="blockIndex" value="${(currentPage - 1) / blockSize}" integerOnly="true" />
+    <fmt:parseNumber var="startPage" value="${blockIndex * blockSize + 1}" integerOnly="true" />
+    <c:set var="endPageRaw" value="${startPage + blockSize - 1}" />
+    <c:if test="${endPageRaw > totalPages}">
+      <c:set var="endPageRaw" value="${totalPages}" />
+    </c:if>
+    <fmt:parseNumber var="endPage" value="${endPageRaw}" integerOnly="true" />
 
-<fmt:parseNumber var="prevPage" value="${currentPage - 1}" integerOnly="true" />
-<fmt:parseNumber var="nextPage" value="${currentPage + 1}" integerOnly="true" />
+    <fmt:parseNumber var="prevPage" value="${currentPage - 1}" integerOnly="true" />
+    <fmt:parseNumber var="nextPage" value="${currentPage + 1}" integerOnly="true" />
 
-<div class="pagination">
- <c:choose>
-   <c:when test="${currentPage le 1}">
-     <div class="page-img-box disabled" aria-disabled="true" role="button">
-       <img src="<c:url value='/assets/asset/left.svg'/>" alt="" aria-hidden="true" />
-     </div>
-   </c:when>
-   <c:otherwise>
-        <c:url var="prevUrl" value="/admin/asset/list">
-          <c:param name="page" value="${prevPage}"/>
-          <c:forEach var="v" items="${paramValues.category}"><c:param name="category" value="${v}"/></c:forEach>
-          <c:forEach var="v" items="${paramValues.company}"><c:param name="company" value="${v}"/></c:forEach>
-          <c:forEach var="v" items="${paramValues.location}"><c:param name="location" value="${v}"/></c:forEach>
-          <c:forEach var="v" items="${paramValues.assetStatus}"><c:param name="assetStatus" value="${v}"/></c:forEach>
-          <c:if test="${not empty param.field}"><c:param name="field" value="${param.field}"/></c:if>
-          <c:if test="${not empty param.keyword}"><c:param name="keyword" value="${param.keyword}"/></c:if>
-          <c:if test="${not empty pageSize}"><c:param name="pageSize" value="${pageSize}"/></c:if>
-        </c:url>
-     <a class="page-img-box" href="${prevUrl}" aria-label="이전 페이지">
-       <img src="<c:url value='/assets/asset/left.svg'/>" alt="이전" />
-     </a>
-   </c:otherwise>
- </c:choose>
+    <div class="pagination">
+     <c:choose>
+       <c:when test="${currentPage le 1}">
+         <div class="page-img-box disabled" aria-disabled="true" role="button">
+           <img src="<c:url value='/assets/asset/left.svg'/>" alt="" aria-hidden="true" />
+         </div>
+       </c:when>
+       <c:otherwise>
+            <c:url var="prevUrl" value="/admin/asset/list">
+              <c:param name="page" value="${prevPage}"/>
+              <c:forEach var="v" items="${paramValues.category}"><c:param name="category" value="${v}"/></c:forEach>
+              <c:forEach var="v" items="${paramValues.company}"><c:param name="company" value="${v}"/></c:forEach>
+              <c:forEach var="v" items="${paramValues.location}"><c:param name="location" value="${v}"/></c:forEach>
+              <c:forEach var="v" items="${paramValues.assetStatus}"><c:param name="assetStatus" value="${v}"/></c:forEach>
+              <c:if test="${not empty param.field}"><c:param name="field" value="${param.field}"/></c:if>
+              <c:if test="${not empty param.keyword}"><c:param name="keyword" value="${param.keyword}"/></c:if>
+              <c:if test="${not empty pageSize}"><c:param name="pageSize" value="${pageSize}"/></c:if>
+            </c:url>
+         <a class="page-img-box" href="${prevUrl}" aria-label="이전 페이지">
+           <img src="<c:url value='/assets/asset/left.svg'/>" alt="이전" />
+         </a>
+       </c:otherwise>
+     </c:choose>
 
-  <c:forEach var="i" begin="${startPage}" end="${endPage}">
+    <c:forEach var="i" begin="${startPage}" end="${endPage}">
     <c:url var="pageUrl" value="/admin/asset/list">
       <c:param name="page" value="${i}"/>
       <c:forEach var="v" items="${paramValues.category}"><c:param name="category" value="${v}"/></c:forEach>
@@ -294,11 +291,10 @@
         <a class="page-num" href="${pageUrl}">${i}</a>
       </c:otherwise>
     </c:choose>
-  </c:forEach>
+    </c:forEach>
 
-  <c:choose>
+    <c:choose>
     <c:when test="${currentPage ge totalPages}">
-      <!-- 클릭 불가하지만 자리 유지 -->
       <div class="page-img-box disabled" aria-disabled="true" role="button">
         <img src="<c:url value='/assets/asset/right.svg'/>" alt="" aria-hidden="true" />
       </div>
@@ -318,13 +314,10 @@
             <img src="<c:url value='/assets/asset/right.svg'/>" alt="다음" />
           </a>
     </c:otherwise>
-  </c:choose>
-
+    </c:choose>
 </div>
 
-
 <jsp:include page="/WEB-INF/views/asset/assetModal.jsp"/>
-록
 
 <!-- 자산등록 모달 -->
 <div class="modal" id="assetRegisterModal">
@@ -371,10 +364,8 @@
                             </div>
 
                             <input class="modal-image-input" id="assetImageName" placeholder="파일을 선택하세요" readonly />
-                            <!-- 서버가 돌려준 접근 URL 저장(필요 시 폼 제출할 값) -->
                             <input type="hidden" id="assetImageUrl" name="imageUrl" />
 
-                            <!-- 실제 파일 인풋(숨김) -->
                             <input type="file" id="assetImageInput" accept="image/*" style="display:none" />
                         </div>
                 </div>
@@ -461,7 +452,6 @@
             </div>
         </div>
 
-
         <div class="detail-part-container">
           <div class="detail-part-title-box">
             <h3>부품</h3>
@@ -473,7 +463,6 @@
                 <strong>${part.name}</strong>
               </div>
 
-              <!-- Body (처음에는 숨김) -->
               <div class="detail-part-info-body">
                 <div class="detail-part-top-container">
                   <div>
@@ -568,7 +557,6 @@
                 <span class="subtitle">종류</span>
               </div>
 
-              <!-- Body (처음에는 숨김) -->
               <div class="edit-part-info-body">
                 <div class="edit-part-top-container">
                   <div>
@@ -604,22 +592,16 @@
         <div class="edit-modal-edit-btn">수정</div>
         <div class="edit-modal-cancel-btn">닫기</div>
     </div>
-
   </div>
 </div>
-
-
-
 
 <!-- 모달 include (하드코딩된 UI만) -->
  <jsp:include page="/WEB-INF/views/maintenance/inspectionApplyModal.jsp" />
 
-
-	<!-- 모달 넣을 자리 -->
+<!-- 모달 넣을 자리 -->
 <div id="modal-container"></div>
 
 <script>
-
 
 (function searchWiring(){
   const select = document.querySelector('.search-select');
@@ -652,9 +634,6 @@
   if (select && [...select.options].some(o => o.value === uiVal)) select.value = uiVal;
 })();
 
-
-
-/* ==================== 모달 동작 ==================== */
 (function modalWiring() {
   const modal        = document.getElementById("assetRegisterModal");
   const openBtn      = document.getElementById("openRegisterModal");
@@ -720,7 +699,6 @@
   });
 })();
 
-/* ==================== 파일 업로드(사진첨부) ==================== */
 (function fileUploadWiring() {
   const pickBtn = document.getElementById('openImagePicker');
   const fileInp = document.getElementById('assetImageInput');
@@ -755,8 +733,8 @@
   if (cancelBtn) cancelBtn.addEventListener('click', clearFile);
 })();
 
-/* ==================== 기간 문자열 → 시간(정수) ==================== */
 const DURATION_BASE = { hoursPerDay: 24, daysPerWeek: 7, daysPerMonth: 30, daysPerYear: 365 };
+
 function parseDurationToHours(s) {
   if (!s) return 0;
   const str = String(s).trim();
@@ -790,7 +768,6 @@ function parseDurationToHours(s) {
 (function registerSubmitWiring() {
   const submitBtn = document.querySelector('#assetRegisterModal .confirm-btn');
 
-  // 간단한 에러 표시/해제 유틸
   function clearErrors() {
     document.querySelectorAll('#assetRegisterModal .is-invalid').forEach(el=>{
       el.classList.remove('is-invalid');
@@ -812,7 +789,6 @@ function parseDurationToHours(s) {
     e.preventDefault();
     clearErrors();
 
-    // 필드 참조
     const categoryEl = document.querySelector('#assetRegisterModal .modal-category-container .modal-input');
     const companyEl  = document.querySelector('#assetRegisterModal .modal-company-container .modal-input');
     const modelEl    = document.querySelector('#assetRegisterModal .modal-model-container .modal-input');
@@ -825,7 +801,6 @@ function parseDurationToHours(s) {
     const cycleStr  = cycleEl?.value?.trim();
     const imageUrl  = imgUrlEl?.value?.trim();
 
-    // ===== 유효성 검사(전부 필수) =====
     let firstInvalid = null;
 
     if (!category){ markError(categoryEl, '종류는 필수입니다.'); firstInvalid = firstInvalid || categoryEl; }
@@ -848,10 +823,8 @@ function parseDurationToHours(s) {
       firstInvalid = firstInvalid || nameInp;
     }
 
-    // 부품(최소 1개, 각 행 이름/주기 모두 필수)
     const rows = document.querySelectorAll('#partList .modal-part-info-container');
     if (!rows.length){
-      // row가 없다면 기본 1개 추가
       document.getElementById('addPartBtn')?.click();
     }
     const validParts = [];
@@ -871,7 +844,6 @@ function parseDurationToHours(s) {
       }
     });
 
-    // 에러가 있으면 중단
     if (firstInvalid){
       focusScroll(firstInvalid);
       showAssetError('모두 항목이 필수 입력입니다.');
@@ -882,7 +854,6 @@ function parseDurationToHours(s) {
       return;
     }
 
-    // 서버 전송 payload
     const payload = {
       asset: {
         category,
@@ -896,67 +867,56 @@ function parseDurationToHours(s) {
       parts: validParts
     };
 
+    let isSubmitting = false;
 
-// 확인 모달
-let isSubmitting = false;
+    assetModal.confirm({
+      title: "자산 등록",
+      message: "입력한 정보로 등록하시겠습니까?",
+      okText: "등록",
+      cancelText: "취소",
+      onOk: async () => {
+        if (isSubmitting) return false;
+        isSubmitting = true;
 
-assetModal.confirm({
-  title: "자산 등록",
-  message: "입력한 정보로 등록하시겠습니까?",
-  okText: "등록",
-  cancelText: "취소",
-  onOk: async () => {
-    if (isSubmitting) return false;
-    isSubmitting = true;
+        try {
+          payload.parts = Array.from(
+            new Map(payload.parts.map(p => [String(p.partName || '').trim(), p])).values()
+          );
 
-    try {
-      // (중복 파트 제거 – ORA-00001 방지)
-      payload.parts = Array.from(
-        new Map(payload.parts.map(p => [String(p.partName || '').trim(), p])).values()
-      );
+          const headers = { 'Content-Type': 'application/json' };
+          try { Object.assign(headers, typeof getCsrfHeaders === 'function' ? getCsrfHeaders() : {}); } catch(_) {}
 
-      const headers = { 'Content-Type': 'application/json' };
-      try { Object.assign(headers, typeof getCsrfHeaders === 'function' ? getCsrfHeaders() : {}); } catch(_) {}
+          const res = await fetch('<c:url value="/admin/asset/register"/>', {
+            method: 'POST',
+            headers,
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) {
+            const msg = (await res.text()).trim();
+            throw new Error(msg || ('등록 실패 (HTTP ' + res.status + ')'));
+          }
 
-      const res = await fetch('<c:url value="/admin/asset/register"/>', {
-        method: 'POST',
-        headers,
-        credentials: 'same-origin',
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const msg = (await res.text()).trim();
-        throw new Error(msg || ('등록 실패 (HTTP ' + res.status + ')'));
+          try { assetModal.close?.(); } catch (_) {}
+          const regModal = document.getElementById('assetRegisterModal');
+          if (regModal) regModal.style.display = 'none';
+          document.body.classList.remove('modal-open');
+          document.body.style.paddingRight = '';
+
+          window.location.replace(window.location.pathname + window.location.search);
+
+          return true;
+        } catch (err) {
+          try { assetModal.close?.(); } catch (_) {}
+          (typeof showAssetError === 'function' ? showAssetError : alert)('등록 중 오류: ' + err.message);
+          return false;
+        } finally {
+          isSubmitting = false;
+        }
       }
-
-      // ===== 성공: 모달/오버레이 정리 =====
-      try { assetModal.close?.(); } catch (_) {}
-      const regModal = document.getElementById('assetRegisterModal');
-      if (regModal) regModal.style.display = 'none';
-      document.body.classList.remove('modal-open');
-      document.body.style.paddingRight = '';
-
-      // ===== 안내 후 하드 리로드 =====
-      window.location.replace(window.location.pathname + window.location.search);
-
-      return true;
-    } catch (err) {
-      try { assetModal.close?.(); } catch (_) {}
-      (typeof showAssetError === 'function' ? showAssetError : alert)('등록 중 오류: ' + err.message);
-      return false;
-    } finally {
-      isSubmitting = false;
-    }
-  }
-});
-
-
-
-
+    });
   });
 })();
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const tbody        = document.querySelector(".asset-table tbody");
@@ -1016,7 +976,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modalEl === editModal)   resetEditModal();
   }
 
-  // ========================= 상세 열기 =========================
   async function openDetailModal(assetId) {
     try {
       closeModal(editModal);
@@ -1064,8 +1023,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const last = formatYmdDot(p.lastMaintenanceDate);
         const mc   = formatHoursToYMDH(p.maintenanceCycle);
 
-
-
         const div = document.createElement("div");
         div.className = "detail-part-info-container collapsed";
         div.innerHTML =
@@ -1095,13 +1052,6 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="detail-part-cancel">닫기</div>';
       partBox.appendChild(btns);
 
-
-
-
-
-
-
-   // 버튼 생성 직후 바로 이벤트 바인딩
   const requestBtn = btns.querySelector('.detail-part-request-btn');
    const cancelBtn = btns.querySelector('.detail-part-cancel');
 
@@ -1114,30 +1064,20 @@ document.addEventListener("DOMContentLoaded", () => {
 	    const modelName = asset.modelName;
 	    const owner =  asset?.owner ? asset.owner : "농촌진흥청";
 
-
-	    // 기존 상세 모달을 먼저 닫기
 	    closeModal(detailModal);
-
-	    // 새로운 점검요청 모달 열기
 
 	    const inspectionModal = $("#inspectionApplyModal");
 	    inspectionModal.removeClass("hidden").css("display","block");
 	    inspectionModal.attr("data-asset-id", assetId); // data 속성에 저장
 	    inspectionModal.attr("data-owner", owner);
-	    
 
 	    $(".apply-input.asset").val(modelName);
 		$(".apply-input.owner").val(owner);
-
 
 	    if (typeof partList === 'function') {
 	        partList(assetId);
 	    }
 	});
-
-
-
-
 
       partBox.querySelectorAll(".toggle-icon").forEach(tg => {
         tg.addEventListener("click", () => {
@@ -1160,7 +1100,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ========================= 수정 열기 =========================
   async function openEditModal(assetId) {
     try {
       closeModal(detailModal);
@@ -1325,139 +1264,132 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("수정 조회 중 오류가 발생했습니다.");
     }
 
-editModal.dataset.assetId = assetId;
+    editModal.dataset.assetId = assetId;
 
-// 별도 스코프(중복 바인딩 방지용)
-{
-  const oldBtn = editModal.querySelector(".edit-modal-edit-btn");
-  const submitBtn = oldBtn.cloneNode(true);
-  oldBtn.parentNode.replaceChild(submitBtn, oldBtn);
+    {
+      const oldBtn = editModal.querySelector(".edit-modal-edit-btn");
+      const submitBtn = oldBtn.cloneNode(true);
+      oldBtn.parentNode.replaceChild(submitBtn, oldBtn);
 
-  submitBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
+      submitBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
 
-    try {
-      const aid = editModal.dataset.assetId || assetId;
+        try {
+          const aid = editModal.dataset.assetId || assetId;
 
-      const res = await fetch("<c:url value='/admin/asset/detail/'/>" + aid, { method: "GET" });
-      if (!res.ok) throw new Error("서버 오류 " + res.status);
-      const { asset, parts } = await res.json();
+          const res = await fetch("<c:url value='/admin/asset/detail/'/>" + aid, { method: "GET" });
+          if (!res.ok) throw new Error("서버 오류 " + res.status);
+          const { asset, parts } = await res.json();
 
-      const origAssetCycle = Number(asset?.maintenanceCycle ?? 0);
-      const origCount      = Array.isArray(parts) ? parts.length : 0;
+          const origAssetCycle = Number(asset?.maintenanceCycle ?? 0);
+          const origCount      = Array.isArray(parts) ? parts.length : 0;
 
-      let assetCycleChanged = false;
-      let partCyclesChanged = false;
-      let imageChanged = false;
+          let assetCycleChanged = false;
+          let partCyclesChanged = false;
+          let imageChanged = false;
 
-      const origImagePath = asset?.imagePath || "";
-      const mergedParts = Array.isArray(parts) ? [...parts] : [];
+          const origImagePath = asset?.imagePath || "";
+          const mergedParts = Array.isArray(parts) ? [...parts] : [];
 
-      // 자산 점검주기 변경 반영
-      const assetCycleInput = editModal.querySelector("[data-edit-input='maintenanceCycle']");
-      const assetCycleStr   = assetCycleInput?.value?.trim();
-      if (assetCycleStr) {
-        const h = parseDurationToHours(assetCycleStr);
-        if (h > 0) {
-          if (origAssetCycle !== h) assetCycleChanged = true;
-          asset.maintenanceCycle = h;
-        }
-      }
-
-      // 기존 파트 주기 변경 반영
-      const existingRows = editModal.querySelectorAll(".edit-part-info-container");
-      existingRows.forEach((row, idx) => {
-        const inp = row.querySelector("input.edit-part-input");
-        const val = inp?.value?.trim();
-        if (!val) return;
-
-        const h = parseDurationToHours(val);
-        if (h > 0 && mergedParts[idx]) {
-          const before = Number(mergedParts[idx].maintenanceCycle ?? 0);
-          if (before !== h) partCyclesChanged = true;
-          mergedParts[idx].maintenanceCycle = h;
-        }
-      });
-
-      // 새 파트 추가 반영
-      const newPartRows = editModal.querySelectorAll(".modal-part-info-container");
-      newPartRows.forEach(row => {
-        const nameEl  = row.querySelector(".modal-part-input");
-        const cycleEl = row.querySelector(".modal-part-lifecycle-input");
-        const partName = nameEl?.value?.trim();
-        const cycleStr = cycleEl?.value?.trim();
-        if (!partName) return;
-
-        const p = { partName, partStatus: "AVAILABLE", assetId: aid };
-        if (cycleStr) {
-          const h = parseDurationToHours(cycleStr);
-          if (h > 0) p.maintenanceCycle = h;
-        }
-        mergedParts.push(p);
-      });
-
-      const partCountChanged = mergedParts.length !== origCount;
-
-      // 이미지 변경 반영
-      const newImageUrl = document.getElementById("editImageUrl")?.value?.trim();
-      if (newImageUrl && newImageUrl !== origImagePath) {
-        asset.imagePath = newImageUrl;
-        imageChanged = true;
-      }
-
-      const payload = {
-        asset,
-        parts: mergedParts,
-        assetCycleChanged,
-        partCyclesChanged,
-        partCountChanged,
-        imageChanged
-      };
-
-      const anyChange = assetCycleChanged || partCyclesChanged || partCountChanged || imageChanged;
-      if (!anyChange) {
-        assetModal.alert({ title: '자산 수정', message: '변경된 내용이 없습니다.' });
-        return;
-      }
-
-      assetModal.confirm({
-        title: '자산 수정',
-        message: '변경사항을 저장하시겠습니까?',
-        okText: '저장',
-        cancelText: '취소',
-        onOk: async () => {
-          try {
-            // CSRF 헤더 안전 병합
-            const headers = { 'Content-Type': 'application/json' };
-            try { Object.assign(headers, typeof getCsrfHeaders === 'function' ? getCsrfHeaders() : {}); } catch (_) {}
-
-            const postRes = await fetch('<c:url value="/admin/asset/update"/>', {
-              method: 'POST',
-              headers,
-              credentials: 'same-origin',
-              body: JSON.stringify(payload)
-            });
-            if (!postRes.ok) throw new Error(await postRes.text() || '수정 실패');
-
-            // 성공: 모달 닫고 하드 리로드
-            try { assetModal.close?.(); } catch (_) {}
-            if (editModal) editModal.style.display = 'none';
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-            window.location.replace(window.location.pathname + window.location.search);
-            return true;
-          } catch (err) {
-            showAssetError('수정 중 오류가 발생했습니다: ' + err.message);
-            return false;
+          const assetCycleInput = editModal.querySelector("[data-edit-input='maintenanceCycle']");
+          const assetCycleStr   = assetCycleInput?.value?.trim();
+          if (assetCycleStr) {
+            const h = parseDurationToHours(assetCycleStr);
+            if (h > 0) {
+              if (origAssetCycle !== h) assetCycleChanged = true;
+              asset.maintenanceCycle = h;
+            }
           }
+
+          const existingRows = editModal.querySelectorAll(".edit-part-info-container");
+          existingRows.forEach((row, idx) => {
+            const inp = row.querySelector("input.edit-part-input");
+            const val = inp?.value?.trim();
+            if (!val) return;
+
+            const h = parseDurationToHours(val);
+            if (h > 0 && mergedParts[idx]) {
+              const before = Number(mergedParts[idx].maintenanceCycle ?? 0);
+              if (before !== h) partCyclesChanged = true;
+              mergedParts[idx].maintenanceCycle = h;
+            }
+          });
+
+          const newPartRows = editModal.querySelectorAll(".modal-part-info-container");
+          newPartRows.forEach(row => {
+            const nameEl  = row.querySelector(".modal-part-input");
+            const cycleEl = row.querySelector(".modal-part-lifecycle-input");
+            const partName = nameEl?.value?.trim();
+            const cycleStr = cycleEl?.value?.trim();
+            if (!partName) return;
+
+            const p = { partName, partStatus: "AVAILABLE", assetId: aid };
+            if (cycleStr) {
+              const h = parseDurationToHours(cycleStr);
+              if (h > 0) p.maintenanceCycle = h;
+            }
+            mergedParts.push(p);
+          });
+
+          const partCountChanged = mergedParts.length !== origCount;
+
+          const newImageUrl = document.getElementById("editImageUrl")?.value?.trim();
+          if (newImageUrl && newImageUrl !== origImagePath) {
+            asset.imagePath = newImageUrl;
+            imageChanged = true;
+          }
+
+          const payload = {
+            asset,
+            parts: mergedParts,
+            assetCycleChanged,
+            partCyclesChanged,
+            partCountChanged,
+            imageChanged
+          };
+
+          const anyChange = assetCycleChanged || partCyclesChanged || partCountChanged || imageChanged;
+          if (!anyChange) {
+            assetModal.alert({ title: '자산 수정', message: '변경된 내용이 없습니다.' });
+            return;
+          }
+
+          assetModal.confirm({
+            title: '자산 수정',
+            message: '변경사항을 저장하시겠습니까?',
+            okText: '저장',
+            cancelText: '취소',
+            onOk: async () => {
+              try {
+                const headers = { 'Content-Type': 'application/json' };
+                try { Object.assign(headers, typeof getCsrfHeaders === 'function' ? getCsrfHeaders() : {}); } catch (_) {}
+
+                const postRes = await fetch('<c:url value="/admin/asset/update"/>', {
+                  method: 'POST',
+                  headers,
+                  credentials: 'same-origin',
+                  body: JSON.stringify(payload)
+                });
+                if (!postRes.ok) throw new Error(await postRes.text() || '수정 실패');
+
+                try { assetModal.close?.(); } catch (_) {}
+                if (editModal) editModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                document.body.style.paddingRight = '';
+                window.location.replace(window.location.pathname + window.location.search);
+                return true;
+              } catch (err) {
+                showAssetError('수정 중 오류가 발생했습니다: ' + err.message);
+                return false;
+              }
+            }
+          });
+        } catch (err) {
+          showAssetError('수정 준비 중 오류가 발생했습니다: ' + err.message);
         }
       });
-    } catch (err) {
-      showAssetError('수정 준비 중 오류가 발생했습니다: ' + err.message);
-    }
-  });
-} // ← 스코프 블록 닫힘
-} // ← openEditModal 함수 닫힘
+   }
+}
 
 
   tbody.addEventListener("click", (e) => {
@@ -1487,7 +1419,6 @@ editModal.dataset.assetId = assetId;
   });
 });
 
-
 function redirectWith(mutator){
   const url = new URL(location.href);
   mutator(url.searchParams);
@@ -1505,9 +1436,8 @@ function redirectWith(mutator){
 
     function applySingle(key, val){
       redirectWith(sp=>{
-        // '전체' 선택 시 해당 키 제거, 그 외에는 '치환'
         if (!val || val === 'all') sp.delete(key);
-        else sp.set(key, val);   // ← 핵심: 기존 append 대신 set 사용
+        else sp.set(key, val);
       });
     }
 
@@ -1542,7 +1472,6 @@ document.getElementById('resetFiltersBtn')?.addEventListener('click', ()=>{
   redirectWith(sp=> keys.forEach(k=>sp.delete(k)));
 });
 
-
 (function wireServerCsvExport(){
   const btn = document.querySelector('.download-btn');
   if (!btn) return;
@@ -1557,7 +1486,6 @@ document.getElementById('resetFiltersBtn')?.addEventListener('click', ()=>{
   });
 })();
 
-/* ==================== 날짜 → "YYYY.MM.DD" ==================== */
 function formatYmdDot(value) {
   if (value == null) return "";
 
@@ -1690,7 +1618,6 @@ function formatHoursToYMDH(value) {
       cancelText: '취소',
       bgClose: false,
       onOk: () => {
-        // 필요 시 fetch로도 가능
         form.submit();
       }
     });
@@ -1743,7 +1670,6 @@ function formatHoursToYMDH(value) {
         label.textContent = opt.text;
         label.dataset.value = String(opt.value);
 
-        // 원본 select 동기화 + change 발생 (필터/검색 로직 그대로 실행됨)
         select.value = opt.value;
         select.dispatchEvent(new Event("change", { bubbles:true }));
 
@@ -1753,14 +1679,12 @@ function formatHoursToYMDH(value) {
         chev.src = ICON_DOWN;
       });
       menu.appendChild(li);
-      btn.setAttribute("aria-expanded", "false");  // 메뉴 닫힘 반영
+      btn.setAttribute("aria-expanded", "false");
     });
 
-    // 원본 select는 숨김
     select.classList.add("sr-only");
     select.tabIndex = -1;
 
-    // DOM 배치
     select.parentNode.insertBefore(wrap, select);
     wrap.appendChild(select);
     wrap.appendChild(box);
@@ -1771,16 +1695,13 @@ function formatHoursToYMDH(value) {
   function enhanceAll(){
     document.querySelectorAll(SELECTOR).forEach(enhanceOne);
 
-    // 열기/닫기(바깥 클릭 닫기)는 공통 유틸 사용
     initDropdown(".asset-container", ".dropdown-toggle", ".dropdown-menu");
 
     $(document).on("click", ".asset-container .dropdown-toggle", function(){
       const open = $(this).siblings(".dropdown-menu").is(":visible");
-      // 클릭 순간의 보임상태(open)를 읽어 반대로 셋팅
       this.setAttribute("aria-expanded", String(!open));
     });
 
-    // 외부에서 select 값 바꾸면 라벨/활성 상태 동기화
     document.querySelectorAll(SELECTOR).forEach(sel=>{
       sel.addEventListener("change", ()=>{
         const wrap = sel.closest(".custom-dropdown");

@@ -70,7 +70,6 @@
             AND COMPANY = #{company}
         </if>
 
-        <!-- 교체 후: 'all'일 때만 OR 검색. 'location'은 여기서 건들지 않음 -->
         <if test="keywordLike != null and keywordLike != ''">
             <choose>
                 <when test="field == 'category'">
@@ -86,7 +85,6 @@
                     AND UPPER(STATUS)   LIKE UPPER(#{keywordLike}) ESCAPE '\'
                 </when>
 
-                <!-- all(전체) 검색일 때만 묶어서 OR -->
                 <when test="field == null or field == '' or field == 'all'">
                     AND (
                     UPPER(CATEGORY) LIKE UPPER(#{keywordLike}) ESCAPE '\'
@@ -95,11 +93,8 @@
                     OR UPPER(STATUS)   LIKE UPPER(#{keywordLike}) ESCAPE '\'
                     )
                 </when>
-
-                <!-- field == 'location'은 여기서 조건 추가하지 않음 (findAllPaged/countAll에서 처리) -->
             </choose>
         </if>
-
     </sql>
 
     <select id="countAll" resultType="int">
@@ -127,8 +122,6 @@
         </where>
     </select>
 
-
-    <!-- 교체: findAllPaged -->
     <select id="findAllPaged" resultMap="AssetDtoResultMap">
         SELECT *
         FROM (
@@ -147,11 +140,9 @@
         <include refid="AssetFilters"/>
         ) t
         <where>
-            <!-- 필터 드롭다운으로 넘긴 location=값 -->
             <if test="location != null and location != ''">
                 AND t.location = #{location}
             </if>
-            <!-- 상단 검색창: field=location & keyword -->
             <if test="field == 'location' and keywordLike != null and keywordLike != ''">
                 AND UPPER(t.location) LIKE UPPER(#{keywordLike}) ESCAPE '\'
             </if>
@@ -160,9 +151,6 @@
         WHERE rn BETWEEN #{startRow} AND #{endRow}
         ORDER BY rn
     </select>
-
-
-
 
     <select id="findAll" resultMap="AssetResultMap">
         SELECT *
@@ -260,10 +248,6 @@
         </foreach>
         SELECT 1 FROM DUAL
     </insert>
-
-
-
-
 
     <update id="updateAsset">
         UPDATE asset

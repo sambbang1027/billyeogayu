@@ -34,20 +34,16 @@ public class AssetController {
     public String redirectToList() {
         return "redirect:/admin/asset/list";
     }
-    
 
     @GetMapping("/list")
     public String asset(@RequestParam(name = "assetStatus", required = false) String assetStatus,
                         @RequestParam(name = "category",     required = false) String category,
                         @RequestParam(name = "company",      required = false) String company,
                         @RequestParam(name = "location",     required = false) String location,
-
                         @RequestParam(name = "field",   required = false) String field,
                         @RequestParam(name = "keyword", required = false) String keyword,
-
                         @RequestParam(name = "page",     defaultValue = "1")  int page,
                         @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-
                         Model model) {
 
         String kwLike = toLikePattern(keyword);
@@ -61,11 +57,9 @@ public class AssetController {
         int startRow = (page - 1) * pageSize + 1;
         int endRow   = page * pageSize;
 
-        // 목록 조회
         List<AssetDto> pageList =
                 assetService.findAssetsPaged(assetStatus, category, company, location, field, kwLike, startRow, endRow);
 
-        // 필터 옵션 데이터
         var opts = assetService.loadFilterOptions();
         model.addAttribute("categories", opts.getCategories());
         model.addAttribute("companies",  opts.getCompanies());
@@ -139,7 +133,6 @@ public class AssetController {
                 throw new IllegalArgumentException("파일이 비어 있습니다.");
             }
 
-            // uuid 기반 파일명 만들기
             String original = file.getOriginalFilename();
             String extension = "";
             if (original != null && original.contains(".")) {
@@ -152,7 +145,6 @@ public class AssetController {
             Files.createDirectories(repoDir);
             Path repoDest = repoDir.resolve(fileName);
 
-            // 런타임 경로에 저장
             String realBase = request.getServletContext().getRealPath("/static/model-image");
             Path deployDir = (realBase != null) ? Paths.get(realBase) : null;
             if (deployDir != null) Files.createDirectories(deployDir);
@@ -165,7 +157,6 @@ public class AssetController {
                 Files.copy(repoDest, deployDest, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // 프로젝트 경로에 저장
             String fileUrl = "/static/model-image/" + fileName;
 
             result.put("success", true);
@@ -199,7 +190,6 @@ public class AssetController {
         int totalPages = Math.max(1, (int)Math.ceil(totalCount / (double)chunkSize));
 
         DownloadCSV.send(resp, "자원리스트.csv", csv -> {
-            // UI 순서와 동일: 종류, 제조사, 모델명, 소유자, 사용시간, 위치, 점검 예정일, 상태
             csv.header("No","종류","제조사","모델명","소유자","사용시간","위치","점검 예정일","상태");
 
             int seq = 0;
@@ -255,7 +245,6 @@ public class AssetController {
         };
     }
 
-    /** LIKE 안전 패턴: \, %, _ 이스케이프 + 앞뒤 % 붙임 */
     private static String toLikePattern(String raw) {
         if (raw == null) return null;
         String s = raw.trim();
@@ -267,7 +256,6 @@ public class AssetController {
         return "%" + s + "%";
     }
 
-    /** 프로젝트 루트 계산: 실행 위치가 달라도 '…/src/…'를 찾을 때까지 상위로 타고 올라감 */
     private String projectRoot() {
         Path cur = Paths.get("").toAbsolutePath();
         Path p = cur;
@@ -275,7 +263,6 @@ public class AssetController {
             if (Files.exists(p.resolve("src"))) return p.toString();
             p = p.getParent();
         }
-        // 그래도 못 찾으면 현재 디렉터리 반환(로컬 IDE 실행이면 대개 루트가 맞음)
         return cur.toString();
     }
 }

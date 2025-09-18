@@ -1,4 +1,3 @@
-<!-- 공통 자산 모달 -->
 <%-- 작성자 : 김민호 --%>
 <div
   class="asset-modal hidden"
